@@ -28,7 +28,6 @@ rule[
 
 	]
 	right[
-
 		node [ id 3  label "C+"]
 		node [ id 11  label "O-"]
 	]
