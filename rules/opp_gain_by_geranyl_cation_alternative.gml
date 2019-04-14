@@ -1,5 +1,5 @@
 rule[
-	ruleID	"Diphosphate capture by geranyl cation alternative"
+	ruleID	"Diphosphate capture by geranyl cation (alternative)"
 	left[
 		node [ id  3  label "C+"]
 		node [ id 11  label "O-"]
