@@ -15,7 +15,7 @@ rule[
 		node [ id  9  label "C"]
 		node [ id 10  label "C"]
 		edge [ source 1 target 2 label "=" ]
-		edge [ source 2 target 3 label "=" ]
+		edge [ source 2 target 3 label "-" ]
 		edge [source 3 target  4 label "-"]
 		edge [source 4 target  5 label "-"]
 		edge [source 5 target  6 label "-"]
