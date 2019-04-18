@@ -1,16 +1,17 @@
 rule[
-	ruleID	"3,7 - closure"
+	ruleID	"Bornyl diphosphate"
 	left[
-		node [ id 2  label "C"]
-		node [ id 7  label "C+"]
-		edge [source 2 target 3 label "="]	
+
+			node [ id  2  label "C+"]
 	]
 	context[
+
 		node [ id  1  label "C"]
 		node [ id  3  label "C"]
 		node [ id  4  label "C"]
 		node [ id  5  label "C"]
 		node [ id  6  label "C"]
+		node [ id  7  label "C"]
 		node [ id  8  label "C"]
 		node [ id  9  label "C"]
 		node [ id 10  label "C"]
@@ -23,11 +24,14 @@ rule[
 		edge [source 7 target  8 label "-"]
 		edge [source 7 target  9 label "-"]
 		edge [source 3 target 10 label "-"]
+
 	]
 	right[
-		node [ id 2  label "C+"]
-		node [ id 7  label "C"]
-		edge [source 2 target 3 label "-"]
-		edge [source 3 target 7 label "-"]
+
+
+		node [ id  2  label "C"]
+		node [ id  12  label "O"]
+		edge [source 2 target 12 label "-"]
+
 	]
 ]
