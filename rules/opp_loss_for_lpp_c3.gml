@@ -5,6 +5,7 @@ rule[
 		node [ id 11  label "O"]
 		edge [ source 1 target 2 label "=" ]
 		edge [ source 3 target 11 label "-"]	
+		edge [source 2 target  3 label "-"]
 	]
 	context[
 		node [ id  2  label "C"]
@@ -16,7 +17,6 @@ rule[
 		node [ id  8  label "C"]
 		node [ id  9  label "C"]
 		node [ id 10  label "C"]
-		edge [source 2 target  3 label "-"]
 		edge [source 3 target  4 label "-"]
 		edge [source 4 target  5 label "-"]
 		edge [source 5 target  6 label "-"]
@@ -30,5 +30,6 @@ rule[
 		node [ id  1  label "C+"]
 		node [ id 11  label "O-"]
 		edge [ source 1 target 2 label "-" ]
+		edge [source 2 target  3 label "="]
 	]
 ]
