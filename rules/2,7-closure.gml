@@ -7,7 +7,7 @@ rule[
 	]
 	context[
 		node [ id  1  label "C"]
-		node [ id  3  label "C"]
+		node [ id  2  label "C"]
 		node [ id  4  label "C"]
 		node [ id  5  label "C"]
 		node [ id  6  label "C"]
