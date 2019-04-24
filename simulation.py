@@ -24,6 +24,8 @@ gppCation = smiles("C([CH2+])=C(C)CCC=C(C)C", "geranyl cation C1+")
 ######################################
 # TARGET MOLECULES
 ######################################
+alphaTerpinol = smiles("CC1=CCC(CC1)C(C)(C)O", "alpha-terpinol")
+
 
 ######################################
 # RULES
@@ -39,6 +41,8 @@ r06 = ruleGML('opp_gain_by_geranyl_cation.gml')
 r07 = ruleGML('opp_loss_for_lpp_c3.gml')
 r08 = ruleGML('opp_loss_for_lpp_c3_alternative.gml')
 r09 = ruleGML('1-6-closure.gml')
+r10 = ruleGML('3,7-closure.gml')
+r11 = ruleGML('2,7-closure.gml')
 popFilePrefix()
 
 
@@ -60,7 +64,7 @@ def countCycs(a):
         return a.numEdges - a.numVertices + 1
 
 # a general breadth-first expansion strategy
-strat = (addSubset(eductMols) >> repeat[6](inputRules))
+strat = (addSubset(eductMols) >> repeat[7](inputRules))
 
 # calculate derivation graph (hypergraph)
 dg = dgRuleComp(inputGraphs, strat, ls)
