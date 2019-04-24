@@ -1,7 +1,13 @@
 # TCC Daniela
 
-## 20-FEV-2019
+Objetivo
 
-* Representar os grafos como matrizes binarias
-* Criar algoritmo para comparar diagonais sup/inf das matrizes
-* Analise do algoritmo de comparacao
+* Simular a biossíntese de monoterpenos em espécies de Milho (Zea mays)
+
+Objetivos específicos
+
+* Escrever regras de gramática de grafos para transformações químicas a partir do Geranyl Diphosphato
+* Escrever simulações da biossíntese a partir das regras escritas, utilizando diferentes estratégias de derivação 
+* Armazenar os resultados em banco de dados
+* Criar queries no banco para responder a questõs biológicas relevantes
+* Criar um sistema Web para consulta utilizando as queries construídas
