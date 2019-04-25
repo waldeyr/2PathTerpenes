@@ -21,7 +21,7 @@ opp = graphDFS("OP(O)(OP(O)([O-])=O)=O", "OPP-")
 gppCationC1 = smiles("C([CH2+])=C(C)CCC=C(C)C", "geranyl cation C1+")
 gppCationC3 = smiles("C(CC[C+](C=C)C)=C(C)C","geranyl cation C3+")
 alfaTerpinylCation = smiles ("C1CC(CCC=1C)[C+](C)C", "alfa terpinyl cation")
-alfaTerpinol = smiles ("(CO)=C(C)CCC=C(C)C", "alfa terpinol")
+alfaTerpinol = smiles ("C(CO)=C(C)CCC=C(C)C", "alfa terpinol")
 ######################################
 # TARGET MOLECULES
 ######################################
