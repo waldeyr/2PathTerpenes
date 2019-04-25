@@ -20,6 +20,7 @@ opp = graphDFS("OP(O)(OP(O)([O-])=O)=O", "OPP-")
 ######################################
 gppCationC1 = smiles("C([CH2+])=C(C)CCC=C(C)C", "geranyl cation C1+")
 gppCationC3 = smiles("C(CC[C+](C=C)C)=C(C)C","geranyl cation C3+")
+lpp = smiles("C(C(C)(CCC=C(C)C)OP(OP(O)(O)=O)(O)=O)=C", "linalyl diphosphate")
 alfaTerpinylCation = smiles ("C1CC(CCC=1C)[C+](C)C", "alfa terpinyl cation")
 alfaTerpinol = smiles ("C(CO)=C(C)CCC=C(C)C", "alfa terpinol")
 ######################################
@@ -54,7 +55,7 @@ popFilePrefix()
 # DEFINE LIST OF INITIAL INPUTS
 ######################################
 #eductMols = [gpp,H2O]
-eductMols = [gppCationC1,H2O]
+eductMols = [gppCationC3,opp]
 
 ######################################
 # HYPERGRAPH GENERATION
