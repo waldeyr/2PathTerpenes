@@ -18,14 +18,14 @@ opp = graphDFS("OP(O)(OP(O)([O-])=O)=O", "OPP-")
 ######################################
 # CATIONS
 ######################################
-gppCation = smiles("C([CH2+])=C(C)CCC=C(C)C", "geranyl cation C1+")
-
+gppCationC1 = smiles("C([CH2+])=C(C)CCC=C(C)C", "geranyl cation C1+")
+gppCationC3 = smiles("C(CC[C+](C=C)C)=C(C)C","geranyl cation C3+")
 
 ######################################
 # TARGET MOLECULES
 ######################################
 alphaTerpinol = smiles("CC1=CCC(CC1)C(C)(C)O", "alpha-terpinol")
-
+limonene = smiles ("CC1=CCC(CC1)C(=C)C","limonene")
 
 ######################################
 # RULES
@@ -43,13 +43,17 @@ r08 = ruleGML('opp_loss_for_lpp_c3_alternative.gml')
 r09 = ruleGML('1-6-closure.gml')
 r10 = ruleGML('3,7-closure.gml')
 r11 = ruleGML('2,7-closure.gml')
+r12 = ruleGML('WMshift.gml')
+r13 = ruleGML('1-8-cyc.gml')
+r14 = ruleGML('2-6-closure.gml')
 popFilePrefix()
 
 
 ######################################
 # DEFINE LIST OF INITIAL INPUTS
 ######################################
-eductMols = [gpp,H2O]
+#eductMols = [gpp,H2O]
+eductMols = [gppCationC1,H2O]
 
 ######################################
 # HYPERGRAPH GENERATION
@@ -64,7 +68,7 @@ def countCycs(a):
         return a.numEdges - a.numVertices + 1
 
 # a general breadth-first expansion strategy
-strat = (addSubset(eductMols) >> repeat[7](inputRules))
+strat = (addSubset(eductMols) >> repeat[1](inputRules))
 
 # calculate derivation graph (hypergraph)
 dg = dgRuleComp(inputGraphs, strat, ls)
