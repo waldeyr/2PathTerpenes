@@ -24,14 +24,18 @@ lpp = smiles("C(C(C)(CCC=C(C)C)OP(OP(O)(O)=O)(O)=O)=C", "linalyl diphosphate")
 alfaTerpinylCation = smiles ("C1CC(CCC=1C)[C+](C)C", "alfa terpinyl cation")
 alfaTerpinol = smiles ("C(CO)=C(C)CCC=C(C)C", "alfa terpinol")
 phellandrylCation = smiles ("C1(C)CCC(C(C)C)[CH+]C=1","Phellandryl Cation")
-pinylCation = smiles (" C[C+]1CCC2CC1C2(C)C", "Pinyl Cation")
+pinylCation = smiles ("C[C+]1CCC2CC1C2(C)C", "Pinyl Cation")
 bornilCation = smiles ("CC12CCC(C[CH+]1)C2(C)C", "Bornyl Cation")
+penchylCation = smiles ("CC12CC(CC1)C(C)(C)[CH+]2","PenchylCation")
 ######################################
 # TARGET MOLECULES
 ######################################
 alphaTerpinol = smiles("CC1=CCC(CC1)C(C)(C)O", "alpha-terpinol")
 limonene = smiles ("CC1=CCC(CC1)C(=C)C","limonene")
 terpinolene = smiles ("C1CC(CCC=1C)=C(C)C","terpinolene")
+betaPinene = smiles ("CC1(C2CCC(=C)C1C2)C","Beta Pinene")
+alfaPinene = smiles ("C1CC2CC(C=1C)C2(C)C","Alfa Pinene")
+
 ######################################
 # RULES
 ######################################
@@ -58,7 +62,7 @@ popFilePrefix()
 # DEFINE LIST OF INITIAL INPUTS
 ######################################
 #eductMols = [gpp,H2O]
-eductMols = [alfaTerpinylCation]
+eductMols = [pinylCation]
 
 ######################################
 # HYPERGRAPH GENERATION
@@ -77,6 +81,7 @@ strat = (addSubset(eductMols) >> repeat[1](inputRules))
 
 # calculate derivation graph (hypergraph)
 dg = dgRuleComp(inputGraphs, strat, ls)
+
 dg.calc()
 
 ######################################
@@ -85,6 +90,7 @@ dg.calc()
 p = DGPrinter()
 # print molecule with all the hydrogenes attached
 p.graphPrinter.collapseHydrogens = True
+p.graphPrinter.withIndex = True
 # color molecules with rings red, charged molecules blue
 p.pushVertexColour(lambda g, dg: "red" if overallCharge(g) != 0 else "black" if countCycs(g) > 0 else "black")
 
