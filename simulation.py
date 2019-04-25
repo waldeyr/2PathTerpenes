@@ -18,17 +18,20 @@ opp = graphDFS("OP(O)(OP(O)([O-])=O)=O", "OPP-")
 ######################################
 # CATIONS
 ######################################
-gppCationC1 = smiles("C([CH2+])=C(C)CCC=C(C)C", "geranyl cation C1+")
-gppCationC3 = smiles("C(CC[C+](C=C)C)=C(C)C","geranyl cation C3+")
+gCationC1 = smiles("C([CH2+])=C(C)CCC=C(C)C", "geranyl cation C1+")
+gCationC3 = smiles("C(CC[C+](C=C)C)=C(C)C","geranyl cation C3+")
 lpp = smiles("C(C(C)(CCC=C(C)C)OP(OP(O)(O)=O)(O)=O)=C", "linalyl diphosphate")
 alfaTerpinylCation = smiles ("C1CC(CCC=1C)[C+](C)C", "alfa terpinyl cation")
 alfaTerpinol = smiles ("C(CO)=C(C)CCC=C(C)C", "alfa terpinol")
+phellandrylCation = smiles ("C1(C)CCC(C(C)C)[CH+]C=1","Phellandryl Cation")
+pinylCation = smiles (" C[C+]1CCC2CC1C2(C)C", "Pinyl Cation")
+bornilCation = smiles ("CC12CCC(C[CH+]1)C2(C)C", "Bornyl Cation")
 ######################################
 # TARGET MOLECULES
 ######################################
 alphaTerpinol = smiles("CC1=CCC(CC1)C(C)(C)O", "alpha-terpinol")
 limonene = smiles ("CC1=CCC(CC1)C(=C)C","limonene")
-
+terpinolene = smiles ("C1CC(CCC=1C)=C(C)C","terpinolene")
 ######################################
 # RULES
 ######################################
@@ -55,7 +58,7 @@ popFilePrefix()
 # DEFINE LIST OF INITIAL INPUTS
 ######################################
 #eductMols = [gpp,H2O]
-eductMols = [gppCationC3,opp]
+eductMols = [alfaTerpinylCation]
 
 ######################################
 # HYPERGRAPH GENERATION
