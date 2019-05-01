@@ -36,6 +36,7 @@ terpinolene = smiles ("C1CC(CCC=1C)=C(C)C","terpinolene")
 betaPinene = smiles ("CC1(C2CCC(=C)C1C2)C","Beta Pinene")
 alfaPinene = smiles ("C1CC2CC(C=1C)C2(C)C","Alfa Pinene")
 car3Ene = smiles ("C1CC2C(C)(C)[CH2]2CC=1C","Car-3-ene")
+fenchol = smiles ("CC1(C)C(C2(C)CCC1C2)O","Fenchol")
 ######################################
 # RULES
 ######################################
@@ -63,7 +64,7 @@ popFilePrefix()
 # DEFINE LIST OF INITIAL INPUTS
 ######################################
 #eductMols = [gpp,H2O]
-eductMols = [alfaTerpinylCation]
+eductMols = [penchylCation,H2O]
 
 ######################################
 # HYPERGRAPH GENERATION
