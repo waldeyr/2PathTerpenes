@@ -25,7 +25,7 @@ alfaTerpinylCation = smiles ("C1CC(CCC=1C)[C+](C)C", "alfa terpinyl cation")
 #alfaTerpinol = smiles ("C(CO)=C(C)CCC=C(C)C", "alfa terpinol")
 phellandrylCation = smiles ("C1(C)CCC(C(C)C)[CH+]C=1","Phellandryl Cation")
 pinylCation = smiles ("C[C+]1CCC2CC1C2(C)C", "Pinyl Cation")
-bornilCation = smiles ("CC12CCC(C[CH+]1)C2(C)C", "Bornyl Cation")
+bornylCation = smiles ("CC12CCC(C[CH+]1)C2(C)C", "Bornyl Cation")
 penchylCation = smiles ("CC12CC(CC1)C(C)(C)[CH+]2","Penchyl Cation")
 isocamphylCation = smiles ("C[C+]1C2CCC(C2)C1(C)C", "Isocamphyl Cation")
 ######################################
@@ -39,6 +39,7 @@ alfaPinene = smiles ("C1CC2CC(C=1C)C2(C)C","Alfa Pinene")
 car3Ene = smiles ("C1CC2C(C)(C)[CH2]2CC=1C","Car-3-ene")
 fenchol = smiles ("CC1(C)C(C2(C)CCC1C2)O","Fenchol")
 camphene = smiles("CC1(C2CCC(C2)C1=C)C","Camphene")
+bornylDisphophate = smiles ("CC1(C)C2CC(C1(C)CC2)OP(OP(O)(O)=O)(O)=O", "Bornyl Diphosphate")
 ######################################
 # RULES
 ######################################
@@ -59,6 +60,7 @@ r12 = ruleGML('WMshift.gml')
 r13 = ruleGML('1-8-cyc.gml')
 r14 = ruleGML('2-6-closure.gml')
 r15 = ruleGML('5-7-closure.gml')
+r16 = ruleGML ('opp_gain_by_bornyl_cation.gml')
 popFilePrefix()
 
 
@@ -66,7 +68,7 @@ popFilePrefix()
 # DEFINE LIST OF INITIAL INPUTS
 ######################################
 #eductMols = [gpp,H2O]
-eductMols = [isocamphylCation]
+eductMols = [bornylCation,opp]
 
 ######################################
 # HYPERGRAPH GENERATION
