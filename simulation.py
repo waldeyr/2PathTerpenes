@@ -27,6 +27,7 @@ phellandrylCation = smiles ("C1(C)CCC(C(C)C)[CH+]C=1","Phellandryl Cation")
 pinylCation = smiles ("C[C+]1CCC2CC1C2(C)C", "Pinyl Cation")
 bornilCation = smiles ("CC12CCC(C[CH+]1)C2(C)C", "Bornyl Cation")
 penchylCation = smiles ("CC12CC(CC1)C(C)(C)[CH+]2","Penchyl Cation")
+isocamphylCation = smiles ("C[C+]1C2CCC(C2)C1(C)C", "Isocamphyl Cation")
 ######################################
 # TARGET MOLECULES
 ######################################
@@ -37,6 +38,7 @@ betaPinene = smiles ("CC1(C2CCC(=C)C1C2)C","Beta Pinene")
 alfaPinene = smiles ("C1CC2CC(C=1C)C2(C)C","Alfa Pinene")
 car3Ene = smiles ("C1CC2C(C)(C)[CH2]2CC=1C","Car-3-ene")
 fenchol = smiles ("CC1(C)C(C2(C)CCC1C2)O","Fenchol")
+camphene = smiles("CC1(C2CCC(C2)C1=C)C","Camphene")
 ######################################
 # RULES
 ######################################
@@ -64,11 +66,11 @@ popFilePrefix()
 # DEFINE LIST OF INITIAL INPUTS
 ######################################
 #eductMols = [gpp,H2O]
-eductMols = [penchylCation,H2O]
+eductMols = [isocamphylCation]
 
 ######################################
 # HYPERGRAPH GENERATION
-######################################
+#|#####################################
 
 # comput overall charge of molecule
 def overallCharge(a):
@@ -92,7 +94,7 @@ dg.calc()
 p = DGPrinter()
 # print molecule with all the hydrogenes attached
 p.graphPrinter.collapseHydrogens = True
-p.graphPrinter.withIndex = True
+p.graphPrinter.withIndex = False
 # color molecules with rings red, charged molecules blue
 p.pushVertexColour(lambda g, dg: "red" if overallCharge(g) != 0 else "black" if countCycs(g) > 0 else "black")
 
