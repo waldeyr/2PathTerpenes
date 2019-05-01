@@ -21,7 +21,7 @@ opp = graphDFS("OP(O)(OP(O)([O-])=O)=O", "OPP-")
 gCationC1 = smiles("C([CH2+])=C(C)CCC=C(C)C", "geranyl cation C1+")
 gCationC3 = smiles("C(CC[C+](C=C)C)=C(C)C","geranyl cation C3+")
 lpp = smiles("C(C(C)(CCC=C(C)C)OP(OP(O)(O)=O)(O)=O)=C", "linalyl diphosphate")
-alfaTerpinylCation = smiles ("C1CC(CCC=1C)[C+](C)C", "alfa terpinyl cation")
+alphaTerpinylCation = smiles ("C1CC(CCC=1C)[C+](C)C", "alfa terpinyl cation")
 #alfaTerpinol = smiles ("C(CO)=C(C)CCC=C(C)C", "alfa terpinol")
 phellandrylCation = smiles ("C1(C)CCC(C(C)C)[CH+]C=1","Phellandryl Cation")
 pinylCation = smiles ("C[C+]1CCC2CC1C2(C)C", "Pinyl Cation")
@@ -29,6 +29,8 @@ bornylCation = smiles ("CC12CCC(C[CH+]1)C2(C)C", "Bornyl Cation")
 penchylCation = smiles ("CC12CC(CC1)C(C)(C)[CH+]2","Penchyl Cation")
 isocamphylCation = smiles ("C[C+]1C2CCC(C2)C1(C)C", "Isocamphyl Cation")
 phellandrylCationAlternative= smiles ("C1C(CC[C+](C=1)C)C(C)C","PhellandrylCation Alternative")
+terpinen4YlCation = smiles ("C1C[C+](CCC=1C)C(C)C", "Terpinen-4-yl-cation")
+thujylCation = smiles ("C[C+]1CCC2(CC21)C(C)C","Thujyl Cation")
 ######################################
 # TARGET MOLECULES
 ######################################
@@ -42,6 +44,8 @@ fenchol = smiles ("CC1(C)C(C2(C)CCC1C2)O","Fenchol")
 camphene = smiles("CC1(C2CCC(C2)C1=C)C","Camphene")
 bornylDisphophate = smiles("CC1(C)C2CC(C1(C)CC2)OP(OP(O)(O)=O)(O)=O", "Bornyl Diphosphate")
 betaPhellandrene = smiles("C1C(CCC(C=1)=C)C(C)C", "Beta Phellandrene")
+gammaTerpinene = smiles ("C1(C(C)C)CC=C(C)CC=1","Gamma Terpinene")
+sabinene = smiles ("C=C1CCC2(CC12)C(C)C","Sabinene")
 ######################################
 # RULES
 ######################################
@@ -71,7 +75,7 @@ popFilePrefix()
 # DEFINE LIST OF INITIAL INPUTS
 ######################################
 #eductMols = [gpp,H2O]
-eductMols = [phellandrylCationAlternative]
+eductMols = [thujylCation]
 
 ######################################
 # HYPERGRAPH GENERATION
