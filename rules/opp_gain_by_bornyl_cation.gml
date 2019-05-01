@@ -32,7 +32,7 @@ rule[
 
 		node [ id  2  label "C"]
 		node [ id  11  label "O"]
-		edge [source 2 target 12 label "-"]
+		edge [source 2 target 11 label "-"]
 
 	]
 ]
