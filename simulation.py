@@ -39,7 +39,7 @@ alfaPinene = smiles ("C1CC2CC(C=1C)C2(C)C","Alfa Pinene")
 car3Ene = smiles ("C1CC2C(C)(C)[CH2]2CC=1C","Car-3-ene")
 fenchol = smiles ("CC1(C)C(C2(C)CCC1C2)O","Fenchol")
 camphene = smiles("CC1(C2CCC(C2)C1=C)C","Camphene")
-bornylDisphophate = smiles ("CC1(C)C2CC(C1(C)CC2)OP(OP(O)(O)=O)(O)=O", "Bornyl Diphosphate")
+bornylDisphophate = smiles("CC1(C)C2CC(C1(C)CC2)OP(OP(O)(O)=O)(O)=O", "Bornyl Diphosphate")
 ######################################
 # RULES
 ######################################
