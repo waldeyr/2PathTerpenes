@@ -14,4 +14,4 @@ Objetivos específicos
 
 Sabinene as target
 
-`/home/docker/mod-v0.7.0/bin/mod -e 'target = smiles ("C=C1CCC2(CC12)C(C)C")' -f simulation.py -f dg.py -f pathway.py`
+`/home/docker/mod-v0.7.0/bin/mod -e 'target = smiles ("C=C1CCC2(CC12)C(C)C")' -f simulation.py -f pathway.py`
