@@ -11,3 +11,7 @@ Objetivos específicos
 * Armazenar os resultados em banco de dados
 * Criar queries no banco para responder a questõs biológicas relevantes
 * Criar um sistema Web para consulta utilizando as queries construídas
+
+Sabinene as target
+
+`/home/docker/mod-v0.7.0/bin/mod -e 'target = smiles ("C=C1CCC2(CC12)C(C)C")' -f simulation.py -f dg.py -f pathway.py`
