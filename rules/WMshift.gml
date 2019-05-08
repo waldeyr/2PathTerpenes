@@ -1,5 +1,3 @@
-# Processes Special Issue "In Silico Metabolic Modeling and Engineering"
-# Rule refrence:  (Christianson, 2017) https://doi.org/10.1021/acs.chemrev.7b00287
 rule [
     ruleID "Wagner-Meerwein 1,2 alcyl shift"
     left [
