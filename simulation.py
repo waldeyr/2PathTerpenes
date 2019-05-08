@@ -48,6 +48,8 @@ gammaTerpinene = smiles ("C1(C(C)C)CC=C(C)CC=1","Gamma Terpinene")
 sabinene = smiles ("C=C1CCC2(CC12)C(C)C","Sabinene")
 mycerne = smiles ("C=C(C=C)CCC=C(C)C","Myrcene")
 betaOcimene = smiles ("CC(=CCC=C(C)C=C)C","Beta-Ocimene")
+linalool = smiles ("C(C(C)(CCC=C(C)C)O)=C","Linalool")
+geraniol = smiles ("C(CO)=C(C)CCC=C(C)C","Geraniol")
 ######################################
 # RULES
 ######################################
@@ -76,8 +78,8 @@ popFilePrefix()
 ######################################
 # DEFINE LIST OF INITIAL INPUTS
 ######################################
-#eductMols = [gpp,H2O]
-eductMols = [lpp,opp]
+eductMols = [gCationC1,H2O]
+#eductMols = [lpp,opp]
 
 ######################################
 # HYPERGRAPH GENERATION
@@ -92,7 +94,7 @@ def countCycs(a):
         return a.numEdges - a.numVertices + 1
 
 # a general breadth-first expansion strategy
-strat = (addSubset(eductMols) >> repeat[2](inputRules))
+strat = (addSubset(eductMols) >> repeat[1](inputRules))
 
 # calculate derivation graph (hypergraph)
 dg = dgRuleComp(inputGraphs, strat, ls)
