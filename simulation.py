@@ -28,7 +28,7 @@ pinylCation = smiles ("C[C+]1CCC2CC1C2(C)C", "Pinyl Cation")
 bornylCation = smiles ("CC12CCC(C[CH+]1)C2(C)C", "Bornyl Cation")
 penchylCation = smiles ("CC12CC(CC1)C(C)(C)[CH+]2","Penchyl Cation")
 isocamphylCation = smiles ("C[C+]1C2CCC(C2)C1(C)C", "Isocamphyl Cation")
-phellandrylCationAlternative= smiles ("C1C(CC[C+](C=1)C)C(C)C","PhellandrylCation Alternative")
+phellandrylCationAlternative= smiles ("C1C(CC[C+](C=1)C)C(C)C","Phellandryl Cation Alternative")
 terpinen4YlCation = smiles ("C1C[C+](CCC=1C)C(C)C", "Terpinen-4-yl-cation")
 thujylCation = smiles ("C[C+]1CCC2(CC21)C(C)C","Thujyl Cation")
 ######################################
@@ -46,6 +46,8 @@ bornylDisphophate = smiles("CC1(C)C2CC(C1(C)CC2)OP(OP(O)(O)=O)(O)=O", "Bornyl Di
 betaPhellandrene = smiles("C1C(CCC(C=1)=C)C(C)C", "Beta Phellandrene")
 gammaTerpinene = smiles ("C1(C(C)C)CC=C(C)CC=1","Gamma Terpinene")
 sabinene = smiles ("C=C1CCC2(CC12)C(C)C","Sabinene")
+mycerne = smiles ("C=C(C=C)CCC=C(C)C","Myrcene")
+betaOcimene = smiles ("CC(=CCC=C(C)C=C)C","Beta-Ocimene")
 ######################################
 # RULES
 ######################################
@@ -75,7 +77,7 @@ popFilePrefix()
 # DEFINE LIST OF INITIAL INPUTS
 ######################################
 #eductMols = [gpp,H2O]
-eductMols = [thujylCation]
+eductMols = [lpp,opp]
 
 ######################################
 # HYPERGRAPH GENERATION
@@ -90,7 +92,7 @@ def countCycs(a):
         return a.numEdges - a.numVertices + 1
 
 # a general breadth-first expansion strategy
-strat = (addSubset(eductMols) >> repeat[1](inputRules))
+strat = (addSubset(eductMols) >> repeat[2](inputRules))
 
 # calculate derivation graph (hypergraph)
 dg = dgRuleComp(inputGraphs, strat, ls)
