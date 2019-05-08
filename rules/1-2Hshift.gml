@@ -1,4 +1,3 @@
-# Processes Special Issue "In Silico Metabolic Modeling and Engineering"
 rule [
     ruleID "1,2 hydrid shift"
     left [
