@@ -50,7 +50,7 @@ mycerne = smiles ("C=C(C=C)CCC=C(C)C","myrcene")
 betaOcimene = smiles ("CC(=CCC=C(C)C=C)C","beta-ocimene")
 linalool = smiles ("C(C(C)(CCC=C(C)C)O)=C","linalool")
 geraniol = smiles ("C(CO)=C(C)CCC=C(C)C","geraniol")
-cineole1-8 = smiles("[CH]1CC2CCC1(C)OC2(C)C", "1,8-cineole")
+cineole18 = smiles("[CH]1CC2CCC1(C)OC2(C)C", "1,8-cineole")
 ######################################
 # RULES
 ######################################
