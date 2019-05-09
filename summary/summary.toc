@@ -1,0 +1,22 @@
+\babel@toc {english}{}
+\contentsline {section}{\numberline {0.1}Generated Hypergraph}{2}{section.0.1}
+\contentsline {subsection}{\numberline {0.1.1}DG Hyper, \texttt {dg\_0}}{2}{subsection.0.1.1}
+\contentsline {section}{\numberline {0.2}Rules}{2}{section.0.2}
+\contentsline {subsection}{\numberline {0.2.1}1,2 hydrid shift}{2}{subsection.0.2.1}
+\contentsline {subsection}{\numberline {0.2.2}1,3 hydrid shift}{3}{subsection.0.2.2}
+\contentsline {subsection}{\numberline {0.2.3}H+ loss}{3}{subsection.0.2.3}
+\contentsline {subsection}{\numberline {0.2.4}Capture of H2O}{4}{subsection.0.2.4}
+\contentsline {subsection}{\numberline {0.2.5}Disphophate loss for GPP}{5}{subsection.0.2.5}
+\contentsline {subsection}{\numberline {0.2.6}Disphophate loss for GPP (altenative)}{6}{subsection.0.2.6}
+\contentsline {subsection}{\numberline {0.2.7}Diphosphate capture by geranyl cation (alternative)}{8}{subsection.0.2.7}
+\contentsline {subsection}{\numberline {0.2.8}Diphosphate loss for linalyl diphosphate}{9}{subsection.0.2.8}
+\contentsline {subsection}{\numberline {0.2.9}Diphosphate loss for linalyl diphosphate (alternative)}{10}{subsection.0.2.9}
+\contentsline {subsection}{\numberline {0.2.10}6,1 ring closure}{11}{subsection.0.2.10}
+\contentsline {subsection}{\numberline {0.2.11}3,7 - closure}{12}{subsection.0.2.11}
+\contentsline {subsection}{\numberline {0.2.12}2,7 - closure}{13}{subsection.0.2.12}
+\contentsline {subsection}{\numberline {0.2.13}Wagner-Meerwein 1,2 alcyl shift}{14}{subsection.0.2.13}
+\contentsline {subsection}{\numberline {0.2.14}1,8 Cyclization}{15}{subsection.0.2.14}
+\contentsline {subsection}{\numberline {0.2.15}2,6 closure}{16}{subsection.0.2.15}
+\contentsline {subsection}{\numberline {0.2.16}5,7 - closure}{17}{subsection.0.2.16}
+\contentsline {subsection}{\numberline {0.2.17}Diphosphate capture by Bornyl Cation}{17}{subsection.0.2.17}
+\contentsline {subsection}{\numberline {0.2.18}allylic charge shift}{18}{subsection.0.2.18}

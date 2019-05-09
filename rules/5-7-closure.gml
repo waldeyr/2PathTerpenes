@@ -1,10 +1,9 @@
 rule[
 	ruleID	"5,7 - closure"
 	left[
-
-		
+		node [ id 11 label "H"]		
 		node [ id 7  label "C+"]
-		
+		edge [source 5 target 11 label "-"]		
 	]
 	context[
 
@@ -30,9 +29,8 @@ rule[
 
 	]
 	right[
-
+		node [id 11 label "H+"]
 		node [ id 7  label "C"]
-		edge [source 5 target 7 label "-"]
-	
+		edge [source 5 target 7 label "-"]	
 	]
 ]

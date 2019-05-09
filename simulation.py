@@ -37,19 +37,20 @@ thujylCation = smiles ("C[C+]1CCC2(CC21)C(C)C","Thujyl Cation")
 alphaTerpinol = smiles("CC1=CCC(CC1)C(C)(C)O", "alpha-terpinol")
 limonene = smiles ("CC1=CCC(CC1)C(=C)C","limonene")
 terpinolene = smiles ("C1CC(CCC=1C)=C(C)C","terpinolene")
-betaPinene = smiles ("CC1(C2CCC(=C)C1C2)C","Beta Pinene")
-alfaPinene = smiles ("C1CC2CC(C=1C)C2(C)C","Alfa Pinene")
-car3Ene = smiles ("C1CC2C(C)(C)[CH2]2CC=1C","Car-3-ene")
-fenchol = smiles ("CC1(C)C(C2(C)CCC1C2)O","Fenchol")
-camphene = smiles("CC1(C2CCC(C2)C1=C)C","Camphene")
-bornylDisphophate = smiles("CC1(C)C2CC(C1(C)CC2)OP(OP(O)(O)=O)(O)=O", "Bornyl Diphosphate")
-betaPhellandrene = smiles("C1C(CCC(C=1)=C)C(C)C", "Beta Phellandrene")
-gammaTerpinene = smiles ("C1(C(C)C)CC=C(C)CC=1","Gamma Terpinene")
-sabinene = smiles ("C=C1CCC2(CC12)C(C)C","Sabinene")
-mycerne = smiles ("C=C(C=C)CCC=C(C)C","Myrcene")
-betaOcimene = smiles ("CC(=CCC=C(C)C=C)C","Beta-Ocimene")
-linalool = smiles ("C(C(C)(CCC=C(C)C)O)=C","Linalool")
-geraniol = smiles ("C(CO)=C(C)CCC=C(C)C","Geraniol")
+betaPinene = smiles ("CC1(C2CCC(=C)C1C2)C","beta Pinene")
+alfaPinene = smiles ("C1CC2CC(C=1C)C2(C)C","alfa Pinene")
+car3Ene = smiles ("C1CC2C(C)(C)[CH2]2CC=1C","car-3-ene")
+fenchol = smiles ("CC1(C)C(C2(C)CCC1C2)O","fenchol")
+camphene = smiles("CC1(C2CCC(C2)C1=C)C","camphene")
+bornylDisphophate = smiles("CC1(C)C2CC(C1(C)CC2)OP(OP(O)(O)=O)(O)=O", "bornyl diphosphate")
+betaPhellandrene = smiles("C1C(CCC(C=1)=C)C(C)C", "beta phellandrene")
+gammaTerpinene = smiles ("C1(C(C)C)CC=C(C)CC=1","gamma terpinene")
+sabinene = smiles ("C=C1CCC2(CC12)C(C)C","sabinene")
+mycerne = smiles ("C=C(C=C)CCC=C(C)C","myrcene")
+betaOcimene = smiles ("CC(=CCC=C(C)C=C)C","beta-ocimene")
+linalool = smiles ("C(C(C)(CCC=C(C)C)O)=C","linalool")
+geraniol = smiles ("C(CO)=C(C)CCC=C(C)C","geraniol")
+cineole1-8 = smiles("[CH]1CC2CCC1(C)OC2(C)C", "1,8-cineole")
 ######################################
 # RULES
 ######################################
@@ -78,8 +79,8 @@ popFilePrefix()
 ######################################
 # DEFINE LIST OF INITIAL INPUTS
 ######################################
-eductMols = [gCationC1,H2O]
-#eductMols = [lpp,opp]
+#eductMols = [alphaTerpinol,H2O]
+eductMols = [gpp,H2O]
 
 ######################################
 # HYPERGRAPH GENERATION
@@ -94,7 +95,7 @@ def countCycs(a):
         return a.numEdges - a.numVertices + 1
 
 # a general breadth-first expansion strategy
-strat = (addSubset(eductMols) >> repeat[1](inputRules))
+strat = (addSubset(eductMols) >> repeat[7](inputRules))
 
 # calculate derivation graph (hypergraph)
 dg = dgRuleComp(inputGraphs, strat, ls)

@@ -1,0 +1,7 @@
+graph G {
+	0 [ label="C | C+" ]
+	1 [ label="C | C" ]
+	2 [ label="C+ | C" ]
+	0 -- 1 [ label="= | -" ]
+	1 -- 2 [ label="- | =" ]
+}
