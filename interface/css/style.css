@@ -1,0 +1,129 @@
+.drag {
+    margin-right: 5%;
+    margin-left: 1%;
+    border: 1px solid;
+}
+
+.drop {
+
+
+    display: block;
+    list-style: none;
+    float: left;
+    width: 45.5%;
+    min-height: 300px;
+    padding: 10px;
+    border: 1px dotted;
+    border-color: black;
+}
+
+
+.drop2 {
+
+
+    margin-left: 0.3%;
+    border: 1px solid;
+    display: block;
+    list-style: none;
+    float: left;
+    width: 45.5%;
+
+    min-height: 300px;
+    padding: 10px;
+    border: 1px dotted;
+    border-color: black;
+}
+
+
+
+.drop-active {border: 2px dotted red;}
+.drop-over {border: 2px dotted #bbb;}
+.drop li {
+    width: 90%; 
+    min-height: 120px; 
+    float: left;
+    margin: 2.5%;
+    display: inline !important;
+}
+.drop li img {
+    width: 100%;
+}
+
+[id^="r"] {
+
+	margin-bottom: .5em;
+  margin-right: .99.8em;
+  margin-left: .3em;
+  display: inline-block;
+}
+
+
+h1{
+    text-align: center;
+}
+.lead {
+    text-align: center;
+}
+.container img {
+    position: relative;
+    left: 10em;     
+}
+.caption{
+    font-size: 8pt;
+}
+
+.fieldset{
+        width: 30%;
+}
+.div{
+       display: flex;
+       aling-items: center;
+       justify-content: space-between;
+}
+
+.button {
+  background-color: #4CAF50;
+  border: none;
+  color: white;
+  float: right;
+  padding: 15px 32px;
+  text-align: center;
+  text-decoration: none;
+  display: inline-block;
+  font-size: 30px;
+  margin: 4px 2px;
+  cursor: pointer;
+  border-radius: 10px;
+  
+}
+
+.iterations{
+  width: 500px; 
+  margin-bottom: 3%; 
+  margin-top: 2%;
+  font-size: 21px; 
+  float:left; 
+  margin-left: 1%; 
+  padding: 0px;
+
+
+
+}
+
+
+.checkBox{
+
+  width: 600px; 
+  margin-bottom: 3%; 
+  margin-top: 2%;
+  font-size: 21px; 
+  float:right; 
+  margin-left: 0%;
+  margin-right: -7%; 
+  padding: 0px;
+  position: relative;
+  right: 0%;
+
+
+
+}
