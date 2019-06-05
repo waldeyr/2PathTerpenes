@@ -34,5 +34,5 @@ Rodar o Docker compartilhando a pasta local atual (pwd) com a pasta shared do co
 
 Ou simplesmente rodar o scipt no docker sem entrar no container
 
-``docker run --rm -v`pwd`:/home/shared  waldeyr/mod_v0.8.0:v1.0 /home/mod-v0.8.0/bin/mod -f molecules.py -f simulation.py -f printer.py ``
+``docker run --rm -v $(pwd):/home/shared/ waldeyr/mod_v0.8.0:v1.0 /home/mod-v0.8.0/bin/mod -f /home/shared/molecules.py -f /home/shared/simulation.py -f /home/shared/printer.py``
 
