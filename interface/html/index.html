@@ -26,7 +26,7 @@
   					
 				</div>
   				<div class="container">
-  					<button type="button" id="window" class="button" onclick='saveAndDisplay()' data-toggle="modal" data-target=".bd-example-modal-lg">Click Here to Generate a MØDatschgerl Simulation Code</button>
+  					<button type="button" id="checkBox" class="button" onclick='saveAndDisplay()' data-toggle="modal" data-target=".bd-example-modal-lg">Click Here to Generate a MØDatschgerl Simulation Code</button>
 
 					<div class="modal fade bd-example-modal-lg">
   					<div class="modal-dialog modal-lg">
@@ -66,45 +66,364 @@
 	<section class="drop drag" ondragstart="dragStart(event);">
       
     		<div id="r00 = ruleGML('1-2Hshift.gml')" ondrop="event.stopPropagation(); event.preventDefault();" draggable="true">
-  	    		<span type="button" class="btn btn-success my-2 my-sm-0" style="font-size: 15px;"  ondblclick="document.getElementById('id00').style.display='block'" class="btn btn-success my-2 my-sm-0">Rule 00</span>
+  	    		<button id="0r"  type="button" class="btn btn-success my-2 my-sm-0" data-toggle="modal" data-target="#myModal">Rule 00</button>
+	  	    	<div id="modal0" class="modal fade bd-example-modal-lg">
+	  					<div class="modal-dialog modal-lg">
+		   					<div class="modal-content">
+			      					<div class="modal-body">
+			          		 			<img src="../img/r0.png" alt="2Path for sesquiterpenes" style="width: 602px; height: 100px; margin-bottom: 3%;  display: table;
+                                             margin: 0 auto; font-size: 45px;">
+			          		 			<hr></hr>
+			               	</div>
 
-	  			<div id="id00" class="w3-modal">
-	    			<div class="w3-modal-content w3-card-4">
-	      			<header class="btn-success my-2 my-sm-0"> 
-	        			<button onclick="document.getElementById('id00').style.display='none'" class="w3-button w3-display-topright">Close</button>
-	      			</header>
-	      				<div class="w3-container">
-	       			 		<br><br><br>
-	        				<p><a class="img2Path15" href="#">
-	    					<img src="../img/2path15.png" alt="2Path for sesquiterpenes">
-	  						</a></p>
-	  						<br><br><br>
-	      				</div>
-	    			</div>
+			               	<div class="modal-footer">
+			               				<button type="button" class="btn btn-success my-2 my-sm-0" data-dismiss="modal">Close</button>
+			               	</div>
+
+		    				</div>
+	  					</div>
 				</div>
 			</div>
 
 
 			<div id="r01 = ruleGML('1-3Hshift.gml')" ondrop="event.stopPropagation(); event.preventDefault();" draggable="true">
-  	    		<span type="button" class="btn btn-success my-2 my-sm-0" style="font-size: 15px;" ondblclick="document.getElementById('id01').style.display='block'" class="btn btn-success my-2 my-sm-0">Rule 01</span>
+  	    		<button id="1r"  type="button" class="btn btn-success my-2 my-sm-0" data-toggle="modal" data-target="#myModal">Rule 01</button>
+	  	    	<div id="modal1" class="modal fade bd-example-modal-lg">
+	  					<div class="modal-dialog modal-lg">
+		   					<div class="modal-content">
+			      					<div class="modal-body">
+			          		 			<img src="../img/r1.png" alt="2Path for sesquiterpenes" style="width: 602px; height: 100px; margin-bottom: 3%;  display: table;
+                                             margin: 0 auto; font-size: 45px;">
+			          		 			<hr></hr>
+			          		 			
+			               	</div>
 
-	  			<div id="id01" class="w3-modal">
-	    			<div class="w3-modal-content w3-card-4">
-	      			<header class="btn-success my-2 my-sm-0"> 
-	        			<button onclick="document.getElementById('id01').style.display='none'" class="w3-button w3-display-topright">Close</button>
-	      			</header>
-	      				<div class="w3-container">
-	       			 		<br><br><br>
-	        				<p>teste</p>
-	  						<br><br><br>
-	      				</div>
-	    			</div>
+			               	<div class="modal-footer">
+			               				<button type="button" class="btn btn-success my-2 my-sm-0" data-dismiss="modal">Close</button>
+			               	</div>
+
+		    				</div>
+	  					</div>
 				</div>
 			</div>
 
 
+			<div id="r02 = ruleGML('h_loss.gml')" ondrop="event.stopPropagation(); event.preventDefault();" draggable="true">
+  	    		<button id="2r"  type="button" class="btn btn-success my-2 my-sm-0" data-toggle="modal" data-target="#myModal">Rule 02</button>
+	  	    	<div id="modal2" class="modal fade bd-example-modal-lg">
+	  					<div class="modal-dialog modal-lg">
+		   					<div class="modal-content">
+			      					<div class="modal-body">
+			          		 			<img src="../img/r2.png" alt="2Path for sesquiterpenes" style="width: 602px; height: 180px; margin-bottom: 3%;  display: table;
+                                             margin: 0 auto; font-size: 45px;">
+			          		 			<hr></hr>
+			               	</div>
 
- 
+			               	<div class="modal-footer">
+			               				<button type="button" class="btn btn-success my-2 my-sm-0" data-dismiss="modal">Close</button>
+			               	</div>
+
+		    				</div>
+	  					</div>
+				</div>
+			</div>
+
+
+			<div id="r03 = ruleGML('h2o_gain.gml')" ondrop="event.stopPropagation(); event.preventDefault();" draggable="true">
+  	    		<button id="3r"  type="button" class="btn btn-success my-2 my-sm-0" data-toggle="modal" data-target="#myModal">Rule 03</button>
+	  	    	<div id="modal3" class="modal fade bd-example-modal-lg">
+	  					<div class="modal-dialog modal-lg">
+		   					<div class="modal-content">
+			      					<div class="modal-body">
+			          		 			<img src="../img/r3.png" alt="2Path for sesquiterpenes" style="width: 602px; height: 180px; margin-bottom: 3%;  display: table;
+                                             margin: 0 auto; font-size: 45px;">
+			          		 			<hr></hr>
+			               	</div>
+
+			               	<div class="modal-footer">
+			               				<button type="button" class="btn btn-success my-2 my-sm-0" data-dismiss="modal">Close</button>
+			               	</div>
+
+		    				</div>
+	  					</div>
+				</div>
+			</div>
+
+
+			<div id="r04 = ruleGML('opp_loss_gpp.gml')" ondrop="event.stopPropagation(); event.preventDefault();" draggable="true">
+  	    		<button id="4r"  type="button" class="btn btn-success my-2 my-sm-0" data-toggle="modal" data-target="#myModal">Rule 04</button>
+	  	    	<div id="modal4" class="modal fade bd-example-modal-lg">
+	  					<div class="modal-dialog modal-lg">
+		   					<div class="modal-content">
+			      					<div class="modal-body">
+			          		 			<p> </p>
+			          		 			<hr></hr>
+			               	</div>
+
+			               	<div class="modal-footer">
+			               				<button type="button" class="btn btn-success my-2 my-sm-0" data-dismiss="modal">Close</button>
+			               	</div>
+
+		    				</div>
+	  					</div>
+				</div>
+			</div>
+
+			<div id="r05 = ruleGML('opp_loss_gpp_alternative.gml')" ondrop="event.stopPropagation(); event.preventDefault();" draggable="true">
+  	    		<button id="5r"  type="button" class="btn btn-success my-2 my-sm-0" data-toggle="modal" data-target="#myModal">Rule 05</button>
+	  	    	<div id="modal5" class="modal fade bd-example-modal-lg">
+	  					<div class="modal-dialog modal-lg">
+		   					<div class="modal-content">
+			      					<div class="modal-body">
+			          		 			<p> </p>
+			          		 			<hr></hr>
+			               	</div>
+
+			               	<div class="modal-footer">
+			               				<button type="button" class="btn btn-success my-2 my-sm-0" data-dismiss="modal">Close</button>
+			               	</div>
+
+		    				</div>
+	  					</div>
+				</div>
+			</div>
+
+
+			<div id="r06 = ruleGML('opp_gain_by_geranyl_cation.gml')" ondrop="event.stopPropagation(); event.preventDefault();" draggable="true">
+  	    		<button id="6r"  type="button" class="btn btn-success my-2 my-sm-0" data-toggle="modal" data-target="#myModal">Rule 06</button>
+	  	    	<div id="modal6" class="modal fade bd-example-modal-lg">
+	  					<div class="modal-dialog modal-lg">
+		   					<div class="modal-content">
+			      					<div class="modal-body">
+			          		 			<p> </p>
+			          		 			<hr></hr>
+			               	</div>
+
+			               	<div class="modal-footer">
+			               				<button type="button" class="btn btn-success my-2 my-sm-0" data-dismiss="modal">Close</button>
+			               	</div>
+
+		    				</div>
+	  					</div>
+				</div>
+			</div>
+
+			<div id="r07 = ruleGML('opp_loss_for_lpp_c3.gml')" ondrop="event.stopPropagation(); event.preventDefault();" draggable="true">
+  	    		<button id="0r"  type="button" class="btn btn-success my-2 my-sm-0" data-toggle="modal" data-target="#myModal">Rule 07</button>
+	  	    	<div id="modal0" class="modal fade bd-example-modal-lg">
+	  					<div class="modal-dialog modal-lg">
+		   					<div class="modal-content">
+			      					<div class="modal-body">
+			          		 			<p> </p>
+			          		 			<hr></hr>
+			               	</div>
+
+			               	<div class="modal-footer">
+			               				<button type="button" class="btn btn-success my-2 my-sm-0" data-dismiss="modal">Close</button>
+			               	</div>
+
+		    				</div>
+	  					</div>
+				</div>
+			</div>
+
+
+			<div id="r08 = ruleGML('opp_loss_for_lpp_c3_alternative.gml')" ondrop="event.stopPropagation(); event.preventDefault();" draggable="true">
+  	    		<button id="0r"  type="button" class="btn btn-success my-2 my-sm-0" data-toggle="modal" data-target="#myModal">Rule 08</button>
+	  	    	<div id="modal0" class="modal fade bd-example-modal-lg">
+	  					<div class="modal-dialog modal-lg">
+		   					<div class="modal-content">
+			      					<div class="modal-body">
+			          		 			<p> </p>
+			          		 			<hr></hr>
+			               	</div>
+
+			               	<div class="modal-footer">
+			               				<button type="button" class="btn btn-success my-2 my-sm-0" data-dismiss="modal">Close</button>
+			               	</div>
+
+		    				</div>
+	  					</div>
+				</div>
+			</div>
+
+
+			<div id="r09 = ruleGML('1-6-closure.gml')" ondrop="event.stopPropagation(); event.preventDefault();" draggable="true">
+  	    		<button id="0r"  type="button" class="btn btn-success my-2 my-sm-0" data-toggle="modal" data-target="#myModal">Rule 09</button>
+	  	    	<div id="modal0" class="modal fade bd-example-modal-lg">
+	  					<div class="modal-dialog modal-lg">
+		   					<div class="modal-content">
+			      					<div class="modal-body">
+			          		 			<p> </p>
+			          		 			<hr></hr>
+			               	</div>
+
+			               	<div class="modal-footer">
+			               				<button type="button" class="btn btn-success my-2 my-sm-0" data-dismiss="modal">Close</button>
+			               	</div>
+
+		    				</div>
+	  					</div>
+				</div>
+			</div>
+
+
+			<div id="r10 = ruleGML('3,7-closure.gml')" ondrop="event.stopPropagation(); event.preventDefault();" draggable="true">
+  	    		<button id="10r"  type="button" class="btn btn-success my-2 my-sm-0" data-toggle="modal" data-target="#myModal">Rule 10</button>
+	  	    	<div id="modal10" class="modal fade bd-example-modal-lg">
+	  					<div class="modal-dialog modal-lg">
+		   					<div class="modal-content">
+			      					<div class="modal-body">
+			          		 			<p> </p>
+			          		 			<hr></hr>
+			               	</div>
+
+			               	<div class="modal-footer">
+			               				<button type="button" class="btn btn-success my-2 my-sm-0" data-dismiss="modal">Close</button>
+			               	</div>
+
+		    				</div>
+	  					</div>
+				</div>
+			</div>
+
+			<div id="r11 = ruleGML('2,7-closure.gml')" ondrop="event.stopPropagation(); event.preventDefault();" draggable="true">
+  	    		<button id="11r"  type="button" class="btn btn-success my-2 my-sm-0" data-toggle="modal" data-target="#myModal">Rule 11</button>
+	  	    	<div id="modal11" class="modal fade bd-example-modal-lg">
+	  					<div class="modal-dialog modal-lg">
+		   					<div class="modal-content">
+			      					<div class="modal-body">
+			          		 			<p> </p>
+			          		 			<hr></hr>
+			               	</div>
+
+			               	<div class="modal-footer">
+			               				<button type="button" class="btn btn-success my-2 my-sm-0" data-dismiss="modal">Close</button>
+			               	</div>
+
+		    				</div>
+	  					</div>
+				</div>
+			</div>
+
+			<div id="r12 = ruleGML('WMshift.gml')" ondrop="event.stopPropagation(); event.preventDefault();" draggable="true">
+  	    		<button id="12r"  type="button" class="btn btn-success my-2 my-sm-0" data-toggle="modal" data-target="#myModal">Rule 12</button>
+	  	    	<div id="modal0" class="modal fade bd-example-modal-lg">
+	  					<div class="modal-dialog modal-lg">
+		   					<div class="modal-content">
+			      					<div class="modal-body">
+			          		 			<p> </p>
+			          		 			<hr></hr>
+			               	</div>
+
+			               	<div class="modal-footer">
+			               				<button type="button" class="btn btn-success my-2 my-sm-0" data-dismiss="modal">Close</button>
+			               	</div>
+
+		    				</div>
+	  					</div>
+				</div>
+			</div>
+
+			<div id="r13 = ruleGML('1-8-cyc.gml')" ondrop="event.stopPropagation(); event.preventDefault();" draggable="true">
+  	    		<button id="13r"  type="button" class="btn btn-success my-2 my-sm-0" data-toggle="modal" data-target="#myModal">Rule 13</button>
+	  	    	<div id="modal13" class="modal fade bd-example-modal-lg">
+	  					<div class="modal-dialog modal-lg">
+		   					<div class="modal-content">
+			      					<div class="modal-body">
+			          		 			<p> </p>
+			          		 			<hr></hr>
+			               	</div>
+
+			               	<div class="modal-footer">
+			               				<button type="button" class="btn btn-success my-2 my-sm-0" data-dismiss="modal">Close</button>
+			               	</div>
+
+		    				</div>
+	  					</div>
+				</div>
+			</div>
+
+			<div id="r14 = ruleGML('2-6-closure.gml')" ondrop="event.stopPropagation(); event.preventDefault();" draggable="true">
+  	    		<button id="14r"  type="button" class="btn btn-success my-2 my-sm-0" data-toggle="modal" data-target="#myModal">Rule 14</button>
+	  	    	<div id="modal14" class="modal fade bd-example-modal-lg">
+	  					<div class="modal-dialog modal-lg">
+		   					<div class="modal-content">
+			      					<div class="modal-body">
+			          		 			<p> </p>
+			          		 			<hr></hr>
+			               	</div>
+
+			               	<div class="modal-footer">
+			               				<button type="button" class="btn btn-success my-2 my-sm-0" data-dismiss="modal">Close</button>
+			               	</div>
+
+		    				</div>
+	  					</div>
+				</div>
+			</div>
+
+			<div id="r15 = ruleGML('5-7-closure.gml')" ondrop="event.stopPropagation(); event.preventDefault();" draggable="true">
+  	    		<button id="15r"  type="button" class="btn btn-success my-2 my-sm-0" data-toggle="modal" data-target="#myModal">Rule 15</button>
+	  	    	<div id="modal15" class="modal fade bd-example-modal-lg">
+	  					<div class="modal-dialog modal-lg">
+		   					<div class="modal-content">
+			      					<div class="modal-body">
+			          		 			<p> </p>
+			          		 			<hr></hr>
+			               	</div>
+
+			               	<div class="modal-footer">
+			               				<button type="button" class="btn btn-success my-2 my-sm-0" data-dismiss="modal">Close</button>
+			               	</div>
+
+		    				</div>
+	  					</div>
+				</div>
+			</div>
+
+			<div id="r16 = ruleGML ('opp_gain_by_bornyl_cation.gml')" ondrop="event.stopPropagation(); event.preventDefault();" draggable="true">
+  	    		<button id="16r"  type="button" class="btn btn-success my-2 my-sm-0" data-toggle="modal" data-target="#myModal">Rule 16</button>
+	  	    	<div id="modal16" class="modal fade bd-example-modal-lg">
+	  					<div class="modal-dialog modal-lg">
+		   					<div class="modal-content">
+			      					<div class="modal-body">
+			          		 			<p> </p>
+			          		 			<hr></hr>
+			               	</div>
+
+			               	<div class="modal-footer">
+			               				<button type="button" class="btn btn-success my-2 my-sm-0" data-dismiss="modal">Close</button>
+			               	</div>
+
+		    				</div>
+	  					</div>
+				</div>
+			</div>
+
+			<div id="r17 = ruleGML ('allylshift.gml')" ondrop="event.stopPropagation(); event.preventDefault();" draggable="true">
+  	    		<button id="17r"  type="button" class="btn btn-success my-2 my-sm-0" data-toggle="modal" data-target="#myModal">Rule 17</button>
+	  	    	<div id="modal17" class="modal fade bd-example-modal-lg">
+	  					<div class="modal-dialog modal-lg">
+		   					<div class="modal-content">
+			      					<div class="modal-body">
+			          		 			<p> </p>
+			          		 			<hr></hr>
+			               	</div>
+
+			               	<div class="modal-footer">
+			               				<button type="button" class="btn btn-success my-2 my-sm-0" data-dismiss="modal">Close</button>
+			               	</div>
+
+		    				</div>
+	  					</div>
+				</div>
+			</div>
+
+			
+
+
+	  			
   
 	</section>
 
@@ -114,9 +433,19 @@
 
 	</section>
 	
-	
 
-	<div class="checkBox">
+
+
+
+
+
+
+	<div  class="iterations">
+  		<span class="badge badge-success">Iterations (between 1 and 7):<input id="number" type="number" name="quantity" min="1" max="7" maxlength="4" style="width: 80px;" onclick="getNumber()"></span>
+	</div>
+
+
+		<div class="checkBox">
 		<input type="checkbox" value="fpp" name="c1">
 		<label for="c1">fpp</label>
 		<br>
@@ -129,16 +458,6 @@
 		<br>-->
 	</div>
 
-
-
-
-
-
-
-
-	<div  class="iterations">
-  		<span class="badge badge-success">Iterations (between 1 and 7):<input id="number" type="number" name="quantity" min="1" max="7" maxlength="4" style="width: 80px;" onclick="getNumber()"></span>
-	</div>
 
 	
 
