@@ -31,13 +31,39 @@
 					<div class="modal fade bd-example-modal-lg">
   					<div class="modal-dialog modal-lg">
    					<div class="modal-content">
+					<!-- MODAL WITH CONTENT FOR simulation.py -->
       				<div class="modal-body">
-         	     		
+						<p align="justify">
+							######################################<br />
+							# RULES<br />
+							######################################<br />
+							pushFilePrefix("rules/")
+						</p>        	     		
           		 		<p align="justify" id="demo"></p>
-          		 		<!--<p align="justify">&nbsp;um</p>-->
-          		 		<p align="justify" id="resultado"></p>
-          		 		<br>
-          		 		<p id="result" style="font-size:15px;"> </p>
+          		 		<p align="justify">
+							popFilePrefix()<br />
+							######################################<br />
+							# DEFINE LIST OF INITIAL INPUTS<br />
+							######################################<br />
+							eductMols = [gpp,H2O]
+							<!-- <p id="result" style="font-size:15px;"> </p> -->
+          		 		</p>
+          		 		<p align="justify">
+							######################################<br />
+							# ITERATIONS<br />
+							######################################
+							<p align="justify" id="resultado"></p>
+						</p>
+						<p align="justify">
+							######################################<br />
+							# NETWORK GENERATION<br />
+							######################################<br />
+							ls = LabelSettings(LabelType.Term, LabelRelation.Unification)<br />
+							def overallCharge(a): return sum(int(v.charge) for v in a.vertices)<br />
+							def countCycs(a): return a.numEdges - a.numVertices + 1<br />
+							dg = dgRuleComp(inputGraphs, strat, ls)<br />
+							dg.calc()
+          		 		</p>         		 		
           		 		<hr></hr>
                		</div>
 
@@ -433,20 +459,15 @@
 
 	</section>
 	
-
-
-
-
-
-
-
 	<div  class="iterations">
-  		<span class="badge badge-success">Iterations (between 1 and 7):<input id="number" type="number" name="quantity" min="1" max="7" maxlength="4" style="width: 80px;" onclick="getNumber()"></span>
+  		<span class="badge badge-success">Iterations (between 1 and 7):
+  		<input id="number" type="number" name="quantity" min="1" max="7" maxlength="1" style="width: 80px;" onclick="getNumber()" onkeydown="return false">
+  		</span>
 	</div>
 
-
+<!--
 		<div class="checkBox">
-		<input type="checkbox" value="fpp" name="c1">
+		<input type="checkbox" value="fpp" name="c1" disable>
 		<label for="c1">fpp</label>
 		<br>
 		<input type="checkbox" value="gpp" name="c2">
@@ -454,17 +475,8 @@
 		<br>
 		<input type="checkbox" value="H2O" name="c3">
 		<label for="c3">H2O</label>
-		<!--<button id="checkBox"> Ok </button>
-		<br>-->
+-->
 	</div>
-
-
-	
-
-
-
-
-
 
 	<!--<div class="mx-auto" style="width: 300px; margin-bottom: 3%; margin-top: 2%;  display: table; margin: 10 auto; font-size: 30px; float:left; margin-left: 10%; padding: 15px;">
   		<span class="badge badge-success">Iterations (between 1 and 7):

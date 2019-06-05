@@ -25,7 +25,7 @@ window.saveAndDisplay = function() {
   var list = document.getElementById('dropBox').children;
   var result="";
   for (var i = 0; i < list.length; i++) {
-    result +="<br/>"+"&nbsp;"+list[i].id+"<br/>";
+    result +="<br/>"+list[i].id+"<br/>";
   }
   document.getElementById('demo').innerHTML=result;
 }
