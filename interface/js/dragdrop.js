@@ -45,45 +45,106 @@ window.getNumber = function() {
 
 
 
-/*window.sliderChange=function(val) {
-	
-
-		
-    	document.getElementById('output').innerHTML = val;
-
-    	var p="strat = (addSubset(eductMols) >> repeat["+val+"](inputRules))";
-		  document.getElementById("resultado").innerHTML=p;
-}
-*/
-
-
-
 
 window.ondblclick = function(event) {
 
-  
-  var modal = document.getElementById('id00');
-  modal = document.getElementById('id01');
-  
-  if (event.target == modal) {
-    modal.style.display = "none";
-  }
-
 }
 
 
 
 
-window.addEventListener('click', function() {
+$('input[type="checkbox"]').on("click", checkBox);
 
 
-  var check = document.querySelectorAll('input:checked');
-  result.innerHTML = "result = mols[" + [].map.call(check, function(el){
-  return el.value;
-  }).join(',')+"]";
+function  checkBox(){
+    var check;
   
+  check = document.querySelectorAll('input:checked');
+ 	 
+	var x = result.innerHTML = "eductMols = [" + [].map.call(check, function(el){
+
+	return el.value;
+	}).join(',')+"]";
+
+	if(x=="result = mols[]"){
+		result.innerHTML="";
+    
+	}
+     
+          
+}
+
+
+
+$('#modal').modal({
+  show: false
 });
 
+$('button').on('dblclick', function() {
+	var x =  $(this).attr('id');
+  //alert(x);
+  if(x=="0r"){
+    $('#modal0').modal('show');
+  }
+  if(x=="1r"){
+    $('#modal1').modal('show');
+  }
+
+  if(x=="2r"){
+    $('#modal2').modal('show');
+  }
+  if(x=="3r"){
+    $('#modal3').modal('show');
+  }
+
+  if(x=="4r"){
+    $('#modal4').modal('show');
+  }
+  if(x=="5r"){
+    $('#modal5').modal('show');
+  }
+
+  if(x=="6r"){
+    $('#modal6').modal('show');
+  }
+  if(x=="7r"){
+    $('#modal7').modal('show');
+  }
+
+  if(x=="8r"){
+    $('#modal8').modal('show');
+  }
+  if(x=="9r"){
+    $('#modal9').modal('show');
+  }
+
+  if(x=="10r"){
+    $('#modal10').modal('show');
+  }
+  if(x=="11r"){
+    $('#modal11').modal('show');
+  }
+
+  if(x=="12r"){
+    $('#modal12').modal('show');
+  }
+  if(x=="13r"){
+    $('#modal13').modal('show');
+  }
+
+  if(x=="14r"){
+    $('#modal14').modal('show');
+  }
+  if(x=="15r"){
+    $('#modal15').modal('show');
+  }
+
+  if(x=="16r"){
+    $('#modal16').modal('show');
+  }
+  if(x=="17r"){
+    $('#modal17').modal('show');
+  }
 
 
-
+});
