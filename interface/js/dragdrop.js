@@ -1,35 +1,53 @@
 window.dragStart = function(e) {
-
-      e.dataTransfer.setData("Text", e.target.id);
-
+    e.dataTransfer.effectAllowed = "move";
+    e.dataTransfer.setData("Text", e.target.getAttribute("id"));
 }
-
-window.allowDropOption = function(e) { 
-        e.preventDefault(); 
-}
-
-window.drop = function(e) {
-  
+window.allowDropOption = function(e) {
     e.preventDefault();
-    var data = e.dataTransfer.getData("text");
-    var nodeCopy = document.getElementById(data).cloneNode(true);
-    e.target.appendChild(nodeCopy);
-  
-    var txt1 = e.target.appendChild(nodeCopy);
-    txt1.onclick = function() {
-    this.remove();}
-
+    
 }
+
+
+
+var list;
+list = document.getElementById('dropBox').children;
 
 window.saveAndDisplay = function() {
-  var list = document.getElementById('dropBox').children;
+
+
+var list = document.getElementById('dropBox').children;
   var result="";
   for (var i = 0; i < list.length; i++) {
     result +="<br/>"+list[i].id+"<br/>";
   }
-  document.getElementById('demo').innerHTML=result;
+  document.getElementById('rules').innerHTML=result;
+  
 }
 
+
+window.drop = function(e) {
+      
+      
+      //e.preventDefault();
+    var data = e.dataTransfer.getData("text");
+    var nodeCopy;
+    nodeCopy = document.getElementById(data).cloneNode(true);
+    
+    for (var i = 0; i < list.length; i++) {
+        var r = list[i].id;
+        if(data == r)  {
+        
+          nodeCopy = document.getElementById(data).cloneNode(false);
+          this.remove(list[i].id);
+        }
+    }
+  
+    var txt1 = e.target.appendChild(nodeCopy);
+    txt1.onclick = function() {
+      this.remove();}
+ 
+   
+}
 
 
 
@@ -37,9 +55,9 @@ window.getNumber = function() {
 
 		var number=document.getElementById("number").value; 
 	
-		var p;
-    p="<br/>"+"strat = (addSubset(eductMols) >> repeat["+number+"](inputRules))"+"<br/>";
-		document.getElementById("resultado").innerHTML=p;
+		var x;
+    x="<br/>"+"strat = (addSubset(eductMols) >> repeat["+number+"](inputRules))"+"<br/>";
+		document.getElementById("interations").innerHTML=x;
 		
 }
 
@@ -66,10 +84,7 @@ function  checkBox(){
 	return el.value;
 	}).join(',')+"]";
 
-	if(x=="result = mols[]"){
-		result.innerHTML="";
-    
-	}
+	
      
           
 }
@@ -148,3 +163,27 @@ $('button').on('dblclick', function() {
 
 
 });
+
+
+
+function download(filename, text) {
+    var element = document.createElement('a');
+    element.setAttribute('href', 'data:text/plain;charset=utf-8,' + encodeURIComponent(text));
+    element.setAttribute('download', filename);
+
+    element.style.display = 'none';
+    document.body.appendChild(element);
+
+    element.click();
+
+    document.body.removeChild(element);
+}
+
+// Start file download.
+document.getElementById("dwn-btn").addEventListener("click", function(){
+    // Generate download of hello.txt file with some content
+    var text = document.getElementById("corpo").innerText;
+    var filename = "hello.py";
+    
+    download(filename, text);
+}, false);
