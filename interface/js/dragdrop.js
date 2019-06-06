@@ -28,7 +28,7 @@ var list = document.getElementById('dropBox').children;
 window.drop = function(e) {
       
       
-      //e.preventDefault();
+    e.preventDefault();
     var data = e.dataTransfer.getData("text");
     var nodeCopy;
     nodeCopy = document.getElementById(data).cloneNode(true);
