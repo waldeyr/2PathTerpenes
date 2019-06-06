@@ -51,6 +51,7 @@ window.drop = function(e) {
 
 
 
+
 window.getNumber = function() {  
 
 		var number=document.getElementById("number").value; 
