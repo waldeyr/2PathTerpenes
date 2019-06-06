@@ -184,7 +184,7 @@ function download(filename, text) {
 document.getElementById("dwn-btn").addEventListener("click", function(){
     // Generate download of hello.txt file with some content
     var text = document.getElementById("corpo").innerText;
-    var filename = "hello.py";
+    var filename = "simulation.py";
     
     download(filename, text);
 }, false);
