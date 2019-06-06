@@ -11,7 +11,7 @@
     list-style: none;
     float: left;
     width: 45.5%;
-    min-height: 300px;
+    min-height: 400px;
     padding: 10px;
     border: 1px dotted;
     border-color: black;
@@ -28,7 +28,7 @@
     float: left;
     width: 45.5%;
 
-    min-height: 300px;
+    min-height: 400px;
     padding: 10px;
     border: 1px dotted;
     border-color: black;
@@ -51,10 +51,10 @@
 
 [id^="r"] {
 
-	margin-bottom: .5em;
-  margin-right: .99.8em;
-  margin-left: .3em;
-  display: inline-block;
+    margin-bottom: .5em;
+    margin-right: .99.8em;
+    margin-left: .3em;
+    display: inline-block;
 }
 
 
@@ -73,57 +73,52 @@ h1{
 }
 
 .fieldset{
-        width: 30%;
+    width: 30%;
 }
 .div{
-       display: flex;
-       aling-items: center;
-       justify-content: space-between;
+    display: flex;
+    aling-items: center;
+    justify-content: space-between;
 }
 
 .button {
-  background-color: #4CAF50;
-  border: none;
-  color: white;
-  float: right;
-  padding: 15px 32px;
-  text-align: center;
-  text-decoration: none;
-  display: inline-block;
-  font-size: 30px;
-  margin: 4px 2px;
-  cursor: pointer;
-  border-radius: 10px;
-  
+    background-color: #4CAF50;
+    border: none;
+    color: white;
+    float: right;
+    padding: 15px 32px;
+    text-align: center;
+    text-decoration: none;
+    display: inline-block;
+    font-size: 30px;
+    margin: 4px 2px;
+    cursor: pointer;
+    border-radius: 10px;
 }
-
 .iterations{
-  width: 500px; 
-  margin-bottom: 3%; 
-  margin-top: 2%;
-  font-size: 21px; 
-  float:left; 
-  margin-left: 1%; 
-  padding: 0px;
-
-
-
+    width: 500px; 
+    margin-bottom: 3%; 
+    margin-top: 2%;
+    font-size: 21px; 
+    float:left; 
+    margin-left: 1%; 
+    padding: 0px;
 }
-
-
 .checkBox{
-
-  width: 600px; 
-  margin-bottom: 3%; 
-  margin-top: 2%;
-  font-size: 21px; 
-  float:right; 
-  margin-left: 0%;
-  margin-right: -7%; 
-  padding: 0px;
-  position: relative;
-  right: 0%;
-
-
-
+    width: 600px; 
+    margin-bottom: 3%; 
+    margin-top: 2%;
+    font-size: 21px; 
+    float:right; 
+    margin-left: 0%;
+    margin-right: -7%; 
+    padding: 0px;
+    position: relative;
+    right: 0%;
+}
+.logo{
+    height: 48px;
+}
+.logo img{
+     height: 5em;
 }
