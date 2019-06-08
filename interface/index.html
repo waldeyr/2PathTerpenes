@@ -10,7 +10,6 @@
         <link rel="stylesheet" href="dependencies/node_modules/bootstrap/compiler/style.css">
         <link rel="stylesheet" href="css/style.css">
         <meta name="viewport" content="width=device-width, initial-scale=1">
-        <link rel="stylesheet" href="https://www.w3schools.com/w3css/4/w3.css">
     </head>	
     <body class="body">
         <header>
@@ -19,14 +18,8 @@
                     <img src="img/2PathLogo.png" alt="2Path: a chemical network for plant terpenes">
                 </a>
             </nav>
-            <nav class="navbar navbar-light bg-transparent">
-                <span class="badge badge-success" style="margin: 2em 0 -2em .1em;">Set of available rules</span>
-                <span class="badge badge-success" style="margin: 2em 2em -2em .1em;">Drag chosen rules to here</span>
-            </nav>
         </header>
-        
-        <br>
-        
+
         <form class="form-inline">
             <div class="container">
                 <div class="modal fade bd-example-modal-lg">
@@ -34,8 +27,8 @@
                         <div class="modal-content">
                             <!-- MODAL WITH CONTENT FOR simulation.py -->
                             <div class="modal-footer">
-                                <button sytle="float:left;" id ="dwn-btn" type="button" class="btn btn-success my-2 my-sm-0" data-dismiss="modal">Save as simulation.py</button>
-                                <button type="button" class="btn btn-success my-2 my-sm-0" data-dismiss="modal">Close</button>
+                                <button sytle="float:left;" id ="dwn-btn" type="button" class="btn btn-success btn-sm" data-dismiss="modal">Save as simulation.py</button>
+                                <button type="button" class="btn btn-success btn-sm" data-dismiss="modal">Close</button>
                             </div>
                             <div id="corpo" class="modal-body">
                                 <p align="justify">
@@ -58,7 +51,6 @@
                                     # ITERATIONS<br />
                                     ######################################
                                 <p align="justify" id="interations"></p>
-                                </p>
                                 <p align="justify">
                                     ######################################<br />
                                     # NETWORK GENERATION<br />
@@ -75,421 +67,475 @@
                     </div>
                 </div>
             </div>
-
         </form>
-        <section class="drop drag" ondragstart="dragStart(event);">
-            <div id="r00 = ruleGML('1-2Hshift.gml')" ondrop="event.stopPropagation(); event.preventDefault();" draggable="true">
-                <button id="0r"  type="button" class="btn btn-success my-2 my-sm-0" data-toggle="modal" data-target="#myModal">1,2 hydrid shift</button>
-                <div id="modal0" class="modal fade bd-example-modal-lg">
-                    <div class="modal-dialog modal-lg">
-                        <div class="modal-content">
-                            <div class="modal-body">
-                                <img src="img/r0.png" alt="2Path Rules" style="width: 600px; height: 95px; margin-bottom: 3%;  display: table;
-                                     margin: 0 auto; font-size: 45px;">
-                                <hr />
-                            </div>
 
-                            <div class="modal-footer">
-                                <button type="button" class="btn btn-success my-2 my-sm-0" data-dismiss="modal">Close</button>
-                            </div>
 
+        <div class="row">
+            <div class="col-sm-4">
+                <section class="drop drag" ondragstart="dragStart(event);">
+                    <div class = "alert alert-warning">Choose rules and drag them to the right pane</div>
+                    <div id="r00 = ruleGML('1-2Hshift.gml')" ondrop="event.stopPropagation(); event.preventDefault();" draggable="true">
+                        <button id="0r"  type="button" class="btn btn-success btn-sm" data-toggle="modal" data-target="#myModal">1,2 hydrid shift</button>
+                        <div id="modal0" class="modal fade bd-example-modal-lg">
+                            <div class="modal-dialog modal-lg">
+                                <div class="modal-content">
+                                    <div class="modal-body">
+                                        <img src="img/r0.png" alt="2Path Rules" style="width: 600px; height: 95px; margin-bottom: 3%;  display: table;
+                                             margin: 0 auto; font-size: 45px;">
+                                        <hr />
+                                    </div>
+
+                                    <div class="modal-footer">
+                                        <button type="button" class="btn btn-success btn-sm" data-dismiss="modal">Close</button>
+                                    </div>
+
+                                </div>
+                            </div>
                         </div>
                     </div>
-                </div>
-            </div>
 
 
-            <div id="r01 = ruleGML('1-3Hshift.gml')" ondrop="event.stopPropagation(); event.preventDefault();" draggable="true">
-                <button id="1r"  type="button" class="btn btn-success my-2 my-sm-0" data-toggle="modal" data-target="#myModal">1,3 hydrid shift</button>
-                <div id="modal1" class="modal fade bd-example-modal-lg">
-                    <div class="modal-dialog modal-lg">
-                        <div class="modal-content">
-                            <div class="modal-body">
-                                <img src="img/r1.png" alt="2Path Rules" style="width: 602px; height: 100px; margin-bottom: 3%;  display: table;
-                                     margin: 0 auto; font-size: 45px;">
-                                <hr />
+                    <div id="r01 = ruleGML('1-3Hshift.gml')" ondrop="event.stopPropagation(); event.preventDefault();" draggable="true">
+                        <button id="1r"  type="button" class="btn btn-success btn-sm" data-toggle="modal" data-target="#myModal">1,3 hydrid shift</button>
+                        <div id="modal1" class="modal fade bd-example-modal-lg">
+                            <div class="modal-dialog modal-lg">
+                                <div class="modal-content">
+                                    <div class="modal-body">
+                                        <img src="img/r1.png" alt="2Path Rules" style="width: 602px; height: 100px; margin-bottom: 3%;  display: table;
+                                             margin: 0 auto; font-size: 45px;">
+                                        <hr />
+                                    </div>
+                                    <div class="modal-footer">
+                                        <button type="button" class="btn btn-success btn-sm" data-dismiss="modal">Close</button>
+                                    </div>
+
+                                </div>
                             </div>
-                            <div class="modal-footer">
-                                <button type="button" class="btn btn-success my-2 my-sm-0" data-dismiss="modal">Close</button>
-                            </div>
-
                         </div>
                     </div>
-                </div>
-            </div>
 
 
-            <div id="r02 = ruleGML('h_loss.gml')" ondrop="event.stopPropagation(); event.preventDefault();" draggable="true">
-                <button id="2r"  type="button" class="btn btn-success my-2 my-sm-0" data-toggle="modal" data-target="#myModal">H+ loss</button>
-                <div id="modal2" class="modal fade bd-example-modal-lg">
-                    <div class="modal-dialog modal-lg">
-                        <div class="modal-content">
-                            <div class="modal-body">
-                                <img src="img/r2.png" alt="2Path Rules" style="width: 602px; height: 180px; margin-bottom: 3%;  display: table;
-                                     margin: 0 auto; font-size: 45px;">
-                                <hr />
+                    <div id="r02 = ruleGML('h_loss.gml')" ondrop="event.stopPropagation(); event.preventDefault();" draggable="true">
+                        <button id="2r"  type="button" class="btn btn-success btn-sm" data-toggle="modal" data-target="#myModal">H+ loss</button>
+                        <div id="modal2" class="modal fade bd-example-modal-lg">
+                            <div class="modal-dialog modal-lg">
+                                <div class="modal-content">
+                                    <div class="modal-body">
+                                        <img src="img/r2.png" alt="2Path Rules" style="width: 602px; height: 180px; margin-bottom: 3%;  display: table;
+                                             margin: 0 auto; font-size: 45px;">
+                                        <hr />
+                                    </div>
+
+                                    <div class="modal-footer">
+                                        <button type="button" class="btn btn-success btn-sm" data-dismiss="modal">Close</button>
+                                    </div>
+
+                                </div>
                             </div>
-
-                            <div class="modal-footer">
-                                <button type="button" class="btn btn-success my-2 my-sm-0" data-dismiss="modal">Close</button>
-                            </div>
-
                         </div>
                     </div>
-                </div>
-            </div>
 
 
-            <div id="r03 = ruleGML('h2o_gain.gml')" ondrop="event.stopPropagation(); event.preventDefault();" draggable="true">
-                <button id="3r"  type="button" class="btn btn-success my-2 my-sm-0" data-toggle="modal" data-target="#myModal">Capture of H2O</button>
-                <div id="modal3" class="modal fade bd-example-modal-lg">
-                    <div class="modal-dialog modal-lg">
-                        <div class="modal-content">
-                            <div class="modal-body">
-                                <img src="img/r3.png" alt="2Path Rules" style="width: 600px; height: 90px; margin-bottom: 3%;  display: table;
-                                     margin: 0 auto; font-size: 45px;">
-                                <hr />
+                    <div id="r03 = ruleGML('h2o_gain.gml')" ondrop="event.stopPropagation(); event.preventDefault();" draggable="true">
+                        <button id="3r"  type="button" class="btn btn-success btn-sm" data-toggle="modal" data-target="#myModal">Capture of H2O</button>
+                        <div id="modal3" class="modal fade bd-example-modal-lg">
+                            <div class="modal-dialog modal-lg">
+                                <div class="modal-content">
+                                    <div class="modal-body">
+                                        <img src="img/r3.png" alt="2Path Rules" style="width: 600px; height: 90px; margin-bottom: 3%;  display: table;
+                                             margin: 0 auto; font-size: 45px;">
+                                        <hr />
+                                    </div>
+
+                                    <div class="modal-footer">
+                                        <button type="button" class="btn btn-success btn-sm" data-dismiss="modal">Close</button>
+                                    </div>
+
+                                </div>
                             </div>
-
-                            <div class="modal-footer">
-                                <button type="button" class="btn btn-success my-2 my-sm-0" data-dismiss="modal">Close</button>
-                            </div>
-
                         </div>
                     </div>
-                </div>
-            </div>
 
 
-            <div id="r04 = ruleGML('opp_loss_gpp.gml')" ondrop="event.stopPropagation(); event.preventDefault();" draggable="true">
-                <button id="4r"  type="button" class="btn btn-success my-2 my-sm-0" data-toggle="modal" data-target="#myModal">Disphophate loss for GPP</button>
-                <div id="modal4" class="modal fade bd-example-modal-lg">
-                    <div class="modal-dialog modal-lg">
-                        <div class="modal-content">
-                            <div class="modal-body">
-                                <img src="img/r4.png" alt="2Path Rules" style="width: 600px; height: 168px; margin-bottom: 3%;  display: table;
-                                     margin: 0 auto; font-size: 45px;">
-                                <hr />
+                    <div id="r04 = ruleGML('opp_loss_gpp.gml')" ondrop="event.stopPropagation(); event.preventDefault();" draggable="true">
+                        <button id="4r"  type="button" class="btn btn-success btn-sm" data-toggle="modal" data-target="#myModal">Disphophate loss for GPP</button>
+                        <div id="modal4" class="modal fade bd-example-modal-lg">
+                            <div class="modal-dialog modal-lg">
+                                <div class="modal-content">
+                                    <div class="modal-body">
+                                        <img src="img/r4.png" alt="2Path Rules" style="width: 600px; height: 168px; margin-bottom: 3%;  display: table;
+                                             margin: 0 auto; font-size: 45px;">
+                                        <hr />
+                                    </div>
+
+                                    <div class="modal-footer">
+                                        <button type="button" class="btn btn-success btn-sm" data-dismiss="modal">Close</button>
+                                    </div>
+
+                                </div>
                             </div>
-
-                            <div class="modal-footer">
-                                <button type="button" class="btn btn-success my-2 my-sm-0" data-dismiss="modal">Close</button>
-                            </div>
-
                         </div>
                     </div>
-                </div>
-            </div>
 
-            <div id="r05 = ruleGML('opp_loss_gpp_alternative.gml')" ondrop="event.stopPropagation(); event.preventDefault();" draggable="true">
-                <button id="5r"  type="button" class="btn btn-success my-2 my-sm-0" data-toggle="modal" data-target="#myModal">Disphophate loss for GPP (alternative)</button>
-                <div id="modal5" class="modal fade bd-example-modal-lg">
-                    <div class="modal-dialog modal-lg">
-                        <div class="modal-content">
-                            <div class="modal-body">
-                                <img src="img/r5.png" alt="2Path Rules" style="width: 600px; height: 168px; margin-bottom: 3%;  display: table;
-                                     margin: 0 auto; font-size: 45px;">
-                                <hr />
+                    <div id="r05 = ruleGML('opp_loss_gpp_alternative.gml')" ondrop="event.stopPropagation(); event.preventDefault();" draggable="true">
+                        <button id="5r"  type="button" class="btn btn-success btn-sm" data-toggle="modal" data-target="#myModal">Disphophate loss for GPP (alternative)</button>
+                        <div id="modal5" class="modal fade bd-example-modal-lg">
+                            <div class="modal-dialog modal-lg">
+                                <div class="modal-content">
+                                    <div class="modal-body">
+                                        <img src="img/r5.png" alt="2Path Rules" style="width: 600px; height: 168px; margin-bottom: 3%;  display: table;
+                                             margin: 0 auto; font-size: 45px;">
+                                        <hr />
+                                    </div>
+
+                                    <div class="modal-footer">
+                                        <button type="button" class="btn btn-success btn-sm" data-dismiss="modal">Close</button>
+                                    </div>
+
+                                </div>
                             </div>
-
-                            <div class="modal-footer">
-                                <button type="button" class="btn btn-success my-2 my-sm-0" data-dismiss="modal">Close</button>
-                            </div>
-
                         </div>
                     </div>
-                </div>
-            </div>
 
 
-            <div id="r06 = ruleGML('opp_gain_by_geranyl_cation.gml')" ondrop="event.stopPropagation(); event.preventDefault();" draggable="true">
-                <button id="6r"  type="button" class="btn btn-success my-2 my-sm-0" data-toggle="modal" data-target="#myModal">Diphosphate capture by geranyl cation (alternative)</button>
-                <div id="modal6" class="modal fade bd-example-modal-lg">
-                    <div class="modal-dialog modal-lg">
-                        <div class="modal-content">
-                            <div class="modal-body">
-                                <img src="img/r6.png" alt="2Path Rules" style="width: 600px; height: 121px; margin-bottom: 3%;  display: table;
-                                     margin: 0 auto; font-size: 45px;">
-                                <hr />
+                    <div id="r06 = ruleGML('opp_gain_by_geranyl_cation.gml')" ondrop="event.stopPropagation(); event.preventDefault();" draggable="true">
+                        <button id="6r"  type="button" class="btn btn-success btn-sm" data-toggle="modal" data-target="#myModal">Diphosphate capture by geranyl cation (alternative)</button>
+                        <div id="modal6" class="modal fade bd-example-modal-lg">
+                            <div class="modal-dialog modal-lg">
+                                <div class="modal-content">
+                                    <div class="modal-body">
+                                        <img src="img/r6.png" alt="2Path Rules" style="width: 600px; height: 121px; margin-bottom: 3%;  display: table;
+                                             margin: 0 auto; font-size: 45px;">
+                                        <hr />
+                                    </div>
+
+                                    <div class="modal-footer">
+                                        <button type="button" class="btn btn-success btn-sm" data-dismiss="modal">Close</button>
+                                    </div>
+
+                                </div>
                             </div>
-
-                            <div class="modal-footer">
-                                <button type="button" class="btn btn-success my-2 my-sm-0" data-dismiss="modal">Close</button>
-                            </div>
-
                         </div>
                     </div>
-                </div>
-            </div>
 
-            <div id="r07 = ruleGML('opp_loss_for_lpp_c3.gml')" ondrop="event.stopPropagation(); event.preventDefault();" draggable="true">
-                <button id="7r"  type="button" class="btn btn-success my-2 my-sm-0" data-toggle="modal" data-target="#myModal">Diphosphate loss for linalyl diphosphate</button>
-                <div id="modal7" class="modal fade bd-example-modal-lg">
-                    <div class="modal-dialog modal-lg">
-                        <div class="modal-content">
-                            <div class="modal-body">
-                                <img src="img/r7.png" alt="2Path Rules" style="width: 600px; height: 119px; margin-bottom: 3%;  display: table;
-                                     margin: 0 auto; font-size: 45px;">
-                                <hr />
+                    <div id="r07 = ruleGML('opp_loss_for_lpp_c3.gml')" ondrop="event.stopPropagation(); event.preventDefault();" draggable="true">
+                        <button id="7r"  type="button" class="btn btn-success btn-sm" data-toggle="modal" data-target="#myModal">Diphosphate loss for linalyl diphosphate</button>
+                        <div id="modal7" class="modal fade bd-example-modal-lg">
+                            <div class="modal-dialog modal-lg">
+                                <div class="modal-content">
+                                    <div class="modal-body">
+                                        <img src="img/r7.png" alt="2Path Rules" style="width: 600px; height: 119px; margin-bottom: 3%;  display: table;
+                                             margin: 0 auto; font-size: 45px;">
+                                        <hr />
+                                    </div>
+
+                                    <div class="modal-footer">
+                                        <button type="button" class="btn btn-success btn-sm" data-dismiss="modal">Close</button>
+                                    </div>
+
+                                </div>
                             </div>
-
-                            <div class="modal-footer">
-                                <button type="button" class="btn btn-success my-2 my-sm-0" data-dismiss="modal">Close</button>
-                            </div>
-
                         </div>
                     </div>
-                </div>
-            </div>
 
 
-            <div id="r08 = ruleGML('opp_loss_for_lpp_c3_alternative.gml')" ondrop="event.stopPropagation(); event.preventDefault();" draggable="true">
-                <button id="8r"  type="button" class="btn btn-success my-2 my-sm-0" data-toggle="modal" data-target="#myModal">Diphosphate loss for linalyl diphosphate (alternative)</button>
-                <div id="modal8" class="modal fade bd-example-modal-lg">
-                    <div class="modal-dialog modal-lg">
-                        <div class="modal-content">
-                            <div class="modal-body">
-                                <img src="img/r8.png" alt="2Path Rules" style="width: 600px; height: 119px; margin-bottom: 3%;  display: table;
-                                     margin: 0 auto; font-size: 45px;">
-                                <hr />
+                    <div id="r08 = ruleGML('opp_loss_for_lpp_c3_alternative.gml')" ondrop="event.stopPropagation(); event.preventDefault();" draggable="true">
+                        <button id="8r"  type="button" class="btn btn-success btn-sm" data-toggle="modal" data-target="#myModal">Diphosphate loss for linalyl diphosphate (alternative)</button>
+                        <div id="modal8" class="modal fade bd-example-modal-lg">
+                            <div class="modal-dialog modal-lg">
+                                <div class="modal-content">
+                                    <div class="modal-body">
+                                        <img src="img/r8.png" alt="2Path Rules" style="width: 600px; height: 119px; margin-bottom: 3%;  display: table;
+                                             margin: 0 auto; font-size: 45px;">
+                                        <hr />
+                                    </div>
+
+                                    <div class="modal-footer">
+                                        <button type="button" class="btn btn-success btn-sm" data-dismiss="modal">Close</button>
+                                    </div>
+
+                                </div>
                             </div>
-
-                            <div class="modal-footer">
-                                <button type="button" class="btn btn-success my-2 my-sm-0" data-dismiss="modal">Close</button>
-                            </div>
-
                         </div>
                     </div>
-                </div>
-            </div>
 
 
-            <div id="r09 = ruleGML('1-6-closure.gml')" ondrop="event.stopPropagation(); event.preventDefault();" draggable="true">
-                <button id="9r"  type="button" class="btn btn-success my-2 my-sm-0" data-toggle="modal" data-target="#myModal">1,6 ring closure</button>
-                <div id="modal9" class="modal fade bd-example-modal-lg">
-                    <div class="modal-dialog modal-lg">
-                        <div class="modal-content">
-                            <div class="modal-body">
-                                <img src="img/r9.png" alt="2Path Rules" style="width: 600px; height: 214px; margin-bottom: 3%;  display: table;
-                                     margin: 0 auto; font-size: 45px;">
-                                <hr />
+                    <div id="r09 = ruleGML('1-6-closure.gml')" ondrop="event.stopPropagation(); event.preventDefault();" draggable="true">
+                        <button id="9r"  type="button" class="btn btn-success btn-sm" data-toggle="modal" data-target="#myModal">1,6 ring closure</button>
+                        <div id="modal9" class="modal fade bd-example-modal-lg">
+                            <div class="modal-dialog modal-lg">
+                                <div class="modal-content">
+                                    <div class="modal-body">
+                                        <img src="img/r9.png" alt="2Path Rules" style="width: 600px; height: 214px; margin-bottom: 3%;  display: table;
+                                             margin: 0 auto; font-size: 45px;">
+                                        <hr />
+                                    </div>
+
+                                    <div class="modal-footer">
+                                        <button type="button" class="btn btn-success btn-sm" data-dismiss="modal">Close</button>
+                                    </div>
+
+                                </div>
                             </div>
-
-                            <div class="modal-footer">
-                                <button type="button" class="btn btn-success my-2 my-sm-0" data-dismiss="modal">Close</button>
-                            </div>
-
                         </div>
                     </div>
-                </div>
-            </div>
 
 
-            <div id="r10 = ruleGML('3,7-closure.gml')" ondrop="event.stopPropagation(); event.preventDefault();" draggable="true">
-                <button id="10r"  type="button" class="btn btn-success my-2 my-sm-0" data-toggle="modal" data-target="#myModal">3,7 ring closure</button>
-                <div id="modal10" class="modal fade bd-example-modal-lg">
-                    <div class="modal-dialog modal-lg">
-                        <div class="modal-content">
-                            <div class="modal-body">
-                                <img src="img/r10.png" alt="2Path Rules" style="width: 600px; height: 164px; margin-bottom: 3%;  display: table;
-                                     margin: 0 auto; font-size: 45px;">
-                                <hr />
+                    <div id="r10 = ruleGML('3,7-closure.gml')" ondrop="event.stopPropagation(); event.preventDefault();" draggable="true">
+                        <button id="10r"  type="button" class="btn btn-success btn-sm" data-toggle="modal" data-target="#myModal">3,7 ring closure</button>
+                        <div id="modal10" class="modal fade bd-example-modal-lg">
+                            <div class="modal-dialog modal-lg">
+                                <div class="modal-content">
+                                    <div class="modal-body">
+                                        <img src="img/r10.png" alt="2Path Rules" style="width: 600px; height: 164px; margin-bottom: 3%;  display: table;
+                                             margin: 0 auto; font-size: 45px;">
+                                        <hr />
+                                    </div>
+
+                                    <div class="modal-footer">
+                                        <button type="button" class="btn btn-success btn-sm" data-dismiss="modal">Close</button>
+                                    </div>
+
+                                </div>
                             </div>
-
-                            <div class="modal-footer">
-                                <button type="button" class="btn btn-success my-2 my-sm-0" data-dismiss="modal">Close</button>
-                            </div>
-
                         </div>
                     </div>
-                </div>
-            </div>
 
-            <div id="r11 = ruleGML('2,7-closure.gml')" ondrop="event.stopPropagation(); event.preventDefault();" draggable="true">
-                <button id="11r"  type="button" class="btn btn-success my-2 my-sm-0" data-toggle="modal" data-target="#myModal">2,7 ring closure</button>
-                <div id="modal11" class="modal fade bd-example-modal-lg">
-                    <div class="modal-dialog modal-lg">
-                        <div class="modal-content">
-                            <div class="modal-body">
-                                <img src="img/r11.png" alt="2Path Rules" style="width: 600px; height: 164px; margin-bottom: 3%;  display: table;
-                                     margin: 0 auto; font-size: 45px;">
-                                <hr />
+                    <div id="r11 = ruleGML('2,7-closure.gml')" ondrop="event.stopPropagation(); event.preventDefault();" draggable="true">
+                        <button id="11r"  type="button" class="btn btn-success btn-sm" data-toggle="modal" data-target="#myModal">2,7 ring closure</button>
+                        <div id="modal11" class="modal fade bd-example-modal-lg">
+                            <div class="modal-dialog modal-lg">
+                                <div class="modal-content">
+                                    <div class="modal-body">
+                                        <img src="img/r11.png" alt="2Path Rules" style="width: 600px; height: 164px; margin-bottom: 3%;  display: table;
+                                             margin: 0 auto; font-size: 45px;">
+                                        <hr />
+                                    </div>
+
+                                    <div class="modal-footer">
+                                        <button type="button" class="btn btn-success btn-sm" data-dismiss="modal">Close</button>
+                                    </div>
+
+                                </div>
                             </div>
-
-                            <div class="modal-footer">
-                                <button type="button" class="btn btn-success my-2 my-sm-0" data-dismiss="modal">Close</button>
-                            </div>
-
                         </div>
                     </div>
-                </div>
-            </div>
 
-            <div id="r12 = ruleGML('WMshift.gml')" ondrop="event.stopPropagation(); event.preventDefault();" draggable="true">
-                <button id="12r"  type="button" class="btn btn-success my-2 my-sm-0" data-toggle="modal" data-target="#myModal">Wagner-Meerwein rearrangment</button>
-                <div id="modal12" class="modal fade bd-example-modal-lg">
-                    <div class="modal-dialog modal-lg">
-                        <div class="modal-content">
-                            <div class="modal-body">
-                                 <img src="img/r12.png" alt="2Path Rules" style="width: 700px; height: 75px; margin-bottom: 3%;  display: table;
-                                     margin: 0 auto; font-size: 45px;">
-                                <hr />
+                    <div id="r12 = ruleGML('WMshift.gml')" ondrop="event.stopPropagation(); event.preventDefault();" draggable="true">
+                        <button id="12r"  type="button" class="btn btn-success btn-sm" data-toggle="modal" data-target="#myModal">Wagner-Meerwein rearrangment</button>
+                        <div id="modal12" class="modal fade bd-example-modal-lg">
+                            <div class="modal-dialog modal-lg">
+                                <div class="modal-content">
+                                    <div class="modal-body">
+                                        <img src="img/r12.png" alt="2Path Rules" style="width: 700px; height: 75px; margin-bottom: 3%;  display: table;
+                                             margin: 0 auto; font-size: 45px;">
+                                        <hr />
+                                    </div>
+
+                                    <div class="modal-footer">
+                                        <button type="button" class="btn btn-success btn-sm" data-dismiss="modal">Close</button>
+                                    </div>
+
+                                </div>
                             </div>
-
-                            <div class="modal-footer">
-                                <button type="button" class="btn btn-success my-2 my-sm-0" data-dismiss="modal">Close</button>
-                            </div>
-
                         </div>
                     </div>
-                </div>
-            </div>
 
-            <div id="r13 = ruleGML('1-8-cyc.gml')" ondrop="event.stopPropagation(); event.preventDefault();" draggable="true">
-                <button id="13r"  type="button" class="btn btn-success my-2 my-sm-0" data-toggle="modal" data-target="#myModal">1,8 ring closure</button>
-                <div id="modal13" class="modal fade bd-example-modal-lg">
-                    <div class="modal-dialog modal-lg">
-                        <div class="modal-content">
-                            <div class="modal-body">
-                               <img src="img/r13.png" alt="2Path Rules" style="width: 600px; height: 175px; margin-bottom: 3%;  display: table;
-                                     margin: 0 auto; font-size: 45px;">
-                                <hr />
+                    <div id="r13 = ruleGML('1-8-cyc.gml')" ondrop="event.stopPropagation(); event.preventDefault();" draggable="true">
+                        <button id="13r"  type="button" class="btn btn-success btn-sm" data-toggle="modal" data-target="#myModal">1,8 ring closure</button>
+                        <div id="modal13" class="modal fade bd-example-modal-lg">
+                            <div class="modal-dialog modal-lg">
+                                <div class="modal-content">
+                                    <div class="modal-body">
+                                        <img src="img/r13.png" alt="2Path Rules" style="width: 600px; height: 175px; margin-bottom: 3%;  display: table;
+                                             margin: 0 auto; font-size: 45px;">
+                                        <hr />
+                                    </div>
+
+                                    <div class="modal-footer">
+                                        <button type="button" class="btn btn-success btn-sm" data-dismiss="modal">Close</button>
+                                    </div>
+
+                                </div>
                             </div>
-
-                            <div class="modal-footer">
-                                <button type="button" class="btn btn-success my-2 my-sm-0" data-dismiss="modal">Close</button>
-                            </div>
-
                         </div>
                     </div>
-                </div>
-            </div>
 
-            <div id="r14 = ruleGML('2-6-closure.gml')" ondrop="event.stopPropagation(); event.preventDefault();" draggable="true">
-                <button id="14r"  type="button" class="btn btn-success my-2 my-sm-0" data-toggle="modal" data-target="#myModal">2,6 ring closure</button>
-                <div id="modal14" class="modal fade bd-example-modal-lg">
-                    <div class="modal-dialog modal-lg">
-                        <div class="modal-content">
-                            <div class="modal-body">
-                                <img src="img/r14.png" alt="2Path Rules" style="width: 600px; height: 175px; margin-bottom: 3%;  display: table;
-                                     margin: 0 auto; font-size: 45px;">
-                                <hr />
+                    <div id="r14 = ruleGML('2-6-closure.gml')" ondrop="event.stopPropagation(); event.preventDefault();" draggable="true">
+                        <button id="14r"  type="button" class="btn btn-success btn-sm" data-toggle="modal" data-target="#myModal">2,6 ring closure</button>
+                        <div id="modal14" class="modal fade bd-example-modal-lg">
+                            <div class="modal-dialog modal-lg">
+                                <div class="modal-content">
+                                    <div class="modal-body">
+                                        <img src="img/r14.png" alt="2Path Rules" style="width: 600px; height: 175px; margin-bottom: 3%;  display: table;
+                                             margin: 0 auto; font-size: 45px;">
+                                        <hr />
+                                    </div>
+
+                                    <div class="modal-footer">
+                                        <button type="button" class="btn btn-success btn-sm" data-dismiss="modal">Close</button>
+                                    </div>
+
+                                </div>
                             </div>
-
-                            <div class="modal-footer">
-                                <button type="button" class="btn btn-success my-2 my-sm-0" data-dismiss="modal">Close</button>
-                            </div>
-
                         </div>
                     </div>
-                </div>
-            </div>
 
-            <div id="r15 = ruleGML('5-7-closure.gml')" ondrop="event.stopPropagation(); event.preventDefault();" draggable="true">
-                <button id="15r"  type="button" class="btn btn-success my-2 my-sm-0" data-toggle="modal" data-target="#myModal">5,7 ring closure</button>
-                <div id="modal15" class="modal fade bd-example-modal-lg">
-                    <div class="modal-dialog modal-lg">
-                        <div class="modal-content">
-                            <div class="modal-body">
-                                <img src="img/r15.png" alt="2Path Rules" style="width: 600px; height: 121px; margin-bottom: 3%;  display: table;
-                                     margin: 0 auto; font-size: 45px;">
-                                <hr />
+                    <div id="r15 = ruleGML('5-7-closure.gml')" ondrop="event.stopPropagation(); event.preventDefault();" draggable="true">
+                        <button id="15r"  type="button" class="btn btn-success btn-sm" data-toggle="modal" data-target="#myModal">5,7 ring closure</button>
+                        <div id="modal15" class="modal fade bd-example-modal-lg">
+                            <div class="modal-dialog modal-lg">
+                                <div class="modal-content">
+                                    <div class="modal-body">
+                                        <img src="img/r15.png" alt="2Path Rules" style="width: 600px; height: 121px; margin-bottom: 3%;  display: table;
+                                             margin: 0 auto; font-size: 45px;">
+                                        <hr />
+                                    </div>
+
+                                    <div class="modal-footer">
+                                        <button type="button" class="btn btn-success btn-sm" data-dismiss="modal">Close</button>
+                                    </div>
+
+                                </div>
                             </div>
-
-                            <div class="modal-footer">
-                                <button type="button" class="btn btn-success my-2 my-sm-0" data-dismiss="modal">Close</button>
-                            </div>
-
                         </div>
                     </div>
-                </div>
-            </div>
 
-            <div id="r16 = ruleGML ('opp_gain_by_bornyl_cation.gml')" ondrop="event.stopPropagation(); event.preventDefault();" draggable="true">
-                <button id="16r"  type="button" class="btn btn-success my-2 my-sm-0" data-toggle="modal" data-target="#myModal">Diphosphate capture by Bornyl Cation</button>
-                <div id="modal16" class="modal fade bd-example-modal-lg">
-                    <div class="modal-dialog modal-lg">
-                        <div class="modal-content">
-                            <div class="modal-body">
-                                <img src="img/r16.png" alt="2Path Rules" style="width: 600px; height: 121px; margin-bottom: 3%;  display: table;
-                                     margin: 0 auto; font-size: 45px;">
-                                <hr />
+                    <div id="r16 = ruleGML ('opp_gain_by_bornyl_cation.gml')" ondrop="event.stopPropagation(); event.preventDefault();" draggable="true">
+                        <button id="16r"  type="button" class="btn btn-success btn-sm" data-toggle="modal" data-target="#myModal">Diphosphate capture by Bornyl Cation</button>
+                        <div id="modal16" class="modal fade bd-example-modal-lg">
+                            <div class="modal-dialog modal-lg">
+                                <div class="modal-content">
+                                    <div class="modal-body">
+                                        <img src="img/r16.png" alt="2Path Rules" style="width: 600px; height: 121px; margin-bottom: 3%;  display: table;
+                                             margin: 0 auto; font-size: 45px;">
+                                        <hr />
+                                    </div>
+
+                                    <div class="modal-footer">
+                                        <button type="button" class="btn btn-success btn-sm" data-dismiss="modal">Close</button>
+                                    </div>
+
+                                </div>
                             </div>
-
-                            <div class="modal-footer">
-                                <button type="button" class="btn btn-success my-2 my-sm-0" data-dismiss="modal">Close</button>
-                            </div>
-
                         </div>
                     </div>
-                </div>
-            </div>
 
-            <div id="r17 = ruleGML ('allylshift.gml')" ondrop="event.stopPropagation(); event.preventDefault();" draggable="true">
-                <button id="17r"  type="button" class="btn btn-success my-2 my-sm-0" data-toggle="modal" data-target="#myModal">Allylic charge shift</button>
-                <div id="modal17" class="modal fade bd-example-modal-lg">
-                    <div class="modal-dialog modal-lg">
-                        <div class="modal-content">
-                            <div class="modal-body">
-                                <img src="img/r17.png" alt="2Path Rules" style="width: 700px; height: 57px; margin-bottom: 3%;  display: table;
-                                     margin: 0 auto; font-size: 45px;">
-                                <hr />
+                    <div id="r17 = ruleGML ('allylshift.gml')" ondrop="event.stopPropagation(); event.preventDefault();" draggable="true">
+                        <button id="17r"  type="button" class="btn btn-success btn-sm" data-toggle="modal" data-target="#myModal">Allylic charge shift</button>
+                        <div id="modal17" class="modal fade bd-example-modal-lg">
+                            <div class="modal-dialog modal-lg">
+                                <div class="modal-content">
+                                    <div class="modal-body">
+                                        <img src="img/r17.png" alt="2Path Rules" style="width: 700px; height: 57px; margin-bottom: 3%;  display: table;
+                                             margin: 0 auto; font-size: 45px;">
+                                        <hr />
+                                    </div>
+
+                                    <div class="modal-footer">
+                                        <button type="button" class="btn btn-success btn-sm" data-dismiss="modal">Close</button>
+                                    </div>
+
+                                </div>
                             </div>
-
-                            <div class="modal-footer">
-                                <button type="button" class="btn btn-success my-2 my-sm-0" data-dismiss="modal">Close</button>
-                            </div>
-
                         </div>
                     </div>
+
+                </section>
+            </div>
+            <div class="col-sm-4">
+                <section id="dropBox" ondragover="allowDropOption(event);" ondrop="drop(event);" class="drop2">  
+                </section>
+            </div>
+            <div class="col-sm-4">
+                <div class="rightblock">
+                    <label for="quantity">Iterations <small>(min=1, max=7)</small>:
+                        <input id="number" type="number" name="quantity" min="1" max="7" maxlength="1" onclick="getNumber()" onkeydown="return false" />
+                    </label>
+                    <br />
+                    <button type="button" id="checkBox" class="btn btn-success btn-md" onclick='saveAndDisplay()' data-toggle="modal" data-target=".bd-example-modal-lg" style="margin-right: 2.75%;">
+                        Generate the Simulation Code
+                    </button>
                 </div>
             </div>
+        </div>
+        <br />
+        <div class="row">
+            <div class="col-sm-10 language-bash">
+                <span class="text-warning">After save the file, if you are using Docker, run:</span>
+                <br />
+                docker run --rm --volume $(pwd):/home/shared/ --workdir /home/shared/ waldeyr/mod_v0.8.0:v1.0 /home/mod-v0.8.0/bin/mod -f /home/shared/molecules.py -f /home/shared/simulation.py -f /home/shared/printer.py
+                <br />
+                <span class="text-warning">If you are using a standalone MedØlDatschgerl version 0.8.0, run:</span>
+                <br />
+                PATH_TO_MOD/mod -f molecules.py -f simulation.py -f printer.py
+                <br />
+            </div>
+        </div>
 
-        </section>
-        <section id="dropBox" ondragover="allowDropOption(event);" ondrop="drop(event);" class="drop2">  </section>
-        <div  class="iterations">
-            <label for="quantity">Iterations (between 1 and 7):
-                <input id="number" type="number" name="quantity" min="1" max="7" maxlength="1" style="width: 80px; height:48px; "onclick="getNumber()" onkeydown="return false">
-            </label>
-        </div>      
-        <button type="button" id="checkBox" class="button" onclick='saveAndDisplay()' data-toggle="modal" data-target=".bd-example-modal-lg" style="margin-right: 2.75%;">
-            Generate the Simulation Code
-        </button>
+        <script src="dependencies/node_modules/jquery/dist/jquery.js"></script>
+        <script src="dependencies/node_modules/popper/dist/umd/popper.js"></script>
+        <script src="dependencies/node_modules/bootstrap/dist/js/bootstrap.js"></script>
+        <script type="text/javascript" src="dependencies/jquery-ui.min.js"></script>
+        <script type="text/javascript" src="js/dragdrop.js"></script>
 
-        <!--
-                        <div class="checkBox">
-                        <input type="checkbox" value="fpp" name="c1" disable>
-                        <label for="c1">fpp</label>
-                        <br>
-                        <input type="checkbox" value="gpp" name="c2">
-                        <label for="c2">gpp</label>
-                        <br>
-                        <input type="checkbox" value="H2O" name="c3">
-                        <label for="c3">H2O</label>
-        -->
-    </div>
+        <!-- Footer -->
+        <footer class="page-footer font-small teal pt-4">
 
-    <!--<div class="mx-auto" style="width: 300px; margin-bottom: 3%; margin-top: 2%;  display: table; margin: 10 auto; font-size: 30px; float:left; margin-left: 10%; padding: 15px;">
-            <span class="badge badge-success">Iterations (between 1 and 7):
-                    <input id="slider" type="range" name="vol" value="0" min="1" max="7" step="1" oninput="sliderChange(this.value)" class="slidercontainer">
-                    <output id="output">Choose a value</output>
-            </span>
-    </div>-->
+            <!-- Footer Text -->
+            <div class="container-fluid text-center text-md-center">
 
+                <!-- Grid row -->
+                <div class="row">
 
+                    <!-- Grid column -->
+                    <div class="col-md-6 mt-md-0 mt-3">
 
-    <!--<div class="mx-auto" style="width: 10px; margin-bottom: 4%; margin-top: 10%;  display: table; margin: 10 auto; font-size: 27px;">
-           <span class="badge badge-success ">  Iterations (between 1 and 7):  <input style="margin-bottom: 0%; margin-top: 0%;" id="slider" type="range" min="1" max="7" step="1" oninput="sliderChange(this.value)">
-           <output id="output"></output>
-   </span>
-   </div>-->
+                        <!-- Content -->
+                        <h5 class="text-uppercase font-weight-bold">Partners and Colaborations</h5>
+                        <p>
+                            <img src="img/ifg.jpg" height="60px"/>
+                            <img src="img/bioinfo.png" height="60px"/>
+                            <img src="img/wien.png" height="60px"/>
+                            <img src="img/leipzig.png" height="60px"/>                            
+                        </p>
 
+                    </div>
+                    <!-- Grid column -->
 
+                    <hr class="clearfix w-100 d-md-none pb-3">
 
-    <script src="dependencies/node_modules/jquery/dist/jquery.js"></script>
-    <script src="dependencies/node_modules/popper/dist/umd/popper.js"></script>
-    <script src="dependencies/node_modules/bootstrap/dist/js/bootstrap.js"></script>
-    <script type="text/javascript" src="dependencies/jquery-ui.min.js"></script>
-    <script type="text/javascript" src="js/dragdrop.js"></script>
-</body>
+                    <!-- Grid column -->
+                    <div class="col-md-6 mb-md-0 mb-3">
+
+                        <!-- Content -->
+                        <h5 class="text-uppercase font-weight-bold">Authors</h5>
+                        <ul>
+                            <li style="list-style: none;">
+                                <a href="https://orcid.org/0000-0002-8660-6331">Daniela Pereira Andrade</a>
+                            </li>
+                            <li style="list-style: none;">
+                                <a href="https://orcid.org/0000-0002-8660-6331">Waldeyr M. C. Silva</a>
+                            </li>
+                        </ul>
+
+                    </div>
+                    <!-- Grid column -->
+
+                </div>
+                <!-- Grid row -->
+
+            </div>
+            <!-- Footer Text -->
+
+            <!-- Copyright -->
+            <div class="footer-copyright text-center py-3">Associated publication
+                <a href="https://www.mdpi.com/2227-9717/7/4/240">Exploring Plant Sesquiterpene Diversity by Generating Chemical Networks</a>
+            </div>
+            <!-- Copyright -->
+
+        </footer>
+        <!-- Footer -->
+
+    </body>
 </html>

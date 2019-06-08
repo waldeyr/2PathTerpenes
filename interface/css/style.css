@@ -5,36 +5,28 @@
 }
 
 .drop {
-
-
     display: block;
     list-style: none;
     float: left;
-    width: 45.5%;
+    width: 96%;
     min-height: 400px;
     padding: 10px;
-    border: 1px dotted;
-    border-color: black;
+    border: 1px dotted green;
+    border-radius: 10px;
+    margin: .5% ;  
 }
-
 
 .drop2 {
-
-
-    margin-left: 0.3%;
-    border: 1px solid;
     display: block;
     list-style: none;
     float: left;
-    width: 45.5%;
-
+    width: 96%;
     min-height: 400px;
     padding: 10px;
-    border: 1px dotted;
-    border-color: black;
+    border: 1px dotted green;
+    border-radius: 10px;
+    margin: .5% ;  
 }
-
-
 
 .drop-active {border: 2px dotted red;}
 .drop-over {border: 2px dotted #bbb;}
@@ -47,6 +39,16 @@
 }
 .drop li img {
     width: 100%;
+}
+
+.rightblock{
+    float: left;
+    width: 96%;
+    min-height: 400px;
+    padding: 25%;
+    border: 1px dotted green;
+    border-radius: 10px;
+    margin: .5% ; 
 }
 
 [id^="r"] {
@@ -64,6 +66,12 @@ h1{
 .lead {
     text-align: center;
 }
+.container {
+    margin: 1%;
+    position: relative;
+    left: 10em;     
+}
+
 .container img {
     position: relative;
     left: 10em;     
@@ -120,5 +128,14 @@ h1{
     height: 48px;
 }
 .logo img{
-     height: 5em;
+    height: 5em;
+}
+
+.language-bash{
+    padding: .5%;
+    margin-left: 7.5%;
+    border-radius: 10px;
+    background-color: dimgray;
+    color: greenyellow;
+    font-family: Consolas,Monaco,Lucida Console,Liberation Mono,DejaVu Sans Mono,Bitstream Vera Sans Mono,Courier New, monospace;
 }
