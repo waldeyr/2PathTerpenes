@@ -1,8 +1,0 @@
-graph G {
-	0 [ label="C | C+" ]
-	1 [ label="C+ | C" ]
-	2 [ label="H | H" ]
-	0 -- 1 [ label="- | -" ]
-	0 -- 2 [ style=dashed label="-" ]
-	1 -- 2 [ style=dotted label="-" ]
-}
