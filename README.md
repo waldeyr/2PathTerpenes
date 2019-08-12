@@ -1,7 +1,5 @@
 ![2Path for Plant Terpenes](https://github.com/waldeyr/2PathTerpenes/blob/master/interface/img/2PathLogo.png)
 
-# 2Path for Plant Terpenes
-
 ## [EN] How to use it?
 
 First you need to have installed the MedØlDatschgerl (MØD) version 0.8.0.
