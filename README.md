@@ -1,6 +1,6 @@
-# 2Path Interface
+![2Path for Plant Terpenes](https://github.com/waldeyr/2PathTerpenes/blob/master/interface/img/2PathLogo.png)
 
-## A Chemical network for plant terpenes
+# 2Path for Plant Terpenes
 
 ## [EN] How to use it?
 
@@ -11,7 +11,7 @@ Assuming you have [Docker](https://docs.docker.com/install/linux/docker-ce/ubunt
 
 Clone this repository repositório
 
-`git clone https://github.com/waldeyr/2PathInterface.git && cd 2PathInterface`
+`git clone https://github.com/waldeyr/2PathTerpenes.git && cd 2PathTerpenes`
 
 Run the code:
 
@@ -34,11 +34,11 @@ Assumindo que o [Docker](https://docs.docker.com/install/linux/docker-ce/ubuntu/
 
 Clonar este repositório em seu computador
 
-`git clone https://github.com/waldeyr/2PathInterface.git`
+`git clone https://github.com/waldeyr/2PathTerpenes.git`
 
 Entrar na pasta
 
-`cd 2PathInterface`
+`cd 2PathTerpenes`
 
 Rodar o Docker em modo interativo compartilhando a pasta local atual (pwd) com a pasta shared do container
 
