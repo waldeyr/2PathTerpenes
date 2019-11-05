@@ -3,6 +3,8 @@
 #  PIVOT MOLECULES
 ######################################
 gpp = graphDFS("CC(=CCCC(=CCOP(=O)(O)OP(=O)(O)O)C)C", "GPP")
+fpp = graphDFS("CC(=CCCC(=CCCC(=CCO[P](=O)(O)O[P](=O)(O)O)C)C)C", "FPP")
+npp = graphDFS("CC(C)=CCCC(C)=CCCC(C)(OP(O)(OP(O)(O)=O)=O)C=C", "NPP")
 H = graphDFS("[H+]", "H+")
 H2O = smiles("[OH2]", "H2O")
 ######################################
