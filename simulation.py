@@ -27,9 +27,7 @@ eductMols = [gpp,fpp,H2O]
 # ITERATIONS
 ######################################
 
-
 strat = (addSubset(eductMols) >> repeat[4](inputRules))
-
 
 ######################################
 # NETWORK GENERATION
