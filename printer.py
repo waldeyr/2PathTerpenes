@@ -11,6 +11,7 @@ p.pushVertexColour(lambda g, dg: "red" if overallCharge(g) != 0 else "black" if 
 postSection("Plant Monoterpenes Biosynthesis")
 dg.print(p)
 
+
 #postSection("Rules")
 #for r in inputRules:
 #	r.print()
