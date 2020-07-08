@@ -1,0 +1,146 @@
+[id^="r"] {
+
+    margin-bottom: .5em;
+    margin-right: .99.8em;
+    margin-left: .3em;
+    display: inline-block;
+}
+
+h1{
+    text-align: center;
+}
+.lead {
+    text-align: center;
+}
+.container img {
+    position: relative;
+    left: 10em;     
+}
+.caption{
+    font-size: 8pt;
+}
+
+.fieldset{
+    width: 30%;
+}
+.div{
+    display: flex;
+    aling-items: center;
+    justify-content: space-between;
+}
+
+.button {
+    background-color: #4CAF50;
+    border: none;
+    color: white;
+    float: right;
+    padding: 15px 32px;
+    text-align: center;
+    text-decoration: none;
+    display: inline-block;
+    font-size: 30px;
+    margin: 4px 2px;
+    cursor: pointer;
+    border-radius: 10px;
+}
+.iterations{
+    width: 500px; 
+    margin-bottom: 3%; 
+    margin-top: 2%;
+    font-size: 21px; 
+    float:left; 
+    margin-left: 1%; 
+    padding: 0px;
+}
+.checkBox{
+    width: 600px; 
+    margin-bottom: 3%; 
+    margin-top: 2%;
+    font-size: 21px; 
+    float:right; 
+    margin-left: 0%;
+    margin-right: -7%; 
+    padding: 0px;
+    position: relative;
+    right: 0%;
+}
+.logo{
+    height: 48px;
+    display: block;
+  margin-left: auto;
+  margin-right: auto;
+  width: 20%;
+  position: absolute;
+  position: absolute; 
+    left: 40%; /* posiciona a 90px para a esquerda */ 
+    
+}
+.logo img{
+    height: 10em;
+
+}
+
+.language-bash{
+    padding: .5%;
+    margin-left: 7.5%;
+    border-radius: 10px;
+    background-color: dimgray;
+    color: greenyellow;
+    font-family: Consolas,Monaco,Lucida Console,Liberation Mono,DejaVu Sans Mono,Bitstream Vera Sans Mono,Courier New, monospace;
+}
+
+
+[id^="g"] {
+
+   background-color: #4CAF50;
+   line-height: 0;
+   color: #F8F8FF;
+   margin: 0 15px 45px 0;
+   padding: 4px;
+  
+}
+
+
+
+[id^="n"] {
+
+   
+    color:#05140d;
+    width: 10%;
+    height: 10$;
+    
+
+
+
+   
+}
+
+[id^="color"] {
+
+   
+    color:#FF8C00;
+   
+}
+
+[id^="lstview_redo"] {
+
+   
+   background-color: #791994;
+   line-height: 1;
+   color: #F8F8FF;
+   border: none;
+
+   
+}
+
+[id^="lstview_undo"] {
+
+   
+    background-color: #791994;
+   line-height: 1;
+   color: #F8F8FF;
+  border: none;
+   
+}
+
+
