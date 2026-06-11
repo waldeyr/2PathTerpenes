@@ -12,7 +12,6 @@ O **2PathTerpenes** é uma ferramenta de bioinformática e modelagem química ba
 *   **Gramática de Regras de Reação GML**: Aplicação de mecanismos de reação realistas (ciclizações, rearranjos Wagner-Meerwein, shifts de hidreto, eliminação e adição de água).
 *   **Geração Automática de Redes Químicas**: Exploração combinatorial e busca de caminhos de reachability resolvidos por Programação Linear Inteira (ILP).
 *   **Exportação e Plotagem Visual**: Geração de relatórios em formato PDF com o grafo de derivação química estrutural.
-*   **Integração com Neo4j**: Persistência de redes químicas integradas a metadados biológicos da literatura científica (Scenarios).
 *   **Análise de Restrições de Ciclização**: Propostas de filtros termodinâmicos e geométricos tridimensionais (tensão de anel) nas rotas químicas.
 
 ---

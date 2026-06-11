@@ -12,7 +12,6 @@
 *   **GML Reaction Rule Grammar**: Application of realistic reaction mechanisms (cyclizations, Wagner-Meerwein rearrangements, hydride shifts, water addition and elimination).
 *   **Automatic Chemical Network Generation**: Combinatorial exploration and search for reachability pathways solved by Integer Linear Programming (ILP).
 *   **Visual Plotting and Export**: PDF report generation showing the structural chemical derivation graph.
-*   **Neo4j Integration**: Persistence of chemical networks integrated with biological metadata from scientific literature (Scenarios).
 *   **Cyclization Constraint Analysis**: Proposals for thermodynamic and 3D geometric filters (ring strain) on chemical routes.
 
 ---
