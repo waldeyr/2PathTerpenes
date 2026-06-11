@@ -19,93 +19,6 @@
 
 # Architecture
 
-## Database
-The project utilizes a graph-oriented database (**Neo4j**) to model the relationship between generated molecules, transformation rules, and experimental biological evidence (Scenarios).
-
-### Database Diagram
-```mermaid
-erDiagram
-    Compound {
-        string id PK
-        string modId
-        string modName
-        string pubchem
-        string chemspider
-        string commonName
-        string molecularFormula
-        string molecularWeight
-        string monoisotopicMass
-        string averageMass
-        string nominalMass
-        string smiles
-        string imageUrl
-    }
-    Rule {
-        string id PK
-        string modName
-    }
-    Scenario {
-        string id PK
-        string scenarioID
-        string ncbiTaxon
-        string ncbiSpecies
-        string ncbiAccession
-        string pubmedAccession
-        string modName
-        string experiment
-        string tissue
-        string condition
-        string compoundYield
-        string ec
-        string kegg
-        string rhea
-        string iubmb
-    }
-    Compound }|--|{ Rule : TO
-    Compound ||--|{ Scenario : OCCURS
-```
-
-### Data Dictionary
-
-#### Table: Compound (Node: Compound)
-Represents stable molecular structures or cationic intermediates in the simulation.
-
-| Field | Type | Description |
-|---|---|---|
-| id | String (PK) | Unique identifier of the molecule. |
-| modId | String | Internal MØD ID assigned to the molecule. |
-| modName | String | Chemical or common name (e.g., geranyl cation C1+). |
-| smiles | String | SMILES string representation of the molecule. |
-| molecularFormula | String | Empirical molecular formula. |
-| molecularWeight | String | Average molecular weight. |
-| pubchem | String | Cross-reference ID in PubChem. |
-| imageUrl | String | Link to the 2D molecular rendering. |
-
-#### Table: Rule (Node: Rule)
-Stores the description of the reaction rules applied during the derivation process.
-
-| Field | Type | Description |
-|---|---|---|
-| id | String (PK) | Unique identifier of the mechanism/rule. |
-| modName | String | GML rule name (e.g., "1-11 Cyclization", "H+ loss"). |
-
-#### Table: Scenario (Node: Scenario)
-Stores biological constraints and literature data regarding terpene synthase enzymes and experimental biosyntheses conditions.
-
-| Field | Type | Description |
-|---|---|---|
-| id | String (PK) | Unique identifier of the ecological scenario. |
-| scenarioID | String | Classification ID of the literature scenario. |
-| ncbiTaxon | String | Taxonomy ID of the producer organism. |
-| ncbiSpecies | String | Biological species name (e.g., Zea mays). |
-| ncbiAccession | String | Enzyme access code in NCBI GenBank. |
-| pubmedAccession| String | PubMed article ID providing the evidence. |
-| tissue | String | Corresponding plant tissue (Plant Ontology). |
-| ec | String | Corresponding Enzyme Commission number. |
-| kegg | String | Reaction reference ID in KEGG. |
-
----
-
 ## Components
 The simulation workflow is divided into components for graph specification, DPO grammar application, derivation graph generation, and database persistence.
 
@@ -124,7 +37,7 @@ graph TD
 ```
 
 ### Web Interface
-The web interface (`docs/index.html`) provides a responsive dashboard for selecting reaction rules and defining simulation parameters.
+The web interface (https://waldeyr.github.io/2PathTerpenes) provides a responsive dashboard for selecting reaction rules and defining simulation parameters.
 
 ### Technologies and their Versions
 

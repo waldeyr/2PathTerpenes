@@ -19,93 +19,6 @@ O **2PathTerpenes** é uma ferramenta de bioinformática e modelagem química ba
 
 # Arquitetura
 
-## Banco de dados
-O projeto utiliza um banco de dados orientado a grafos (**Neo4j**) para modelar a relação entre moléculas geradas, regras de transformação e evidências experimentais da biologia (Scenarios).
-
-### Diagrama de banco de dados
-```mermaid
-erDiagram
-    Compound {
-        string id PK
-        string modId
-        string modName
-        string pubchem
-        string chemspider
-        string commonName
-        string molecularFormula
-        string molecularWeight
-        string monoisotopicMass
-        string averageMass
-        string nominalMass
-        string smiles
-        string imageUrl
-    }
-    Rule {
-        string id PK
-        string modName
-    }
-    Scenario {
-        string id PK
-        string scenarioID
-        string ncbiTaxon
-        string ncbiSpecies
-        string ncbiAccession
-        string pubmedAccession
-        string modName
-        string experiment
-        string tissue
-        string condition
-        string compoundYield
-        string ec
-        string kegg
-        string rhea
-        string iubmb
-    }
-    Compound }|--|{ Rule : TO
-    Compound ||--|{ Scenario : OCCURS
-```
-
-### Dicionário de dados
-
-#### Tabela: Compound (Nó: Compound)
-Representa as estruturas moleculares estáveis ou intermediários catiônicos na simulação.
-
-| Campo | Tipo | Descrição |
-|---|---|---|
-| id | String (PK) | Identificador único da molécula. |
-| modId | String | ID interno do MØD atribuído à molécula. |
-| modName | String | Nome químico ou comum (ex: geranyl cation C1+). |
-| smiles | String | String smiles da representação molecular. |
-| molecularFormula | String | Fórmula molecular empírica. |
-| molecularWeight | String | Peso molecular médio. |
-| pubchem | String | ID de referência cruzada no PubChem. |
-| imageUrl | String | Link para a renderização 2D da molécula. |
-
-#### Tabela: Rule (Nó: Rule)
-Armazena a descrição das regras de reação aplicadas durante o processo de derivação.
-
-| Campo | Tipo | Descrição |
-|---|---|---|
-| id | String (PK) | Identificador exclusivo do mecanismo/regra. |
-| modName | String | Nome da regra GML (ex: "1-11 Cyclization", "H+ loss"). |
-
-#### Tabela: Scenario (Nó: Scenario)
-Armazena restrições biológicas e dados literários sobre as enzimas terpene synthases e as condições experimentais de biossíntese.
-
-| Campo | Tipo | Descrição |
-|---|---|---|
-| id | String (PK) | Identificador único do cenário ecológico. |
-| scenarioID | String | ID de classificação do cenário literário. |
-| ncbiTaxon | String | ID de taxonomia do organismo produtor. |
-| ncbiSpecies | String | Nome da espécie biológica (ex: Zea mays). |
-| ncbiAccession | String | Código de acesso no NCBI GenBank da enzima. |
-| pubmedAccession| String | ID do artigo no PubMed que fornece as evidências. |
-| tissue | String | Tecido vegetal correspondente (Plant Ontology). |
-| ec | String | Número da Enzyme Commission correspondente. |
-| kegg | String | ID de referência da reação no KEGG. |
-
----
-
 ## Componentes
 O fluxo de simulação é dividido em componentes de especificação de grafos, aplicação de gramáticas DPO, geração do grafo de derivação e persistência em banco de dados.
 
@@ -124,7 +37,7 @@ graph TD
 ```
 
 ### Interface Web
-A interface web (`docs/index.html`) fornece um painel responsivo para selecionar regras de reação e definir parâmetros de simulação.
+A interface web (https://waldeyr.github.io/2PathTerpenes) fornece um painel responsivo para selecionar regras de reação e definir parâmetros de simulação.
 
 ### Tecnologias e suas versões
 
