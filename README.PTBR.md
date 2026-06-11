@@ -1,0 +1,211 @@
+![2Path for Plant Terpenes](https://github.com/waldeyr/2PathTerpenes/blob/master/docs/img/2PathLogo.png)
+
+# 2PathTerpenes
+
+*Disponível também em:* 🇺🇸 *[English](README.md)*
+
+## Resumo do projeto
+O **2PathTerpenes** é uma ferramenta de bioinformática e modelagem química baseada em gramática de grafos para reconstruir e explorar redes metabólicas de biossíntese de terpenos vegetais (monoterpenos C10 e sesquiterpenos C15). O projeto utiliza o simulador **MedØlDatschgerl (MØD)** e o formalismo de Double Pushout (DPO) para gerar caminhos de síntese de moléculas complexas (como $\beta$-caryophyllene, $\alpha$-humulene e $\beta$-farnesene) a partir de precursores acíclicos lineares como o Farnesyl Diphosphate (FPP). Os resultados da simulação podem ser exportados em relatórios estruturais PDF ou integrados a um banco de dados de grafos **Neo4j** sob restrições ecológicas e biológicas ("Scenarios").
+
+## Lista de funcionalidades
+*   **Definição Topológica de Moléculas**: Modelagem de precursores químicos e carbocátions usando representações lineares SMILES e DFS em grafos.
+*   **Gramática de Regras de Reação GML**: Aplicação de mecanismos de reação realistas (ciclizações, rearranjos Wagner-Meerwein, shifts de hidreto, eliminação e adição de água).
+*   **Geração Automática de Redes Químicas**: Exploração combinatorial e busca de caminhos de reachability resolvidos por Programação Linear Inteira (ILP).
+*   **Exportação e Plotagem Visual**: Geração de relatórios em formato PDF com o grafo de derivação química estrutural.
+*   **Integração com Neo4j**: Persistência de redes químicas integradas a metadados biológicos da literatura científica (Scenarios).
+*   **Análise de Restrições de Ciclização**: Propostas de filtros termodinâmicos e geométricos tridimensionais (tensão de anel) nas rotas químicas.
+
+---
+
+# Arquitetura
+
+## Banco de dados
+O projeto utiliza um banco de dados orientado a grafos (**Neo4j**) para modelar a relação entre moléculas geradas, regras de transformação e evidências experimentais da biologia (Scenarios).
+
+### Diagrama de banco de dados
+```mermaid
+erDiagram
+    Compound {
+        string id PK
+        string modId
+        string modName
+        string pubchem
+        string chemspider
+        string commonName
+        string molecularFormula
+        string molecularWeight
+        string monoisotopicMass
+        string averageMass
+        string nominalMass
+        string smiles
+        string imageUrl
+    }
+    Rule {
+        string id PK
+        string modName
+    }
+    Scenario {
+        string id PK
+        string scenarioID
+        string ncbiTaxon
+        string ncbiSpecies
+        string ncbiAccession
+        string pubmedAccession
+        string modName
+        string experiment
+        string tissue
+        string condition
+        string compoundYield
+        string ec
+        string kegg
+        string rhea
+        string iubmb
+    }
+    Compound }|--|{ Rule : TO
+    Compound ||--|{ Scenario : OCCURS
+```
+
+### Dicionário de dados
+
+#### Tabela: Compound (Nó: Compound)
+Representa as estruturas moleculares estáveis ou intermediários catiônicos na simulação.
+
+| Campo | Tipo | Descrição |
+|---|---|---|
+| id | String (PK) | Identificador único da molécula. |
+| modId | String | ID interno do MØD atribuído à molécula. |
+| modName | String | Nome químico ou comum (ex: geranyl cation C1+). |
+| smiles | String | String smiles da representação molecular. |
+| molecularFormula | String | Fórmula molecular empírica. |
+| molecularWeight | String | Peso molecular médio. |
+| pubchem | String | ID de referência cruzada no PubChem. |
+| imageUrl | String | Link para a renderização 2D da molécula. |
+
+#### Tabela: Rule (Nó: Rule)
+Armazena a descrição das regras de reação aplicadas durante o processo de derivação.
+
+| Campo | Tipo | Descrição |
+|---|---|---|
+| id | String (PK) | Identificador exclusivo do mecanismo/regra. |
+| modName | String | Nome da regra GML (ex: "1-11 Cyclization", "H+ loss"). |
+
+#### Tabela: Scenario (Nó: Scenario)
+Armazena restrições biológicas e dados literários sobre as enzimas terpene synthases e as condições experimentais de biossíntese.
+
+| Campo | Tipo | Descrição |
+|---|---|---|
+| id | String (PK) | Identificador único do cenário ecológico. |
+| scenarioID | String | ID de classificação do cenário literário. |
+| ncbiTaxon | String | ID de taxonomia do organismo produtor. |
+| ncbiSpecies | String | Nome da espécie biológica (ex: Zea mays). |
+| ncbiAccession | String | Código de acesso no NCBI GenBank da enzima. |
+| pubmedAccession| String | ID do artigo no PubMed que fornece as evidências. |
+| tissue | String | Tecido vegetal correspondente (Plant Ontology). |
+| ec | String | Número da Enzyme Commission correspondente. |
+| kegg | String | ID de referência da reação no KEGG. |
+
+---
+
+## Componentes
+O fluxo de simulação é dividido em componentes de especificação de grafos, aplicação de gramáticas DPO, geração do grafo de derivação e persistência em banco de dados.
+
+### Diagrama de componentes
+```mermaid
+graph TD
+    UI[Interface Web: index.html] -->|Gera parâmetros| SimPy[simulation.py]
+    SimPy -->|Importa moléculas| MolPy[molecules.py]
+    SimPy -->|Carrega regras GML| RulesGML[rules/*.gml]
+    SimPy -->|Invoca| MOD[MØD Wrapper/Library]
+    MOD -->|Constrói| DG[Derivation Graph]
+    DG -->|Formata Relatório| PrintPy[printer.py]
+    PrintPy -->|Gera| PDF[Relatório PDF]
+    DG -->|Grava dados| Neo4jStore[Storer Neo4j]
+    Neo4jStore -->|Salva| Neo4j[Neo4j Database]
+```
+
+### Interface Web
+A interface web (`docs/index.html`) fornece um painel responsivo para selecionar regras de reação e definir parâmetros de simulação.
+
+### Tecnologias e suas versões
+
+| Tecnologia | Versão | Função Principal |
+|---|---|---|
+| MedØlDatschgerl (MØD) | v0.8.0 ou v1.0.0+ | Kernel de transformação de grafos químicos (DPO) e solver ILP. |
+| Python | v3.8+ | Scripts de automação da simulação (`molecules.py`, `simulation.py`, `printer.py`). |
+| Open Babel | v3.0+ | Geração de conformações 3D e cálculo de energia dos carbocátions. |
+| Docker | v19.x+ | Empacotamento de ambiente Linux completo para execução do MØD de forma agnóstica. |
+
+---
+
+## Funcionalidades
+
+### Requisitos
+
+| Funcionalidade | Campo de Formulário | Campo de Banco de Dados | Regras Aplicadas |
+|---|---|---|---|
+| **Definição de Moléculas** | N/A (Arquivo de script) | `Compound.smiles`, `Compound.modName` | Sintaxe SMILES ou DFS para inicializar o multiset de reagentes da simulação. |
+| **Geração de Rede Química** | N/A (Arquivo de script) | `Rule.modName`, `Compound.id` | Aplicação repetitiva de regras de DPO graph rewriting (`addSubset >> repeat`). |
+| **Geração de PDF** | N/A (Relatório final) | N/A | Renderização dos intermediários com hidrogênios colapsados e coloração (vermelho para anéis, azul para cargas). |
+| **Gravação de Cenários** | N/A (Script de carga) | `Scenario.scenarioID`, `Scenario.ncbiAccession`, `Scenario.pubmedAccession` | Mapeamento relacional de moléculas e reações físicas com ensaios in vitro descritos na literatura. |
+
+---
+
+## Análise de Restrições de Ciclização nas Regras de Simulação
+Durante a geração de caminhos de síntese de sesquiterpenos, reações de ciclização eletrofílica ocorrem com alta reatividade molecular. Como o MØD tradicional atua apenas a nível topológico de grafos discretos, ciclizações impossíveis de ocorrer no espaço 3D real por alta tensão conformacional poderiam ser simuladas.
+
+Identificamos **quatro possíveis melhorias de arquitetura** para implementar restrições de ciclização nas simulações:
+1.  **Filtro de Energia Conformacional (via Open Babel)**: Com o MØD v1.0.0+, o Open Babel calcula coordenadas 3D e estima a energia livre de cada carbocátion via campo de força MMFF94 (`Graph.energy`). Pode-se implementar uma validação em Python que descarte intermediários de ciclização cujo delta de energia conformacional em relação ao precursor seja excessivo (tensão do anel inviável).
+2.  **Restrições no Contexto das Regras GML**: Adição de caminhos rígidos e topologia impeditiva no `context` do GML. Impede a regra de ser aplicada se a molécula já tiver sistemas de anéis adjacentes rígidos que impeçam fisicamente o dobramento da cadeia.
+3.  **Heurísticas com Estratégia de Derivação Customizada (DGStrat em Python)**: Utilização de uma estratégia de derivação escrita em Python para interceptar a criação de ciclos e bloquear reações que gerem anéis tensionados incompatíveis (ex: anéis com pontes complexas de 3 ou 4 carbonos em locais inadequados).
+4.  **Hyperflow e Programação Linear com Custos**: No MØD v1.0, o solver de Programação Linear Inteira (ILP) pode atribuir custos e capacidades baseados em restrições termodinâmicas no fluxo geral da rede, minimizando caminhos energeticamente desfavoráveis.
+
+---
+
+## Instalação e uso
+
+### Organização dos Arquivos de Regras e Recursos
+*   **Regras GML (`rules/`)**: Todas as regras de reação GML oficiais são mantidas e atualizadas diretamente no diretório `rules/`. O diretório temporário/legado `rules/novas/` foi removido para evitar duplicidade.
+*   **Imagens de Recursos (`docs/img/`)**: Apenas imagens que são ativamente usadas ou dinamicamente referenciadas (como visualizações de regras) por `docs/index.html` são mantidas no controle de versão. Arquivos temporários ou redundantes de imagem são limpos antes do commit.
+
+### Gerando Previews de Regras GML
+
+Para gerar as imagens de visualização SVG das regras de reação química exibidas na interface web:
+
+1. **Execute o gerador dentro do Docker** (isso compila as regras GML e gera arquivos `.pdf` em `out/`):
+   ```bash
+   docker run --rm --volume "$(pwd):/home/shared" --workdir /home/shared 2path-terpenes-mod:latest -f /home/shared/generate_rules_svg.py
+   ```
+
+2. **Converta os PDFs gerados em SVGs** (rodando o loop dentro do container MØD de uma só vez):
+   ```bash
+   docker run --rm --entrypoint /bin/bash --volume "$(pwd):/home/shared" --workdir /home/shared 2path-terpenes-mod:latest -c "for f in out/*_{L,K,R}.pdf; do mod_post --mode pdfToSvg \${f%.pdf} \${f%.pdf}; done"
+   ```
+
+3. **Copie as imagens geradas para a pasta de recursos**:
+   ```bash
+   python organize_svgs.py
+   ```
+   Este script auxiliar copia os componentes `_L.svg`, `_K.svg` e `_R.svg` de `out/` diretamente para `docs/img/` mantendo seus nomes originais.
+
+### Rodando Simulações com Docker (Recomendado)
+
+#### Como testar na sua máquina:
+
+1. **Reconstrua a imagem Docker**:
+   ```bash
+   docker build -t 2path-terpenes-mod:latest .
+   ```
+   *(Nota: A imagem Docker instala o compilador LaTeX com suporte a fontes Latin Modern `texlive-lmodern`, corrigindo eventuais problemas de compilação do arquivo de resumo `summary.pdf`. Para suportar ambientes LaTeX mínimos ou a imagem legada, também incluímos um arquivo de fallback mock `lmodern.sty` no workspace, de modo que a compilação use automaticamente as fontes padrão do LaTeX caso o pacote `lmodern` esteja ausente.)*
+
+2. **Execute a simulação principal do projeto**:
+   ```bash
+   docker run --rm --volume $(pwd):/home/shared/ --workdir /home/shared/ 2path-terpenes-mod:latest -f /home/shared/molecules.py -f /home/shared/simulation.py -f /home/shared/printer.py
+   ```
+
+#### Opção Alternativa: Usando a Imagem Legada (waldeyr/mod_v0.8.0)
+Caso prefira usar a imagem antiga pronta no Docker Hub sem buildar localmente:
+```bash
+docker run --rm --volume $(pwd):/home/shared/ --workdir /home/shared/ waldeyr/mod_v0.8.0:v1.0 /home/mod-v0.8.0/bin/mod -f /home/shared/molecules.py -f /home/shared/simulation.py -f /home/shared/printer.py
+```
+
+Os arquivos de simulação contêm **helpers de compatibilidade dinâmica**, agora atualizados para usar a nova interface de construção do MØD (`DG.build().execute()`) em versões mais novas (1.0+) para resolver avisos de depreciação de `dgRuleComp` e `DG.calc()`, assim como os avisos de depreciação para `pushVertexColour` e `postSection` em `printer.py`, mantendo total compatibilidade retroativa com versões legadas (0.8.0).

@@ -1,0 +1,3 @@
+[submodule "mod"]
+	path = mod
+	url = https://github.com/jakobandersen/mod.git

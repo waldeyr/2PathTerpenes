@@ -6,16 +6,16 @@
 rule [
  ruleID "1-6 closure"
  left [
-  node [ id  6 label "C+" ]
+  node [ id  1 label "C+" ]
   node [ id  7 label "C" ]
   edge [ source  6 target  7 label "=" ]  
  ]
  context [
-
   node [ id  2 label "C" ]
   node [ id  3 label "C" ]
   node [ id  4 label "*" ]
   node [ id  5 label "*" ]
+  node [ id  6 label "C" ]
   node [ id  8 label "C" ]
   node [ id  9 label "C" ]
   node [ id 14 label "C" ]
