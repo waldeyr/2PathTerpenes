@@ -121,3 +121,23 @@ docker run --rm --volume $(pwd):/home/shared/ --workdir /home/shared/ waldeyr/mo
 ```
 
 The simulation files contain **dynamic compatibility helpers**, now updated to use the new MØD build interface (`DG.build().execute()`) on newer MØD versions (1.0+) to resolve deprecation warnings for `dgRuleComp` and `DG.calc()`, as well as addressing deprecations for `pushVertexColour` and `postSection` in `printer.py`, while remaining fully backwards-compatible with legacy versions (0.8.0).
+
+### Interactive Hypergraph Viewer (HTML/JS)
+
+In addition to the LaTeX/PDF report, the derivation graph can be exported as an interactive, browser-based "metro map" of the chemical hypergraph: molecules are stations and reactions (which may have several educts/products) are the connections between lines, color-coded by rule category (Mono/Sesqui/Common).
+
+1. **Export the hypergraph as JSON** (run alongside the existing simulation scripts):
+   ```bash
+   docker run --rm --volume $(pwd):/home/shared/ --workdir /home/shared/ 2path-terpenes-mod:latest -f /home/shared/molecules.py -f /home/shared/simulation.py -f /home/shared/export_hypergraph.py -f /home/shared/printer.py
+   ```
+   This writes `out/hypergraph.json` plus one depiction per molecule.
+
+2. **Copy the data and depictions into `docs/`**:
+   ```bash
+   python organize_hypergraph_assets.py
+   ```
+   This produces `docs/data/hypergraph.json` and `docs/img/molecules/*.svg`.
+
+3. **Open `docs/hypergraph.html`** (or visit it on GitHub Pages, via the "Interactive Hypergraph Viewer" link in the rule selector). If `docs/data/hypergraph.json` is not present yet, the page falls back to `docs/data/hypergraph.sample.json` so the viewer can be previewed without running MØD.
+
+The viewer supports pan/zoom, search by molecule name, filtering by reaction category, and clicking a molecule or reaction to see its details (SMILES, charge, rings, applied rule(s)).

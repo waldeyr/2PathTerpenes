@@ -1,0 +1,286 @@
+/* Interactive Hypergraph Viewer - metro map style */
+
+.hg-page {
+  display: flex;
+  flex-direction: column;
+  gap: 1.25rem;
+  max-width: 1400px;
+  margin: 0 auto;
+  padding: 1.5rem;
+}
+
+.hg-page .intro h2 {
+  margin: 0 0 0.5rem 0;
+  color: var(--text-main);
+}
+
+/* Toolbar */
+.hg-toolbar {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 1.5rem;
+  background: var(--panel-bg);
+  border: 1px solid var(--panel-border);
+  border-radius: var(--radius-md);
+  padding: 0.85rem 1.25rem;
+  box-shadow: var(--shadow-main);
+}
+
+.hg-toolbar-group {
+  display: flex;
+  align-items: center;
+  gap: 0.6rem;
+  flex-wrap: wrap;
+}
+
+.hg-label {
+  font-size: 0.85rem;
+  font-weight: 600;
+  color: var(--text-muted);
+  white-space: nowrap;
+}
+
+.hg-search-input {
+  font-family: var(--font-sans);
+  font-size: 0.9rem;
+  padding: 0.45rem 0.75rem;
+  border-radius: var(--radius-sm);
+  border: 1px solid var(--panel-border);
+  min-width: 220px;
+}
+
+.hg-legend {
+  gap: 1rem;
+}
+
+.hg-legend-item {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.4rem;
+  font-size: 0.85rem;
+  color: var(--text-main);
+  cursor: pointer;
+  user-select: none;
+}
+
+.hg-swatch {
+  display: inline-block;
+  width: 22px;
+  height: 6px;
+  border-radius: 3px;
+}
+
+.hg-swatch-mono {
+  background: var(--mono-color);
+}
+
+.hg-swatch-sesqui {
+  background: var(--sesqui-color);
+}
+
+.hg-swatch-common {
+  background: var(--common-color);
+}
+
+.hg-btn {
+  font-family: var(--font-sans);
+  font-size: 0.85rem;
+  font-weight: 600;
+  padding: 0.45rem 0.9rem;
+  border-radius: var(--radius-sm);
+  border: 1px solid var(--panel-border);
+  background: #fff;
+  color: var(--text-main);
+  cursor: pointer;
+  transition: background 0.15s ease, color 0.15s ease;
+}
+
+.hg-btn:hover {
+  background: var(--primary);
+  color: var(--text-dark);
+  border-color: var(--primary);
+}
+
+.hg-status {
+  font-size: 0.8rem;
+  color: var(--text-muted);
+}
+
+/* Layout: canvas + details */
+.hg-layout {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) 320px;
+  gap: 1.25rem;
+  align-items: stretch;
+}
+
+@media (max-width: 900px) {
+  .hg-layout {
+    grid-template-columns: 1fr;
+  }
+}
+
+.hg-canvas-wrap {
+  background: var(--panel-bg);
+  border: 1px solid var(--panel-border);
+  border-radius: var(--radius-lg);
+  box-shadow: var(--shadow-main);
+  overflow: hidden;
+  min-height: 520px;
+}
+
+#hg-canvas {
+  width: 100%;
+  height: 600px;
+  display: block;
+  cursor: grab;
+}
+
+#hg-canvas:active {
+  cursor: grabbing;
+}
+
+/* Details panel */
+.hg-details {
+  background: var(--panel-bg);
+  border: 1px solid var(--panel-border);
+  border-radius: var(--radius-lg);
+  box-shadow: var(--shadow-main);
+  padding: 1rem 1.1rem;
+  font-size: 0.9rem;
+  color: var(--text-main);
+  overflow-y: auto;
+}
+
+.hg-details-placeholder {
+  color: var(--text-muted);
+  font-size: 0.85rem;
+}
+
+.hg-details h3 {
+  margin: 0 0 0.4rem 0;
+  font-size: 1.05rem;
+}
+
+.hg-details dl {
+  display: grid;
+  grid-template-columns: auto 1fr;
+  gap: 0.25rem 0.6rem;
+  margin: 0.6rem 0;
+}
+
+.hg-details dt {
+  font-weight: 600;
+  color: var(--text-muted);
+}
+
+.hg-details dd {
+  margin: 0;
+  word-break: break-word;
+  font-family: var(--font-mono);
+  font-size: 0.8rem;
+}
+
+.hg-details .hg-rule-list {
+  list-style: none;
+  padding: 0;
+  margin: 0.4rem 0 0 0;
+  display: flex;
+  flex-direction: column;
+  gap: 0.3rem;
+}
+
+.hg-details .hg-rule-list li {
+  font-family: var(--font-mono);
+  font-size: 0.78rem;
+  background: rgba(15, 23, 42, 0.05);
+  border-radius: var(--radius-sm);
+  padding: 0.3rem 0.5rem;
+}
+
+.hg-details img.hg-molecule-image {
+  max-width: 100%;
+  border-radius: var(--radius-sm);
+  border: 1px solid var(--panel-border);
+  background: #fff;
+  margin-bottom: 0.5rem;
+}
+
+/* SVG elements */
+.hg-link {
+  fill: none;
+  stroke-linecap: round;
+  stroke-width: 5;
+  opacity: 0.85;
+  cursor: pointer;
+  transition: opacity 0.15s ease, stroke-width 0.15s ease;
+}
+
+.hg-link:hover,
+.hg-link.is-active {
+  stroke-width: 7;
+  opacity: 1;
+}
+
+.hg-link.is-dimmed {
+  opacity: 0.12;
+}
+
+.hg-hyperedge {
+  stroke: #fff;
+  stroke-width: 1.5;
+  cursor: pointer;
+  transition: opacity 0.15s ease, r 0.15s ease;
+}
+
+.hg-hyperedge:hover,
+.hg-hyperedge.is-active {
+  r: 8;
+}
+
+.hg-hyperedge.is-dimmed {
+  opacity: 0.12;
+}
+
+.hg-node circle {
+  fill: #ffffff;
+  stroke: var(--text-muted);
+  stroke-width: 2.5;
+  transition: stroke 0.15s ease, opacity 0.15s ease, r 0.15s ease;
+}
+
+.hg-node {
+  cursor: pointer;
+}
+
+.hg-node:hover circle,
+.hg-node.is-active circle {
+  stroke: var(--primary);
+  stroke-width: 3.5;
+}
+
+.hg-node.is-dimmed {
+  opacity: 0.2;
+}
+
+.hg-node.is-root circle {
+  fill: var(--primary);
+  stroke: var(--primary);
+}
+
+.hg-node.is-leaf circle {
+  stroke-dasharray: 3 2;
+}
+
+.hg-node text {
+  font-family: var(--font-sans);
+  font-size: 11px;
+  fill: var(--text-main);
+  pointer-events: none;
+  text-anchor: middle;
+}
+
+.hg-node.is-root text {
+  fill: var(--text-dark);
+}

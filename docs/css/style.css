@@ -60,6 +60,32 @@ header {
   display: flex;
   justify-content: center;
   align-items: center;
+  gap: 2rem;
+  position: relative;
+  flex-wrap: wrap;
+}
+
+.site-nav {
+  display: flex;
+  gap: 1.25rem;
+}
+
+.site-nav a {
+  font-family: var(--font-sans);
+  font-size: 0.9rem;
+  font-weight: 600;
+  color: var(--primary);
+  text-decoration: none;
+  border: 1px solid var(--panel-border);
+  border-radius: var(--radius-sm);
+  padding: 0.45rem 0.9rem;
+  transition: var(--transition);
+}
+
+.site-nav a:hover {
+  background: var(--primary);
+  color: var(--text-dark);
+  border-color: var(--primary);
 }
 
 .logo img {

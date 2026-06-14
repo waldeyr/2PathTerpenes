@@ -1,0 +1,82 @@
+<!DOCTYPE html>
+<html lang="en-us">
+
+<head>
+  <title>2Path: Interactive Hypergraph Viewer</title>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+  <meta name="description"
+    content="Interactive metro-map style visualization of the 2Path chemical derivation hypergraph.">
+
+  <link rel="stylesheet" href="css/style.css">
+  <link rel="stylesheet" href="css/hypergraph.css">
+</head>
+
+<body>
+
+  <header>
+    <a class="logo" href="index.html" aria-label="2Path Logo">
+      <img src="img/2PathLogo.png" alt="2Path: a chemical network for plant terpenes Logo">
+    </a>
+    <nav class="site-nav" aria-label="Site navigation">
+      <a href="index.html">Rule Selector</a>
+    </nav>
+  </header>
+
+  <main class="hg-page">
+    <section class="intro">
+      <h2>Interactive Derivation Hypergraph</h2>
+      <p>
+        Explore the chemical derivation network as an interactive "metro map": molecules are stations, and
+        reactions (hyperedges, with possibly multiple reactants and products) are the connections between lines.
+        Click a station for molecule details, click a connection for the reaction rule(s) applied, and use the
+        controls below to search and filter.
+      </p>
+    </section>
+
+    <section class="hg-toolbar" aria-label="Hypergraph controls">
+      <div class="hg-toolbar-group">
+        <label for="hg-search" class="hg-label">Search molecule</label>
+        <input type="text" id="hg-search" class="hg-search-input" placeholder="e.g. limonene, FPP, cation...">
+      </div>
+
+      <div class="hg-toolbar-group hg-legend" id="hg-legend" aria-label="Reaction categories">
+        <span class="hg-label">Reaction lines</span>
+        <label class="hg-legend-item">
+          <input type="checkbox" data-category="mono" checked>
+          <span class="hg-swatch hg-swatch-mono"></span> Mono
+        </label>
+        <label class="hg-legend-item">
+          <input type="checkbox" data-category="sesqui" checked>
+          <span class="hg-swatch hg-swatch-sesqui"></span> Sesqui
+        </label>
+        <label class="hg-legend-item">
+          <input type="checkbox" data-category="common" checked>
+          <span class="hg-swatch hg-swatch-common"></span> Common
+        </label>
+      </div>
+
+      <div class="hg-toolbar-group">
+        <button type="button" id="hg-reset" class="hg-btn">Reset view</button>
+        <span class="hg-status" id="hg-status" aria-live="polite"></span>
+      </div>
+    </section>
+
+    <section class="hg-layout">
+      <div class="hg-canvas-wrap">
+        <svg id="hg-canvas" role="img" aria-label="Derivation hypergraph metro map"></svg>
+      </div>
+
+      <aside class="hg-details" id="hg-details" aria-label="Selection details">
+        <div class="hg-details-placeholder">
+          Select a molecule (station) or a reaction (connector) to see details here.
+        </div>
+      </aside>
+    </section>
+  </main>
+
+  <script src="https://d3js.org/d3.v7.min.js"></script>
+  <script type="text/javascript" src="javascript/hypergraph.js" defer></script>
+</body>
+
+</html>
