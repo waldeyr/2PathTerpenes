@@ -28,6 +28,7 @@ try:
 except ImportError:
     moleculePrinter = None
 
+import glob
 import json
 import os
 
@@ -35,12 +36,36 @@ OUT_DIR = "out"
 os.makedirs(OUT_DIR, exist_ok=True)
 
 
-def rule_category(rule_name):
-    name = rule_name.lower()
-    if name.startswith("mono"):
-        return "mono"
-    if name.startswith("sesqui"):
-        return "sesqui"
+def build_rule_category_map():
+    # Rule.name (used below) reflects the GML "ruleID" of each rule (e.g.
+    # "2,6 closure"), not the GML filename (e.g. "mono_2_6_Cyc.gml"). Build a
+    # ruleID -> category lookup from the filenames in rules/ so hyperedges can
+    # still be classified as mono/sesqui/common for the viewer's legend filter.
+    mapping = {}
+    for category, prefix in (("mono", "mono_"), ("sesqui", "sesqui_")):
+        for path in glob.glob(os.path.join("rules", f"{prefix}*.gml")):
+            try:
+                with open(path) as f:
+                    for line in f:
+                        line = line.strip()
+                        if line.startswith("ruleID"):
+                            parts = line.split('"')
+                            if len(parts) >= 2:
+                                mapping[parts[1]] = category
+                            break
+            except OSError:
+                continue
+    return mapping
+
+
+RULE_CATEGORY_BY_ID = build_rule_category_map()
+
+
+def hyperedge_category(rule_names):
+    categories = {RULE_CATEGORY_BY_ID.get(name, "common") for name in rule_names}
+    for preferred in ("mono", "sesqui"):
+        if preferred in categories:
+            return preferred
     return "common"
 
 
@@ -53,6 +78,8 @@ def graph_smiles(g):
 
 
 def graph_charge(g):
+    # Mirrors simulation.py's overallCharge(), reimplemented here so this
+    # script can also run standalone.
     try:
         return sum(int(v.charge) for v in g.vertices)
     except Exception:
@@ -60,6 +87,8 @@ def graph_charge(g):
 
 
 def graph_cycles(g):
+    # Mirrors simulation.py's countCycs(), reimplemented here so this script
+    # can also run standalone.
     try:
         return g.numEdges - g.numVertices + 1
     except Exception:
@@ -122,7 +151,7 @@ for e in dg.edges:
 
     sources = [f"v{src.id}" for src in e.sources]
     targets = [f"v{tgt.id}" for tgt in e.targets]
-    category = rule_category(rule_names[0]) if rule_names else "common"
+    category = hyperedge_category(rule_names)
 
     hyperedges.append({
         "id": f"e{len(hyperedges)}",

@@ -53,7 +53,7 @@
   }
 
   function normalizeData(raw) {
-    const nodes = (raw.nodes || []).map(n => ({ ...n }));
+    const nodes = (raw.nodes || []).map(n => ({ ...n, name: n.name || '(unnamed)' }));
     const hyperedges = (raw.hyperedges || []).map((e, idx) => ({
       id: e.id || `e${idx}`,
       sources: e.sources || [],
@@ -111,7 +111,7 @@
       guard++;
       data.hyperedges.forEach(e => {
         const srcIters = e.sources.map(id => nodesById.get(id).iteration);
-        if (srcIters.every(v => v != null)) {
+        if (srcIters.length && srcIters.every(v => v != null)) {
           const level = Math.max(...srcIters) + 1;
           e.targets.forEach(tid => {
             const tNode = nodesById.get(tid);
@@ -188,6 +188,9 @@
         : sourceX + COL_WIDTH;
       e.x = (sourceX + targetX) / 2;
       e.y = avgY;
+      if (typeof e.iteration !== 'number') {
+        e.iteration = connected.reduce((m, n) => Math.max(m, n.iteration), 0);
+      }
     });
 
     return {
