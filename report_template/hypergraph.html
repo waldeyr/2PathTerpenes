@@ -20,13 +20,7 @@
 
   <main class="hg-page">
     <section class="intro">
-      <h3>Interactive Derivation Hypergraph</h3>
-      <p>
-        Explore the chemical derivation network as an interactive "metro map": molecules are stations, and
-        reactions (hyperedges, with possibly multiple reactants and products) are the connections between lines.
-        Click a station for molecule details, click a connection for the reaction rule(s) applied, and use the
-        controls below to search and filter.
-      </p>
+      <h3 title="Explore the chemical derivation network as an interactive &quot;metro map&quot;: molecules are stations, and reactions (hyperedges, with possibly multiple reactants and products) are the connections between lines. Click a station for molecule details, click a connection for the reaction rule(s) applied, and use the controls below to search and filter.">Interactive Derivation Hypergraph</h3>
     </section>
 
     <section class="hg-toolbar" aria-label="Hypergraph controls">
@@ -42,24 +36,8 @@
         </select>
       </div>
 
-      <div class="hg-toolbar-group hg-legend" id="hg-legend" aria-label="Reaction categories">
-        <span class="hg-label">Reaction lines</span>
-        <label class="hg-legend-item">
-          <input type="checkbox" data-category="mono" checked>
-          <span class="hg-swatch hg-swatch-mono"></span> Mono
-        </label>
-        <label class="hg-legend-item">
-          <input type="checkbox" data-category="sesqui" checked>
-          <span class="hg-swatch hg-swatch-sesqui"></span> Sesqui
-        </label>
-        <label class="hg-legend-item">
-          <input type="checkbox" data-category="common" checked>
-          <span class="hg-swatch hg-swatch-common"></span> Common
-        </label>
-      </div>
-
       <div class="hg-toolbar-group">
-        <button type="button" id="hg-reset" class="hg-btn">Reset view</button>
+        <button type="button" id="hg-reset" class="hg-btn">Reset views</button>
         <span class="hg-status" id="hg-status" aria-live="polite"></span>
       </div>
     </section>

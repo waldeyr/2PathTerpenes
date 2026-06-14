@@ -42,6 +42,6 @@ def vertex_colour_cb(*args):
 p.pushVertexColour(vertex_colour_cb)
 
 post.summarySection("Plant Monoterpenes Biosynthesis")
-with progress_utils.phase("Fase 4/4: Gerando relatorio PDF/LaTeX (summary.pdf)"):
+with progress_utils.phase("Phase 4/4: Generating PDF/LaTeX report (summary.pdf)"):
     dg.print(p)
 

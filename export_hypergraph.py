@@ -38,13 +38,16 @@ os.makedirs(OUT_DIR, exist_ok=True)
 
 
 def build_rule_category_map():
-    # Rule.name (used below) reflects the GML "ruleID" of each rule (e.g.
-    # "2,6 closure"), not the GML filename (e.g. "mono_2_6_Cyc.gml"). Build a
-    # ruleID -> category lookup from the filenames in rules/ so hyperedges can
-    # still be classified as mono/sesqui/common for the viewer's legend filter.
+    # Rule.name (used below) may reflect the GML "ruleID" (e.g. "2,6 closure")
+    # or the GML filename (e.g. "mono_2_6_Cyc.gml" / "mono_2_6_Cyc"). Build a
+    # lookup mapping all of these to their respective category.
     mapping = {}
     for category, prefix in (("mono", "mono_"), ("sesqui", "sesqui_")):
         for path in glob.glob(os.path.join("rules", f"{prefix}*.gml")):
+            base = os.path.basename(path)
+            mapping[base] = category
+            if base.endswith(".gml"):
+                mapping[base[:-4]] = category
             try:
                 with open(path) as f:
                     for line in f:
@@ -63,7 +66,20 @@ RULE_CATEGORY_BY_ID = build_rule_category_map()
 
 
 def hyperedge_category(rule_names):
-    categories = {RULE_CATEGORY_BY_ID.get(name, "common") for name in rule_names}
+    categories = {RULE_CATEGORY_BY_ID.get(name) for name in rule_names if name in RULE_CATEGORY_BY_ID}
+    categories = {c for c in categories if c is not None}
+    
+    # Fallback to substring matching on rule name
+    if not categories:
+        for name in rule_names:
+            name_lower = name.lower()
+            if "mono" in name_lower:
+                categories.add("mono")
+            elif "sesqui" in name_lower:
+                categories.add("sesqui")
+            elif "common" in name_lower:
+                categories.add("common")
+                
     for preferred in ("mono", "sesqui"):
         if preferred in categories:
             return preferred
@@ -163,7 +179,7 @@ for v in dg.vertices:
 
 nodes = []
 
-for v in progress_utils.progress_iter(dg.vertices, desc="Fase 3/4: Renderizando moleculas (LaTeX/PDF)"):
+for v in progress_utils.progress_iter(dg.vertices, desc="Phase 3/4: Rendering molecules (LaTeX/PDF)"):
     g = v.graph
     file_prefix = print_graph(g)
     nodes.append({
@@ -177,7 +193,7 @@ for v in progress_utils.progress_iter(dg.vertices, desc="Fase 3/4: Renderizando 
     })
 
 hyperedges = []
-for e in progress_utils.progress_iter(dg.edges, desc="Fase 3/4: Exportando reacoes (hiperarestas)"):
+for e in progress_utils.progress_iter(dg.edges, desc="Phase 3/4: Exporting reactions (hyperedges)"):
     rule_names = []
     try:
         for r in e.rules:

@@ -11,7 +11,7 @@
   };
 
   const COL_WIDTH = 200;
-  const LANE_HEIGHT = 80;
+  const LANE_HEIGHT = 120;
   const MARGIN_X = 80;
   const MARGIN_Y = 60;
   const NODE_RADIUS = 20;
@@ -302,6 +302,43 @@
     applyFilters();
   }
 
+  function getRoundedPath(points, radius) {
+    if (points.length < 2) return '';
+    if (points.length === 2) {
+      return `M${points[0][0]},${points[0][1]} L${points[1][0]},${points[1][1]}`;
+    }
+
+    let d = `M${points[0][0]},${points[0][1]}`;
+    
+    for (let i = 1; i < points.length - 1; i++) {
+      const prev = points[i - 1];
+      const curr = points[i];
+      const next = points[i + 1];
+
+      const dx1 = curr[0] - prev[0];
+      const dy1 = curr[1] - prev[1];
+      const len1 = Math.sqrt(dx1 * dx1 + dy1 * dy1);
+
+      const dx2 = next[0] - curr[0];
+      const dy2 = next[1] - curr[1];
+      const len2 = Math.sqrt(dx2 * dx2 + dy2 * dy2);
+
+      if (len1 === 0 || len2 === 0) continue;
+
+      const r = Math.min(radius, len1 / 2, len2 / 2);
+
+      const p1x = curr[0] - (dx1 / len1) * r;
+      const p1y = curr[1] - (dy1 / len1) * r;
+      const p2x = curr[0] + (dx2 / len2) * r;
+      const p2y = curr[1] + (dy2 / len2) * r;
+
+      d += ` L${p1x},${p1y} Q${curr[0]},${curr[1]} ${p2x},${p2y}`;
+    }
+
+    d += ` L${points[points.length - 1][0]},${points[points.length - 1][1]}`;
+    return d;
+  }
+
   function linkPath(d) {
     const n = d.node;
     const e = d.hyperedge;
@@ -313,8 +350,24 @@
       x0 = e.x; y0 = e.y;
       x1 = n.x - NODE_RADIUS; y1 = n.y;
     }
-    const mx = (x0 + x1) / 2;
-    return `M${x0},${y0} C${mx},${y0} ${mx},${y1} ${x1},${y1}`;
+
+    const dx = Math.abs(x1 - x0);
+    const dy = y1 - y0;
+    const absDy = Math.abs(dy);
+
+    let points = [];
+    if (absDy === 0) {
+      points = [[x0, y0], [x1, y1]];
+    } else if (dx >= absDy) {
+      const x_mid1 = x0 + (x1 > x0 ? 1 : -1) * (dx - absDy) / 2;
+      const x_mid2 = x1 - (x1 > x0 ? 1 : -1) * (dx - absDy) / 2;
+      points = [[x0, y0], [x_mid1, y0], [x_mid2, y1], [x1, y1]];
+    } else {
+      const x_mid = (x0 + x1) / 2;
+      points = [[x0, y0], [x_mid, y0], [x_mid, y1], [x1, y1]];
+    }
+
+    return getRoundedPath(points, 8);
   }
 
   // ---------------------------------------------------------------------
@@ -542,12 +595,6 @@
       applyFilters();
     });
 
-    d3.selectAll('#hg-legend input[type=checkbox]').on('change', event => {
-      const category = event.target.dataset.category;
-      if (event.target.checked) state.activeCategories.add(category);
-      else state.activeCategories.delete(category);
-      applyFilters();
-    });
 
     d3.select('#hg-pathway').on('change', event => {
       const targetId = event.target.value;

@@ -4,19 +4,19 @@ set -euo pipefail
 
 IMAGE=2path-terpenes-mod:latest
 
-echo "==> Passo 1/3: Simulacao + export do hypergraph + relatorio PDF (Docker)"
+echo "==> Step 1/3: Simulation + hypergraph export + PDF report (Docker)"
 docker run --rm --volume "$(pwd):/home/shared/" --workdir /home/shared/ "$IMAGE" \
   -f /home/shared/molecules.py \
   -f /home/shared/simulation.py \
   -f /home/shared/export_hypergraph.py \
   -f /home/shared/printer.py
 
-echo "==> Passo 2/3: Convertendo depictions de moleculas (PDF -> SVG)"
+echo "==> Step 2/3: Converting molecule depictions (PDF -> SVG)"
 docker run --rm --entrypoint /bin/bash --volume "$(pwd):/home/shared" --workdir /home/shared "$IMAGE" \
   -c 'for f in out/*_g_*.pdf; do mod_post --mode pdfToSvg "${f%.pdf}" "${f%.pdf}"; done'
 
-echo "==> Passo 3/3: Gerando pacote standalone report/ (viewer interativo)"
+echo "==> Step 3/3: Generating standalone report/ package (interactive viewer)"
 cd "$(pwd)"
 python organize_hypergraph_assets.py
 
-echo "Pronto. Abra report/hypergraph.html (duplo-clique, funciona sem servidor) para ver o resultado."
+echo "Done. Open report/hypergraph.html (double-click, works without a server) to see the result."

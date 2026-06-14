@@ -54,7 +54,7 @@ def overallCharge(a): return sum(int(v.charge) for v in a.vertices)
 def countCycs(a): return a.numEdges - a.numVertices + 1
 
 # Instancia o Derivation Graph com o novo build interface do MØD
-with progress_utils.phase("Fase 2/4: Construindo grafo de derivacao (MOD DPO)"):
+with progress_utils.phase("Phase 2/4: Building derivation graph (MOD DPO)"):
     try:
         # Novo build interface do MØD (v1.0.0+)
         dg = DG(graphDatabase=inputGraphs, labelSettings=ls)

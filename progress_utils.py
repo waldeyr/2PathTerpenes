@@ -24,7 +24,7 @@ def phase(description):
         print(f"==> {description}...")
         start = time.time()
         yield
-        print(f"==> {description} concluido ({time.time() - start:.1f}s)")
+        print(f"==> {description} completed ({time.time() - start:.1f}s)")
         return
 
     bar = tqdm(total=1, desc=description, bar_format="{desc}: {elapsed}")
@@ -47,7 +47,7 @@ def phase_start(description):
 def phase_end(token):
     bar, description, start = token
     if bar is None:
-        print(f"==> {description} concluido ({time.time() - start:.1f}s)")
+        print(f"==> {description} completed ({time.time() - start:.1f}s)")
         return
     bar.update(1)
     bar.close()

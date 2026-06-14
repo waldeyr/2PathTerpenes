@@ -217,6 +217,32 @@
   transition: opacity 0.15s ease, stroke-width 0.15s ease;
 }
 
+.hg-link-mono {
+  stroke: var(--mono-color);
+}
+.hg-link-sesqui {
+  stroke: var(--sesqui-color);
+}
+.hg-link-common {
+  stroke: var(--common-color);
+}
+.hg-link-default {
+  stroke: var(--text-muted);
+}
+
+.hg-hyperedge-mono {
+  fill: var(--mono-color);
+}
+.hg-hyperedge-sesqui {
+  fill: var(--sesqui-color);
+}
+.hg-hyperedge-common {
+  fill: var(--common-color);
+}
+.hg-hyperedge-default {
+  fill: var(--text-muted);
+}
+
 .hg-link:hover,
 .hg-link.is-active {
   stroke-width: 7;

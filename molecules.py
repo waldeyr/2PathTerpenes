@@ -1,6 +1,6 @@
 # MOLECULES DEFNITIONS
 import progress_utils
-_phase_token = progress_utils.phase_start("Fase 1/4: Carregando moleculas e regras GML")
+_phase_token = progress_utils.phase_start("Phase 1/4: Loading molecules and GML rules")
 
 # Helper para compatibilidade com versões antigas (0.8.0) e novas (1.0+) de MØD
 try:

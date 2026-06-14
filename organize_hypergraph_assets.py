@@ -31,7 +31,7 @@ def main():
     img_dir = os.path.join(report_dir, "img", "molecules")
     os.makedirs(img_dir, exist_ok=True)
     copied = 0
-    for node in progress_utils.progress_iter(hypergraph.get("nodes", []), desc="Copiando depictions SVG para report/"):
+    for node in progress_utils.progress_iter(hypergraph.get("nodes", []), desc="Copying SVG depictions to report/"):
         image = node.get("image")
         if not image:
             continue
