@@ -157,15 +157,23 @@ if not roots:
 
 vertex_iterations = {v.id: None for v in dg.vertices}
 for r in roots:
-    vertex_iterations[r.id] = 0
+    if r.graph.name.upper() in ("H2O", "WATER"):
+        vertex_iterations[r.id] = 1  # H2O is placed at the second level (iteration 1)
+    else:
+        vertex_iterations[r.id] = 0
 
 # BFS-style level propagation
 changed = True
 while changed:
     changed = False
     for e in dg.edges:
-        if e.sources and all(vertex_iterations[src.id] is not None for src in e.sources):
-            src_levels = [vertex_iterations[src.id] for src in e.sources]
+        # Filter out H2O from source nodes when propagating levels to avoid advancing other products
+        sources_to_propagate = [src for src in e.sources if src.graph.name.upper() not in ("H2O", "WATER")]
+        if not sources_to_propagate:
+            sources_to_propagate = e.sources
+
+        if sources_to_propagate and all(vertex_iterations[src.id] is not None for src in sources_to_propagate):
+            src_levels = [vertex_iterations[src.id] for src in sources_to_propagate]
             level = max(src_levels) + 1
             for tgt in e.targets:
                 if vertex_iterations[tgt.id] is None or level < vertex_iterations[tgt.id]:

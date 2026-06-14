@@ -98,8 +98,8 @@
   <script>
     // Inlined layout computation from report_template/javascript/hypergraph.js to test layout
     (function () {
-      const COL_WIDTH = 180;
-      const LANE_HEIGHT = 70;
+      const COL_WIDTH = 240;
+      const LANE_HEIGHT = 90;
       const MARGIN_X = 60;
       const MARGIN_Y = 50;
       const NODE_RADIUS = 15;
@@ -133,9 +133,17 @@
       // Iterations: smart fallback check for GPP, FPP, NPP, H2O
       const rootNames = new Set(['gpp', 'fpp', 'npp', 'h2o', 'water']);
       data.nodes.forEach(n => {
+        const nameLower = n.name.toLowerCase();
+        const isH2O = nameLower === 'h2o' || nameLower === 'water';
         if (typeof n.iteration !== 'number') {
-          const isRoot = incoming.get(n.id).length === 0 || rootNames.has(n.name.toLowerCase());
-          n.iteration = isRoot ? 0 : null;
+          const isRoot = incoming.get(n.id).length === 0 || rootNames.has(nameLower);
+          if (isRoot) {
+            n.iteration = isH2O ? 1 : 0;
+          } else {
+            n.iteration = null;
+          }
+        } else if (isH2O) {
+          n.iteration = 1;
         }
       });
 
@@ -145,12 +153,18 @@
         changed = false;
         guard++;
         data.hyperedges.forEach(e => {
-          const srcIters = e.sources.map(id => nodesById.get(id).iteration);
+          // Filter out H2O/water when propagating levels
+          const sourcesToPropagate = e.sources.filter(id => {
+            const name = nodesById.get(id).name.toLowerCase();
+            return name !== 'h2o' && name !== 'water';
+          });
+          const activeSources = sourcesToPropagate.length ? sourcesToPropagate : e.sources;
+
+          const srcIters = activeSources.map(id => nodesById.get(id).iteration);
           if (srcIters.length && srcIters.every(v => v != null)) {
             const level = Math.max(...srcIters) + 1;
             e.targets.forEach(tid => {
               const tNode = nodesById.get(tid);
-              // FIXED CONDITION: level < tNode.iteration instead of tNode.iteration < level
               if (tNode.iteration == null || level < tNode.iteration) {
                 tNode.iteration = level;
                 changed = true;

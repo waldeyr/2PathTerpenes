@@ -10,8 +10,8 @@
     default: '#94a3b8'
   };
 
-  const COL_WIDTH = 200;
-  const LANE_HEIGHT = 120;
+  const COL_WIDTH = 260;
+  const LANE_HEIGHT = 140;
   const MARGIN_X = 80;
   const MARGIN_Y = 60;
   const NODE_RADIUS = 20;
@@ -111,9 +111,17 @@
     // nodes (root nodes with no incoming hyperedge start at 0).
     const rootNames = new Set(['gpp', 'fpp', 'npp', 'h2o', 'water']);
     data.nodes.forEach(n => {
+      const nameLower = n.name.toLowerCase();
+      const isH2O = nameLower === 'h2o' || nameLower === 'water';
       if (typeof n.iteration !== 'number') {
-        const isRoot = incoming.get(n.id).length === 0 || rootNames.has(n.name.toLowerCase());
-        n.iteration = isRoot ? 0 : null;
+        const isRoot = incoming.get(n.id).length === 0 || rootNames.has(nameLower);
+        if (isRoot) {
+          n.iteration = isH2O ? 1 : 0;
+        } else {
+          n.iteration = null;
+        }
+      } else if (isH2O) {
+        n.iteration = 1;
       }
     });
     let changed = true;
@@ -122,7 +130,14 @@
       changed = false;
       guard++;
       data.hyperedges.forEach(e => {
-        const srcIters = e.sources.map(id => nodesById.get(id).iteration);
+        // Filter out H2O/water when propagating levels
+        const sourcesToPropagate = e.sources.filter(id => {
+          const name = nodesById.get(id).name.toLowerCase();
+          return name !== 'h2o' && name !== 'water';
+        });
+        const activeSources = sourcesToPropagate.length ? sourcesToPropagate : e.sources;
+
+        const srcIters = activeSources.map(id => nodesById.get(id).iteration);
         if (srcIters.length && srcIters.every(v => v != null)) {
           const level = Math.max(...srcIters) + 1;
           e.targets.forEach(tid => {

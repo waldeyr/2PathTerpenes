@@ -19,6 +19,7 @@
   display: flex;
   flex-wrap: wrap;
   align-items: center;
+  justify-content: center;
   gap: 1.5rem;
   background: var(--panel-bg);
   border: 1px solid var(--panel-border);
@@ -296,6 +297,7 @@
 }
 
 .hg-node.is-leaf circle {
+  stroke: var(--secondary);
   stroke-dasharray: 3 2;
 }
 
