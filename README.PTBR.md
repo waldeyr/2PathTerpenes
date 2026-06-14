@@ -79,7 +79,7 @@ Identificamos **quatro possíveis melhorias de arquitetura** para implementar re
 ## Instalação e uso
 
 ### Organização dos Arquivos de Regras e Recursos
-*   **Regras GML (`rules/`)**: Todas as regras de reação GML oficiais são mantidas e atualizadas diretamente no diretório `rules/`. O diretório temporário/legado `rules/novas/` foi removido para evitar duplicidade.
+*   **Regras GML (`rules/`)**: Todas as regras de reação GML oficiais são mantidas e atualizadas diretamente no diretório `rules/`.
 *   **Imagens de Recursos (`docs/img/`)**: Apenas imagens que são ativamente usadas ou dinamicamente referenciadas (como visualizações de regras) por `docs/index.html` são mantidas no controle de versão. Arquivos temporários ou redundantes de imagem são limpos antes do commit.
 
 ### Gerando Previews de Regras GML

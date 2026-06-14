@@ -79,7 +79,7 @@ We have identified **four potential architectural improvements** to implement cy
 ## Installation and Usage
 
 ### Organization of Rules and Resource Files
-*   **GML Rules (`rules/`)**: All official GML reaction rules are maintained and updated directly in the `rules/` directory. The temporary/legacy `rules/novas/` directory has been removed to avoid duplication.
+*   **GML Rules (`rules/`)**: All official GML reaction rules are maintained and updated directly in the `rules/` directory.
 *   **Resource Images (`docs/img/`)**: Only images actively used or dynamically referenced (like rule previews) by `docs/index.html` are kept in version control. Temporary or redundant image files are cleaned up prior to committing.
 
 ### Generating GML Rule Previews
