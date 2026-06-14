@@ -2,6 +2,14 @@ import json
 import os
 import re
 import shutil
+import sys
+
+# Ensure the script's directory is in the path to find local helper modules
+try:
+    script_dir = os.path.dirname(os.path.abspath(__file__))
+    sys.path.insert(0, script_dir)
+except FileNotFoundError:
+    sys.path.insert(0, '')
 
 import progress_utils
 

@@ -16,6 +16,7 @@ docker run --rm --entrypoint /bin/bash --volume "$(pwd):/home/shared" --workdir 
   -c 'for f in out/*_g_*.pdf; do mod_post --mode pdfToSvg "${f%.pdf}" "${f%.pdf}"; done'
 
 echo "==> Passo 3/3: Gerando pacote standalone report/ (viewer interativo)"
+cd "$(pwd)"
 python organize_hypergraph_assets.py
 
 echo "Pronto. Abra report/hypergraph.html (duplo-clique, funciona sem servidor) para ver o resultado."
