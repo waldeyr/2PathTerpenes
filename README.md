@@ -5,7 +5,7 @@
 *Also available in:* 🇧🇷 *[Português (Brasil)](README.PTBR.md)*
 
 ## Project Summary
-**2PathTerpenes** is a bioinformatics and chemical modeling tool based on graph grammar to reconstruct and explore metabolic networks of plant terpene biosynthesis (C10 monoterpenes and C15 sesquiterpenes). The project utilizes the **MedØlDatschgerl (MØD)** simulator and the Double Pushout (DPO) formalism to generate synthesis pathways for complex molecules (such as $\beta$-caryophyllene, $\alpha$-humulene, and $\beta$-farnesene) starting from linear acyclic precursors like Farnesyl Diphosphate (FPP). The simulation results can be exported as structural PDF reports or integrated into a **Neo4j** graph database under ecological and biological constraints ("Scenarios").
+**2PathTerpenes** is a bioinformatics and chemical modeling tool based on graph grammar to reconstruct and explore metabolic networks of plant terpene biosynthesis (C10 monoterpenes and C15 sesquiterpenes). The project utilizes the **MedØlDatschgerl (MØD)** simulator and the Double Pushout (DPO) formalism to generate synthesis pathways for complex molecules (such as $\beta$-caryophyllene, $\alpha$-humulene, and $\beta$-farnesene) starting from linear acyclic precursors like Farnesyl Diphosphate (FPP). The simulation results can be exported as structural PDF reports or as an interactive HTML/JavaScript hypergraph viewer, optionally annotated with compound identifiers from the ChEMBL database.
 
 ## Feature List
 *   **Molecular Topological Definition**: Modeling of chemical precursors and carbocations using SMILES linear representations and DFS in graphs.
@@ -31,8 +31,11 @@ graph TD
     MOD -->|Builds| DG[Derivation Graph]
     DG -->|Formats Report| PrintPy[printer.py]
     PrintPy -->|Generates| PDF[PDF Report]
-    DG -->|Writes data| Neo4jStore[Neo4j Storer]
-    Neo4jStore -->|Saves| Neo4j[Neo4j Database]
+    DG -->|Exports| ExportPy[export_hypergraph.py]
+    ExportPy -->|Writes| HGJSON[hypergraph.json]
+    HGJSON -->|Annotates| AnnotatePy[annotate_chembl.py]
+    AnnotatePy -->|Queries| ChEMBL[ChEMBL API]
+    HGJSON -->|Renders| HGHTML[hypergraph.html]
 ```
 
 ### Web Interface
@@ -42,7 +45,7 @@ The web interface (https://waldeyr.github.io/2PathTerpenes) provides a responsiv
 
 | Technology | Version | Main Function |
 |---|---|---|
-| MedØlDatschgerl (MØD) | v0.8.0 or v1.0.0+ | Chemical graph transformation kernel (DPO) and ILP solver. |
+| MedØlDatschgerl (MØD) | v1.0.0+ | Chemical graph transformation kernel (DPO) and ILP solver. |
 | Python | v3.8+ | Simulation automation scripts (`molecules.py`, `simulation.py`, `printer.py`). |
 | Open Babel | v3.0+ | 3D conformation generation and energy calculation of carbocations. |
 | Docker | v19.x+ | Full Linux environment packaging for agnostic execution of MØD. |
@@ -107,20 +110,12 @@ To generate the SVG preview images for the chemical reaction rules shown in the 
    ```bash
    docker build -t 2path-terpenes-mod:latest .
    ```
-   *(Note: The Docker image installs the LaTeX compiler with support for Latin Modern fonts `texlive-lmodern`, fixing potential compilation issues for the summary report `summary.pdf`. To support minimal LaTeX environments or the legacy image, we also include a fallback mock `lmodern.sty` in the workspace, so the compilation automatically falls back to default LaTeX fonts if `lmodern` is missing.)*
+   *(Note: The Docker image installs the LaTeX compiler with support for Latin Modern fonts `texlive-lmodern`, fixing potential compilation issues for the summary report `summary.pdf`. To support minimal LaTeX environments, we also include a fallback mock `lmodern.sty` in the workspace, so the compilation automatically falls back to default LaTeX fonts if `lmodern` is missing.)*
 
 2. **Run the main project simulation**:
    ```bash
    docker run --rm --volume $(pwd):/home/shared/ --workdir /home/shared/ 2path-terpenes-mod:latest -f /home/shared/molecules.py -f /home/shared/simulation.py -f /home/shared/printer.py
    ```
-
-#### Alternative Option: Using the Legacy Image (waldeyr/mod_v0.8.0)
-If you prefer to use the existing image pre-built on Docker Hub without building locally:
-```bash
-docker run --rm --volume $(pwd):/home/shared/ --workdir /home/shared/ waldeyr/mod_v0.8.0:v1.0 /home/mod-v0.8.0/bin/mod -f /home/shared/molecules.py -f /home/shared/simulation.py -f /home/shared/printer.py
-```
-
-The simulation files contain **dynamic compatibility helpers**, now updated to use the new MØD build interface (`DG.build().execute()`) on newer MØD versions (1.0+) to resolve deprecation warnings for `dgRuleComp` and `DG.calc()`, as well as addressing deprecations for `pushVertexColour` and `postSection` in `printer.py`, while remaining fully backwards-compatible with legacy versions (0.8.0).
 
 ### Interactive Hypergraph Viewer (HTML/JS)
 
@@ -143,6 +138,12 @@ In addition to the LaTeX/PDF report, the derivation graph can be exported as an 
    ```
    This produces `docs/data/hypergraph.json` and `docs/img/molecules/*.svg`.
 
-4. **Open `docs/hypergraph.html`** (or visit it on GitHub Pages, via the "Interactive Hypergraph Viewer" link in the rule selector). If `docs/data/hypergraph.json` is not present yet, the page falls back to `docs/data/hypergraph.sample.json` so the viewer can be previewed without running MØD.
+4. **(Optional) Annotate molecules with ChEMBL identifiers**:
+   ```bash
+   python annotate_chembl.py
+   ```
+   For each molecule with a `smiles` field, this computes its InChIKey (via the `obabel` CLI) and looks up an exact match in the [ChEMBL REST API](https://www.ebi.ac.uk/chembl/api/data/molecule), adding `chemblId`/`chemblName` fields to `docs/data/hypergraph.json` when a match is found. Results are cached in `docs/data/chembl_cache.json` so repeated runs only query ChEMBL for previously unseen structures. Matched molecules show their ChEMBL ID/name (with a link) in the viewer's details panel and become searchable by that name.
+
+5. **Open `docs/hypergraph.html`** (or visit it on GitHub Pages, via the "Interactive Hypergraph Viewer" link in the rule selector). If `docs/data/hypergraph.json` is not present yet, the page falls back to `docs/data/hypergraph.sample.json` so the viewer can be previewed without running MØD.
 
 The viewer supports pan/zoom, search by molecule name, filtering by reaction category, and clicking a molecule or reaction to see its details (SMILES, charge, rings, applied rule(s)).

@@ -14,12 +14,12 @@
     { "id": "v6", "name": "alfa terpinyl cation", "smiles": "C1CC(CCC=1C)[C+](C)C", "charge": 1, "cycles": 1, "iteration": 2, "image": null },
     { "id": "v7", "name": "Bornyl Cation", "smiles": "CC12CCC(C[CH+]1)C2(C)C", "charge": 1, "cycles": 2, "iteration": 2, "image": null },
     { "id": "v8", "name": "Pinyl Cation", "smiles": "C[C+]1CCC2CC1C2(C)C", "charge": 1, "cycles": 2, "iteration": 2, "image": null },
-    { "id": "v9", "name": "limonene", "smiles": "CC1=CCC(CC1)C(=C)C", "charge": 0, "cycles": 1, "iteration": 3, "image": null },
+    { "id": "v9", "name": "limonene", "smiles": "CC1=CCC(CC1)C(=C)C", "charge": 0, "cycles": 1, "iteration": 3, "image": null, "chemblId": "CHEMBL15932", "chemblName": "LIMONENE" },
     { "id": "v10", "name": "terpinolene", "smiles": "C1CC(CCC=1C)=C(C)C", "charge": 0, "cycles": 1, "iteration": 3, "image": null },
     { "id": "v11", "name": "alpha-terpinol", "smiles": "CC1=CCC(CC1)C(C)(C)O", "charge": 0, "cycles": 1, "iteration": 3, "image": null },
     { "id": "v12", "name": "bornyl diphosphate", "smiles": "CC1(C)C2CC(C1(C)CC2)OP(OP(O)(O)=O)(O)=O", "charge": 0, "cycles": 2, "iteration": 3, "image": null },
     { "id": "v13", "name": "camphene", "smiles": "CC1(C2CCC(C2)C1=C)C", "charge": 0, "cycles": 2, "iteration": 3, "image": null },
-    { "id": "v14", "name": "alfa Pinene", "smiles": "C1CC2CC(C=1C)C2(C)C", "charge": 0, "cycles": 2, "iteration": 3, "image": null }
+    { "id": "v14", "name": "alfa Pinene", "smiles": "C1CC2CC(C=1C)C2(C)C", "charge": 0, "cycles": 2, "iteration": 3, "image": null, "chemblId": "CHEMBL28213", "chemblName": "ALPHA-PINENE" }
   ],
   "hyperedges": [
     { "id": "e0", "sources": ["v0"], "targets": ["v4", "v3"], "rules": ["common_opp_loss"], "category": "common", "iteration": 1 },

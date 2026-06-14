@@ -394,7 +394,11 @@
     const search = state.searchTerm.trim().toLowerCase();
 
     const searchNodes = search
-      ? new Set(data.nodes.filter(n => n.name.toLowerCase().includes(search)).map(n => n.id))
+      ? new Set(data.nodes.filter(n => {
+          return n.name.toLowerCase().includes(search) ||
+            (n.chemblName && n.chemblName.toLowerCase().includes(search)) ||
+            (n.chemblId && n.chemblId.toLowerCase().includes(search));
+        }).map(n => n.id))
       : null;
 
     const highlightNodes = new Set();
@@ -460,6 +464,12 @@
     if (typeof node.charge === 'number') html += `<dt>Charge</dt><dd>${node.charge}</dd>`;
     if (typeof node.cycles === 'number') html += `<dt>Rings</dt><dd>${node.cycles}</dd>`;
     html += `<dt>Step</dt><dd>${node.iteration}</dd>`;
+    if (node.chemblId) {
+      const chemblUrl = `https://www.ebi.ac.uk/chembl/explore/molecule/${encodeURIComponent(node.chemblId)}`;
+      html += `<dt>ChEMBL</dt><dd><a href="${escapeHtml(chemblUrl)}" target="_blank" rel="noopener">${escapeHtml(node.chemblId)}</a>`;
+      if (node.chemblName) html += ` &mdash; ${escapeHtml(node.chemblName)}`;
+      html += '</dd>';
+    }
     html += '</dl>';
 
     if (incomingEdges.length) {
