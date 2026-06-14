@@ -109,9 +109,11 @@
 
     // Iterations: trust provided values, otherwise derive from the source
     // nodes (root nodes with no incoming hyperedge start at 0).
+    const rootNames = new Set(['gpp', 'fpp', 'npp', 'h2o', 'water']);
     data.nodes.forEach(n => {
       if (typeof n.iteration !== 'number') {
-        n.iteration = incoming.get(n.id).length === 0 ? 0 : null;
+        const isRoot = incoming.get(n.id).length === 0 || rootNames.has(n.name.toLowerCase());
+        n.iteration = isRoot ? 0 : null;
       }
     });
     let changed = true;
@@ -125,7 +127,7 @@
           const level = Math.max(...srcIters) + 1;
           e.targets.forEach(tid => {
             const tNode = nodesById.get(tid);
-            if (tNode.iteration == null || tNode.iteration < level) {
+            if (tNode.iteration == null || level < tNode.iteration) {
               tNode.iteration = level;
               changed = true;
             }

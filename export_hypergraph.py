@@ -127,6 +127,40 @@ def print_graph(g):
     return base
 
 
+# Compute shortest-path level (iteration) from initial compounds (roots)
+incoming_edges = {v.id: [] for v in dg.vertices}
+for e in dg.edges:
+    for tgt in e.targets:
+        incoming_edges[tgt.id].append(e)
+
+# Identify roots: starting educts (GPP, FPP, H2O) or nodes with no incoming edges
+educt_names = {m.name for m in eductMols} if 'eductMols' in globals() else {"GPP", "FPP", "H2O"}
+roots = [v for v in dg.vertices if v.graph.name in educt_names]
+if not roots:
+    roots = [v for v in dg.vertices if not incoming_edges[v.id]]
+
+vertex_iterations = {v.id: None for v in dg.vertices}
+for r in roots:
+    vertex_iterations[r.id] = 0
+
+# BFS-style level propagation
+changed = True
+while changed:
+    changed = False
+    for e in dg.edges:
+        if e.sources and all(vertex_iterations[src.id] is not None for src in e.sources):
+            src_levels = [vertex_iterations[src.id] for src in e.sources]
+            level = max(src_levels) + 1
+            for tgt in e.targets:
+                if vertex_iterations[tgt.id] is None or level < vertex_iterations[tgt.id]:
+                    vertex_iterations[tgt.id] = level
+                    changed = True
+
+# Default any unreachable node to iteration 0
+for v in dg.vertices:
+    if vertex_iterations[v.id] is None:
+        vertex_iterations[v.id] = 0
+
 nodes = []
 
 for v in progress_utils.progress_iter(dg.vertices, desc="Fase 3/4: Renderizando moleculas (LaTeX/PDF)"):
@@ -139,6 +173,7 @@ for v in progress_utils.progress_iter(dg.vertices, desc="Fase 3/4: Renderizando 
         "charge": graph_charge(g),
         "cycles": graph_cycles(g),
         "image": f"{file_prefix}.svg" if file_prefix else None,
+        "iteration": vertex_iterations[v.id],
     })
 
 hyperedges = []

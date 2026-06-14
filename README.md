@@ -18,6 +18,76 @@
 
 # Architecture
 
+## Database (or other storage format)
+This project uses JSON-based files for persistent storage and metadata cache, along with a GML rules dataset.
+
+### Database Diagram
+```mermaid
+erDiagram
+    HYPERGRAPH_JSON ||--o{ NODE_JSON : contains
+    HYPERGRAPH_JSON ||--o{ HYPEREDGE_JSON : contains
+    CHEMBL_CACHE_JSON ||--o{ CHEMBL_ENTRY_JSON : stores
+
+    NODE_JSON {
+        string id PK
+        string name
+        string smiles
+        int charge
+        int cycles
+        string image
+        int iteration
+        string chemblId
+        string chemblName
+    }
+
+    HYPEREDGE_JSON {
+        string id PK
+        string_array sources
+        string_array targets
+        string_array rules
+        string category
+    }
+
+    CHEMBL_ENTRY_JSON {
+        string smiles PK
+        string inchikey
+        string chemblId
+        string chemblName
+    }
+```
+
+### Data Dictionary
+
+#### Nodes Table (inside `hypergraph.json` -> `nodes`)
+| Field | Type | Description |
+|---|---|---|
+| `id` | String | Unique vertex identifier (e.g., `v0`, `v1`). |
+| `name` | String | Name of the chemical compound (e.g., `GPP`, `limonene`). |
+| `smiles` | String | SMILES representation of the molecule. |
+| `charge` | Integer | Net charge of the carbocation/neutral molecule. |
+| `cycles` | Integer | Number of rings/cycles in the molecule. |
+| `image` | String | Relative path to the depiction SVG file. |
+| `iteration` | Integer | Shortest path steps from the initial precursors (0-indexed). |
+| `chemblId` | String | (Optional) ChEMBL compound identifier. |
+| `chemblName` | String | (Optional) Common name fetched from ChEMBL database. |
+
+#### Hyperedges Table (inside `hypergraph.json` -> `hyperedges`)
+| Field | Type | Description |
+|---|---|---|
+| `id` | String | Unique hyperedge/reaction identifier (e.g., `e0`, `e1`). |
+| `sources` | Array of Strings | Reactant/educt node IDs. |
+| `targets` | Array of Strings | Product node IDs. |
+| `rules` | Array of Strings | Names of the reaction rules applied. |
+| `category` | String | Reaction category (`mono`, `sesqui`, or `common`). |
+
+#### ChEMBL Cache Table (`chembl_cache.json`)
+| Field | Type | Description |
+|---|---|---|
+| `smiles` | String | SMILES representation of the molecule (Primary Key). |
+| `inchikey` | String | Calculated InChIKey (hash) of the SMILES structure. |
+| `chemblId` | String | ChEMBL compound identifier. |
+| `chemblName` | String | Common name of the compound in ChEMBL. |
+
 ## Components
 The simulation workflow is divided into components for graph specification, DPO grammar application, derivation graph generation, and database persistence.
 

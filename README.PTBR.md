@@ -18,6 +18,76 @@ O **2PathTerpenes** é uma ferramenta de bioinformática e modelagem química ba
 
 # Arquitetura
 
+## Banco de dados (ou outra forma de armazenamento que estiver sendo usada)
+Este projeto usa arquivos baseados no formato JSON para armazenamento persistente dos dados do grafo e cache de metadados, além de um conjunto de arquivos GML com regras de reação.
+
+### Diagrama de banco de dados
+```mermaid
+erDiagram
+    HYPERGRAPH_JSON ||--o{ NODE_JSON : contains
+    HYPERGRAPH_JSON ||--o{ HYPEREDGE_JSON : contains
+    CHEMBL_CACHE_JSON ||--o{ CHEMBL_ENTRY_JSON : stores
+
+    NODE_JSON {
+        string id PK
+        string name
+        string smiles
+        int charge
+        int cycles
+        string image
+        int iteration
+        string chemblId
+        string chemblName
+    }
+
+    HYPEREDGE_JSON {
+        string id PK
+        string_array sources
+        string_array targets
+        string_array rules
+        string category
+    }
+
+    CHEMBL_ENTRY_JSON {
+        string smiles PK
+        string inchikey
+        string chemblId
+        string chemblName
+    }
+```
+
+### Dicionário de dados
+
+#### Tabela de Nós (dentro de `hypergraph.json` -> `nodes`)
+| Campo | Tipo | Descrição |
+|---|---|---|
+| `id` | String | Identificador único do vértice (ex: `v0`, `v1`). |
+| `name` | String | Nome do composto químico (ex: `GPP`, `limonene`). |
+| `smiles` | String | Representação SMILES da estrutura molecular. |
+| `charge` | Integer | Carga líquida do carbocátion ou molécula neutra. |
+| `cycles` | Integer | Número de ciclos/anéis na molécula. |
+| `image` | String | Caminho relativo para o arquivo SVG com a representação molecular. |
+| `iteration` | Integer | Passos/nível de caminho mais curto a partir dos precursores iniciais (0-indexed). |
+| `chemblId` | String | (Opcional) Identificador do composto na base ChEMBL. |
+| `chemblName` | String | (Opcional) Nome comum retornado pela base ChEMBL. |
+
+#### Tabela de Hiperarestas (dentro de `hypergraph.json` -> `hyperedges`)
+| Campo | Tipo | Descrição |
+|---|---|---|
+| `id` | String | Identificador único da hiperaresta/reação (ex: `e0`, `e1`). |
+| `sources` | Vetor de Strings | Identificadores dos nós reagentes (eductos). |
+| `targets` | Vetor de Strings | Identificadores dos nós produtos. |
+| `rules` | Vetor de Strings | Nomes das regras de reação aplicadas. |
+| `category` | String | Categoria da reação (`mono`, `sesqui` ou `common`). |
+
+#### Tabela de Cache ChEMBL (`chembl_cache.json`)
+| Campo | Tipo | Descrição |
+|---|---|---|
+| `smiles` | String | Representação SMILES da molécula (Chave Primária). |
+| `inchikey` | String | InChIKey calculado (hash) da estrutura SMILES. |
+| `chemblId` | String | Identificador do composto na base ChEMBL. |
+| `chemblName` | String | Nome comum do composto na base ChEMBL. |
+
 ## Componentes
 O fluxo de simulação é dividido em componentes de especificação de grafos, aplicação de gramáticas DPO, geração do grafo de derivação e persistência em banco de dados.
 

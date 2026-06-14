@@ -1,0 +1,295 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>Mock Hypergraph Test</title>
+  <style>
+    body {
+      font-family: sans-serif;
+      background: #0f172a;
+      color: #e2e8f0;
+      padding: 20px;
+    }
+    #hg-canvas {
+      background: #1e293b;
+      border: 1px solid #334155;
+      border-radius: 8px;
+      width: 100%;
+      height: 400px;
+    }
+    .node-label {
+      fill: #f8fafc;
+      font-size: 10px;
+      text-anchor: middle;
+    }
+    .node-circle {
+      fill: #38bdf8;
+      stroke: #0284c7;
+      stroke-width: 2px;
+    }
+    .edge-circle {
+      fill: #f43f5e;
+    }
+    .link {
+      fill: none;
+      stroke: #64748b;
+      stroke-width: 3px;
+      opacity: 0.6;
+    }
+    #coords-table {
+      margin-top: 20px;
+      border-collapse: collapse;
+      width: 100%;
+    }
+    #coords-table th, #coords-table td {
+      border: 1px solid #334155;
+      padding: 8px;
+      text-align: left;
+    }
+    #coords-table th {
+      background: #1e293b;
+    }
+  </style>
+</head>
+<body>
+  <h2>Mock Hypergraph Visual Layout Verification</h2>
+  <svg id="hg-canvas"></svg>
+
+  <h3>Computed Coordinates Table</h3>
+  <table id="coords-table">
+    <thead>
+      <tr>
+        <th>Node ID</th>
+        <th>Name</th>
+        <th>Iteration (Column)</th>
+        <th>Lane (Row)</th>
+        <th>X</th>
+        <th>Y</th>
+      </tr>
+    </thead>
+    <tbody id="coords-body"></tbody>
+  </table>
+
+  <!-- Embedded mock data with a GPP -> cation -> GPP cycle and FPP pathway -->
+  <script type="application/json" id="hg-data">
+  {
+    "meta": { "title": "Mock Biosynthesis" },
+    "nodes": [
+      { "id": "v0", "name": "GPP" },
+      { "id": "v1", "name": "geranyl cation" },
+      { "id": "v2", "name": "OPP-" },
+      { "id": "v3", "name": "cyclic cation" },
+      { "id": "v4", "name": "limonene" },
+      { "id": "v5", "name": "FPP" },
+      { "id": "v6", "name": "farnesyl cation" },
+      { "id": "v7", "name": "bisabolyl cation" }
+    ],
+    "hyperedges": [
+      { "id": "e0", "sources": ["v0"], "targets": ["v1", "v2"], "rules": ["OPP Loss"], "category": "mono" },
+      { "id": "e1", "sources": ["v1", "v2"], "targets": ["v0"], "rules": ["OPP Reassociation"], "category": "mono" },
+      { "id": "e2", "sources": ["v1"], "targets": ["v3"], "rules": ["Cyclization"], "category": "mono" },
+      { "id": "e3", "sources": ["v3"], "targets": ["v4"], "rules": ["Proton Loss"], "category": "mono" },
+      { "id": "e4", "sources": ["v5"], "targets": ["v6", "v2"], "rules": ["OPP Loss"], "category": "sesqui" },
+      { "id": "e5", "sources": ["v6"], "targets": ["v7"], "rules": ["Cyclization"], "category": "sesqui" }
+    ]
+  }
+  </script>
+
+  <script src="https://d3js.org/d3.v7.min.js"></script>
+  <script>
+    // Inlined layout computation from report_template/javascript/hypergraph.js to test layout
+    (function () {
+      const COL_WIDTH = 180;
+      const LANE_HEIGHT = 70;
+      const MARGIN_X = 60;
+      const MARGIN_Y = 50;
+      const NODE_RADIUS = 15;
+
+      const rawData = JSON.parse(document.getElementById('hg-data').textContent);
+
+      // Normalize
+      const nodes = rawData.nodes.map(n => ({ ...n }));
+      const hyperedges = rawData.hyperedges.map((e, idx) => ({
+        id: e.id || `e${idx}`,
+        sources: e.sources || [],
+        targets: e.targets || [],
+        rules: e.rules || [],
+        category: e.category || 'default'
+      }));
+      const data = { nodes, hyperedges };
+
+      // ComputeLayout
+      const nodesById = new Map(data.nodes.map(n => [n.id, n]));
+      const incoming = new Map();
+      const outgoing = new Map();
+      data.nodes.forEach(n => {
+        incoming.set(n.id, []);
+        outgoing.set(n.id, []);
+      });
+      data.hyperedges.forEach(e => {
+        e.sources.forEach(s => outgoing.get(s) && outgoing.get(s).push(e));
+        e.targets.forEach(t => incoming.get(t) && incoming.get(t).push(e));
+      });
+
+      // Iterations: smart fallback check for GPP, FPP, NPP, H2O
+      const rootNames = new Set(['gpp', 'fpp', 'npp', 'h2o', 'water']);
+      data.nodes.forEach(n => {
+        if (typeof n.iteration !== 'number') {
+          const isRoot = incoming.get(n.id).length === 0 || rootNames.has(n.name.toLowerCase());
+          n.iteration = isRoot ? 0 : null;
+        }
+      });
+
+      let changed = true;
+      let guard = 0;
+      while (changed && guard < 1000) {
+        changed = false;
+        guard++;
+        data.hyperedges.forEach(e => {
+          const srcIters = e.sources.map(id => nodesById.get(id).iteration);
+          if (srcIters.length && srcIters.every(v => v != null)) {
+            const level = Math.max(...srcIters) + 1;
+            e.targets.forEach(tid => {
+              const tNode = nodesById.get(tid);
+              // FIXED CONDITION: level < tNode.iteration instead of tNode.iteration < level
+              if (tNode.iteration == null || level < tNode.iteration) {
+                tNode.iteration = level;
+                changed = true;
+              }
+            });
+          }
+        });
+      }
+      data.nodes.forEach(n => { if (n.iteration == null) n.iteration = 0; });
+
+      // Group nodes into columns
+      const maxIter = data.nodes.reduce((m, n) => Math.max(m, n.iteration), 0);
+      const columns = Array.from({ length: maxIter + 1 }, () => []);
+      data.nodes.forEach(n => columns[n.iteration].push(n));
+
+      // Lane assignment
+      const laneOf = new Map();
+      function preferredLane(node) {
+        const inc = incoming.get(node.id);
+        if (inc.length === 0) return null;
+        const srcLanes = [];
+        inc.forEach(e => e.sources.forEach(srcId => {
+          if (laneOf.has(srcId)) srcLanes.push(laneOf.get(srcId));
+        }));
+        if (!srcLanes.length) return null;
+        const avg = srcLanes.reduce((s, v) => s + v, 0) / srcLanes.length;
+        return Math.round(avg);
+      }
+      columns.forEach(col => {
+        const occupied = new Set();
+        const ordered = [...col].sort((a, b) => {
+          const pa = preferredLane(a);
+          const pb = preferredLane(b);
+          return (pa == null ? Infinity : pa) - (pb == null ? Infinity : pb);
+        });
+        ordered.forEach(n => {
+          let lane = preferredLane(n);
+          if (lane == null || occupied.has(lane)) {
+            lane = 0;
+            while (occupied.has(lane)) lane++;
+          }
+          occupied.add(lane);
+          laneOf.set(n.id, lane);
+          n.lane = lane;
+        });
+      });
+
+      // Pixel coordinates
+      data.nodes.forEach(n => {
+        n.x = MARGIN_X + n.iteration * COL_WIDTH;
+        n.y = MARGIN_Y + n.lane * LANE_HEIGHT;
+      });
+
+      const maxLane = data.nodes.reduce((m, n) => Math.max(m, n.lane), 0);
+      const width = MARGIN_X * 2 + maxIter * COL_WIDTH;
+      const height = MARGIN_Y * 2 + maxLane * LANE_HEIGHT;
+
+      data.hyperedges.forEach(e => {
+        const connected = [...e.sources, ...e.targets]
+          .map(id => nodesById.get(id))
+          .filter(Boolean);
+        const avgY = connected.reduce((s, n) => s + n.y, 0) / (connected.length || 1);
+        const sourceX = e.sources.length
+          ? Math.max(...e.sources.map(id => nodesById.get(id).x))
+          : MARGIN_X;
+        const targetX = e.targets.length
+          ? Math.min(...e.targets.map(id => nodesById.get(id).x))
+          : sourceX + COL_WIDTH;
+        e.x = (sourceX + targetX) / 2;
+        e.y = avgY;
+      });
+
+      // Render Visual
+      const svg = d3.select('#hg-canvas')
+        .attr('viewBox', `0 0 ${width} ${height}`);
+
+      // Draw links
+      const links = [];
+      data.hyperedges.forEach(e => {
+        e.sources.forEach(sid => links.push({ hyperedge: e, node: nodesById.get(sid), dir: 'in' }));
+        e.targets.forEach(tid => links.push({ hyperedge: e, node: nodesById.get(tid), dir: 'out' }));
+      });
+
+      svg.append('g').selectAll('path')
+        .data(links)
+        .join('path')
+        .attr('class', 'link')
+        .attr('d', d => {
+          const n = d.node;
+          const e = d.hyperedge;
+          let x0, y0, x1, y1;
+          if (d.dir === 'in') {
+            x0 = n.x + NODE_RADIUS; y0 = n.y;
+            x1 = e.x; y1 = e.y;
+          } else {
+            x0 = e.x; y0 = e.y;
+            x1 = n.x - NODE_RADIUS; y1 = n.y;
+          }
+          const mx = (x0 + x1) / 2;
+          return `M${x0},${y0} C${mx},${y0} ${mx},${y1} ${x1},${y1}`;
+        });
+
+      // Draw hyperedge circles
+      svg.append('g').selectAll('circle')
+        .data(data.hyperedges)
+        .join('circle')
+        .attr('class', 'edge-circle')
+        .attr('cx', d => d.x)
+        .attr('cy', d => d.y)
+        .attr('r', 4);
+
+      // Draw node groups
+      const nodeGroup = svg.append('g').selectAll('g')
+        .data(data.nodes)
+        .join('g')
+        .attr('transform', d => `translate(${d.x}, ${d.y})`);
+
+      nodeGroup.append('circle')
+        .attr('class', 'node-circle')
+        .attr('r', NODE_RADIUS);
+
+      nodeGroup.append('text')
+        .attr('class', 'node-label')
+        .attr('dy', 4)
+        .text(d => d.name);
+
+      // Render coordinates table
+      const tbody = d3.select('#coords-body');
+      data.nodes.forEach(n => {
+        tbody.append('tr').html(`
+          <td>${n.id}</td>
+          <td><strong>${n.name}</strong></td>
+          <td>${n.iteration}</td>
+          <td>${n.lane}</td>
+          <td>${n.x}px</td>
+          <td>${n.y}px</td>
+        `);
+      });
+    })();
+  </script>
+</body>
+</html>
