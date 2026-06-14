@@ -23,6 +23,7 @@
     data: null,
     layout: null,
     selection: null,
+    pathHighlight: null,
     activeCategories: new Set(['mono', 'sesqui', 'common', 'default']),
     searchTerm: '',
     svg: null,
@@ -129,17 +130,22 @@
     const columns = Array.from({ length: maxIter + 1 }, () => []);
     data.nodes.forEach(n => columns[n.iteration].push(n));
 
-    // Lane assignment: a node prefers the lane of its first incoming
-    // hyperedge's first source (keeps a "line" on the same row), falling
-    // back to the next free lane in its column.
+    // Lane assignment: a node prefers the (rounded) average lane of the
+    // sources of its incoming hyperedge(s) - this keeps a simple chain on
+    // the same row (straight metro line), while merge points (multiple
+    // educts) land between the lanes of their sources instead of jumping
+    // to whichever source happens to be listed first.
     const laneOf = new Map();
     function preferredLane(node) {
       const inc = incoming.get(node.id);
-      if (inc.length > 0) {
-        const srcId = inc[0].sources[0];
-        if (laneOf.has(srcId)) return laneOf.get(srcId);
-      }
-      return null;
+      if (inc.length === 0) return null;
+      const srcLanes = [];
+      inc.forEach(e => e.sources.forEach(srcId => {
+        if (laneOf.has(srcId)) srcLanes.push(laneOf.get(srcId));
+      }));
+      if (!srcLanes.length) return null;
+      const avg = srcLanes.reduce((s, v) => s + v, 0) / srcLanes.length;
+      return Math.round(avg);
     }
     columns.forEach(col => {
       const occupied = new Set();
@@ -297,6 +303,76 @@
   }
 
   // ---------------------------------------------------------------------
+  // Pathway highlighting: trace a route from a root molecule (e.g. GPP/FPP)
+  // to a chosen target through the hyperedges that were actually reachable.
+  // ---------------------------------------------------------------------
+  function computePathToTarget(targetId) {
+    const { incoming, outgoing, nodesById } = state.layout;
+
+    const roots = state.data.nodes
+      .filter(n => (incoming.get(n.id) || []).length === 0)
+      .map(n => n.id);
+
+    // Multi-source BFS: a hyperedge "fires" once all of its sources have
+    // been reached, recording the hyperedge that first reached each target.
+    const predEdge = new Map();
+    const reached = new Set(roots);
+    let frontier = [...roots];
+    while (frontier.length) {
+      const next = [];
+      frontier.forEach(nodeId => {
+        (outgoing.get(nodeId) || []).forEach(e => {
+          if (e.sources.every(s => reached.has(s))) {
+            e.targets.forEach(t => {
+              if (!reached.has(t)) {
+                reached.add(t);
+                predEdge.set(t, e);
+                next.push(t);
+              }
+            });
+          }
+        });
+      });
+      frontier = next;
+    }
+
+    if (!reached.has(targetId)) return null;
+
+    // Walk the predecessor forest backwards from the target. Each non-root
+    // node has exactly one predEdge (the hyperedge that first produced it),
+    // so following all of its sources keeps the highlighted set connected
+    // (e.g. a merge step also highlights the edge that produced each educt).
+    const nodes = new Set();
+    const edges = new Set();
+    const stack = [targetId];
+    while (stack.length) {
+      const current = stack.pop();
+      if (nodes.has(current)) continue;
+      nodes.add(current);
+      const edge = predEdge.get(current);
+      if (!edge) continue;
+      edges.add(edge.id);
+      edge.sources.forEach(s => stack.push(s));
+      edge.targets.forEach(t => nodes.add(t));
+    }
+    return { nodes, edges };
+  }
+
+  function populatePathwaySelect() {
+    const select = d3.select('#hg-pathway');
+    const leaves = state.data.nodes
+      .filter(n => (state.layout.outgoing.get(n.id) || []).length === 0)
+      .sort((a, b) => a.name.localeCompare(b.name));
+    select.selectAll('option:not([value=""])').remove();
+    select.selectAll('option.hg-pathway-option')
+      .data(leaves)
+      .join('option')
+      .attr('class', 'hg-pathway-option')
+      .attr('value', d => d.id)
+      .text(d => d.name);
+  }
+
+  // ---------------------------------------------------------------------
   // Selection, search and category filters
   // ---------------------------------------------------------------------
   function selectNode(node) {
@@ -339,6 +415,10 @@
         edge.sources.forEach(s => highlightNodes.add(s));
         edge.targets.forEach(t => highlightNodes.add(t));
       }
+    }
+    if (state.pathHighlight) {
+      state.pathHighlight.nodes.forEach(id => highlightNodes.add(id));
+      state.pathHighlight.edges.forEach(id => highlightEdges.add(id));
     }
 
     const hasSelection = highlightNodes.size > 0;
@@ -430,6 +510,8 @@
   }
 
   function bindControls() {
+    populatePathwaySelect();
+
     d3.select('#hg-search').on('input', event => {
       state.searchTerm = event.target.value;
       applyFilters();
@@ -442,13 +524,53 @@
       applyFilters();
     });
 
+    d3.select('#hg-pathway').on('change', event => {
+      const targetId = event.target.value;
+      if (!targetId) {
+        state.pathHighlight = null;
+        applyFilters();
+        renderPlaceholder();
+        return;
+      }
+      const path = computePathToTarget(targetId);
+      state.pathHighlight = path;
+      applyFilters();
+      if (path) {
+        renderPathwayDetails(state.layout.nodesById.get(targetId), path);
+      } else {
+        d3.select('#hg-details').html(
+          '<div class="hg-details-placeholder">No reachable pathway found to this molecule.</div>'
+        );
+      }
+    });
+
     d3.select('#hg-reset').on('click', () => {
       state.selection = null;
+      state.pathHighlight = null;
       state.searchTerm = '';
       d3.select('#hg-search').property('value', '');
+      d3.select('#hg-pathway').property('value', '');
       state.svg.transition().duration(300).call(state.zoom.transform, d3.zoomIdentity);
       applyFilters();
       renderPlaceholder();
     });
+  }
+
+  function renderPathwayDetails(target, path) {
+    const steps = [...path.edges]
+      .map(id => state.data.hyperedges.find(e => e.id === id))
+      .sort((a, b) => a.iteration - b.iteration);
+
+    let html = `<h3>Pathway to ${escapeHtml(target.name)}</h3>`;
+    html += `<p class="hg-label">${steps.length} reaction step(s)</p>`;
+    html += '<ul class="hg-rule-list">';
+    steps.forEach(e => {
+      const sources = e.sources.map(id => state.layout.nodesById.get(id)?.name || id).join(' + ');
+      const targets = e.targets.map(id => state.layout.nodesById.get(id)?.name || id).join(' + ');
+      const rules = e.rules.length ? e.rules.join(', ') : '(unnamed rule)';
+      html += `<li>${escapeHtml(sources)} &rarr; ${escapeHtml(targets)}<br><em>${escapeHtml(rules)}</em></li>`;
+    });
+    html += '</ul>';
+    d3.select('#hg-details').html(html);
   }
 })();

@@ -130,14 +130,19 @@ Além do relatório em LaTeX/PDF, o grafo de derivação pode ser exportado como
    ```bash
    docker run --rm --volume $(pwd):/home/shared/ --workdir /home/shared/ 2path-terpenes-mod:latest -f /home/shared/molecules.py -f /home/shared/simulation.py -f /home/shared/export_hypergraph.py -f /home/shared/printer.py
    ```
-   Isso grava `out/hypergraph.json` e uma representação gráfica para cada molécula.
+   Isso grava `out/hypergraph.json` e renderiza um PDF de representação para cada molécula.
 
-2. **Copiar os dados e as representações para `docs/`**:
+2. **Converter as representações das moléculas para SVG** (mesma abordagem `pdfToSvg` usada para os previews de regras):
+   ```bash
+   docker run --rm --entrypoint /bin/bash --volume "$(pwd):/home/shared" --workdir /home/shared 2path-terpenes-mod:latest -c "for f in out/*_g_*.pdf; do mod_post --mode pdfToSvg \${f%.pdf} \${f%.pdf}; done"
+   ```
+
+3. **Copiar os dados e as representações para `docs/`**:
    ```bash
    python organize_hypergraph_assets.py
    ```
    Isso gera `docs/data/hypergraph.json` e `docs/img/molecules/*.svg`.
 
-3. **Abrir `docs/hypergraph.html`** (ou acessar via GitHub Pages, pelo link "Interactive Hypergraph Viewer" no seletor de regras). Se `docs/data/hypergraph.json` ainda não existir, a página usa `docs/data/hypergraph.sample.json` como exemplo, permitindo testar o visualizador sem rodar o MØD.
+4. **Abrir `docs/hypergraph.html`** (ou acessar via GitHub Pages, pelo link "Interactive Hypergraph Viewer" no seletor de regras). Se `docs/data/hypergraph.json` ainda não existir, a página usa `docs/data/hypergraph.sample.json` como exemplo, permitindo testar o visualizador sem rodar o MØD.
 
 O visualizador suporta pan/zoom, busca por nome de molécula, filtro por categoria de reação, e clique em uma molécula ou reação para ver detalhes (SMILES, carga, anéis, regra(s) aplicada(s)).

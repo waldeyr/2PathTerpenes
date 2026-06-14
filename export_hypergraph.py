@@ -20,6 +20,14 @@ except ImportError:
             pass
     post = PostDummy
 
+try:
+    from mod import GraphPrinter
+    moleculePrinter = GraphPrinter()
+    moleculePrinter.collapseHydrogens = True
+    moleculePrinter.withIndex = False
+except ImportError:
+    moleculePrinter = None
+
 import json
 import os
 
@@ -58,36 +66,50 @@ def graph_cycles(g):
         return None
 
 
-def print_graph(g, vertex_id):
-    # Render the molecule depiction to PDF; organize_hypergraph_assets.py
-    # converts these to SVG (same pdfToSvg approach used for rule previews).
+def print_graph(g):
+    # Graph.print() returns a tuple of PDF file paths (e.g. "out/0003_g_5.pdf").
+    # Render with collapsed hydrogens (matching printer.py) and return the file
+    # basename without extension, so the corresponding "<base>.svg" (produced by
+    # `mod_post --mode pdfToSvg`, see organize_hypergraph_assets.py / README) can
+    # be referenced from the JSON.
     try:
-        result = g.print()
-        if isinstance(result, str) and result:
-            return result
-        if isinstance(result, (list, tuple)) and result:
-            return result[0]
+        if moleculePrinter is not None:
+            result = g.print(moleculePrinter)
+        else:
+            result = g.print()
     except Exception:
-        pass
-    return None
+        try:
+            result = g.print()
+        except Exception:
+            return None
+
+    pdf_path = None
+    if isinstance(result, str) and result:
+        pdf_path = result
+    elif isinstance(result, (list, tuple)) and result:
+        pdf_path = result[0]
+    if not pdf_path:
+        return None
+
+    base = os.path.basename(pdf_path)
+    if base.endswith(".pdf"):
+        base = base[:-4]
+    return base
 
 
 nodes = []
-node_index = {}
 
 for v in dg.vertices:
     g = v.graph
-    file_prefix = print_graph(g, v.id)
-    node = {
+    file_prefix = print_graph(g)
+    nodes.append({
         "id": f"v{v.id}",
         "name": g.name,
         "smiles": graph_smiles(g),
         "charge": graph_charge(g),
         "cycles": graph_cycles(g),
         "image": f"{file_prefix}.svg" if file_prefix else None,
-    }
-    nodes.append(node)
-    node_index[v.id] = node
+    })
 
 hyperedges = []
 for e in dg.edges:
