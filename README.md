@@ -38,6 +38,8 @@ erDiagram
         int iteration
         string chemblId
         string chemblName
+        string pubchemId
+        string pubchemName
     }
 
     HYPEREDGE_JSON {
@@ -53,6 +55,8 @@ erDiagram
         string inchikey
         string chemblId
         string chemblName
+        string pubchemId
+        string pubchemName
     }
 ```
 
@@ -70,6 +74,8 @@ erDiagram
 | `iteration` | Integer | Shortest path steps from the initial precursors (0-indexed). |
 | `chemblId` | String | (Optional) ChEMBL compound identifier. |
 | `chemblName` | String | (Optional) Common name fetched from ChEMBL database. |
+| `pubchemId` | String | (Optional) PubChem compound identifier (CID). |
+| `pubchemName` | String | (Optional) Common name fetched from PubChem database. |
 
 #### Hyperedges Table (inside `hypergraph.json` -> `hyperedges`)
 | Field | Type | Description |
@@ -85,8 +91,10 @@ erDiagram
 |---|---|---|
 | `smiles` | String | SMILES representation of the molecule (Primary Key). |
 | `inchikey` | String | Calculated InChIKey (hash) of the SMILES structure. |
-| `chemblId` | String | ChEMBL compound identifier. |
-| `chemblName` | String | Common name of the compound in ChEMBL. |
+| `chemblId` | String | ChEMBL compound identifier (or null if not matched). |
+| `chemblName` | String | Common name of the compound in ChEMBL (or null if not matched). |
+| `pubchemId` | String | PubChem compound identifier (or null if not matched). |
+| `pubchemName` | String | Common name of the compound in PubChem (or null if not matched). |
 
 ## Components
 The simulation workflow is divided into components for graph specification, DPO grammar application, derivation graph generation, and database persistence.
@@ -104,7 +112,7 @@ graph TD
     DG -->|Exports| ExportPy[export_hypergraph.py]
     ExportPy -->|Writes| HGJSON[hypergraph.json]
     HGJSON -->|Annotates| AnnotatePy[annotate_chembl.py]
-    AnnotatePy -->|Queries| ChEMBL[ChEMBL API]
+    AnnotatePy -->|Queries| ChEMBL[ChEMBL & PubChem APIs]
     HGJSON -->|Renders| HGHTML[hypergraph.html]
 ```
 
@@ -210,11 +218,11 @@ Then open `report/hypergraph.html` directly (double-click, no server needed) to 
    docker run --rm --entrypoint /bin/bash --volume "$(pwd):/home/shared" --workdir /home/shared 2path-terpenes-mod:latest -c "for f in out/*_g_*.pdf; do mod_post --mode pdfToSvg \${f%.pdf} \${f%.pdf}; done"
    ```
 
-3. **(Optional) Annotate molecules with ChEMBL identifiers**:
+3. **(Optional) Annotate molecules with database identifiers**:
    ```bash
    python annotate_chembl.py
    ```
-   For each molecule with a `smiles` field, this computes its InChIKey (via the `obabel` CLI) and looks up an exact match in the [ChEMBL REST API](https://www.ebi.ac.uk/chembl/api/data/molecule), adding `chemblId`/`chemblName` fields to `out/hypergraph.json` when a match is found. Results are cached in `out/chembl_cache.json` so repeated runs only query ChEMBL for previously unseen structures. Matched molecules show their ChEMBL ID/name (with a link) in the viewer's details panel and become searchable by that name.
+   For each molecule with a `smiles` field, this computes its InChIKey (via the `obabel` CLI) and looks up an exact match in the [ChEMBL REST API](https://www.ebi.ac.uk/chembl/api/data/molecule). If no match is found, it falls back to looking up the InChIKey in the **PubChem PUG-REST API**. The script adds matching `chemblId`/`chemblName` or `pubchemId`/`pubchemName` fields to `out/hypergraph.json`. Results are cached in `out/chembl_cache.json` so repeated runs do not query the external APIs for previously seen structures. Matched molecules show their respective database links and common names in the viewer's details panel and become searchable.
 
 4. **Build the standalone report**:
    ```bash

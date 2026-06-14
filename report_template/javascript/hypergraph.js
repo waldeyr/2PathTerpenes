@@ -480,7 +480,9 @@
       ? new Set(data.nodes.filter(n => {
           return n.name.toLowerCase().includes(search) ||
             (n.chemblName && n.chemblName.toLowerCase().includes(search)) ||
-            (n.chemblId && n.chemblId.toLowerCase().includes(search));
+            (n.chemblId && n.chemblId.toLowerCase().includes(search)) ||
+            (n.pubchemName && n.pubchemName.toLowerCase().includes(search)) ||
+            (n.pubchemId && String(n.pubchemId).toLowerCase().includes(search));
         }).map(n => n.id))
       : null;
 
@@ -551,6 +553,12 @@
       const chemblUrl = `https://www.ebi.ac.uk/chembl/explore/molecule/${encodeURIComponent(node.chemblId)}`;
       html += `<dt>ChEMBL</dt><dd><a href="${escapeHtml(chemblUrl)}" target="_blank" rel="noopener">${escapeHtml(node.chemblId)}</a>`;
       if (node.chemblName) html += ` &mdash; ${escapeHtml(node.chemblName)}`;
+      html += '</dd>';
+    }
+    if (node.pubchemId) {
+      const pubchemUrl = `https://pubchem.ncbi.nlm.nih.gov/compound/${encodeURIComponent(node.pubchemId)}`;
+      html += `<dt>PubChem</dt><dd><a href="${escapeHtml(pubchemUrl)}" target="_blank" rel="noopener">CID ${escapeHtml(node.pubchemId)}</a>`;
+      if (node.pubchemName) html += ` &mdash; ${escapeHtml(node.pubchemName)}`;
       html += '</dd>';
     }
     html += '</dl>';

@@ -62,6 +62,31 @@ def lookup_chembl(inchikey):
     }
 
 
+def lookup_pubchem(inchikey):
+    url = f"https://pubchem.ncbi.nlm.nih.gov/rest/pug/compound/inchikey/{inchikey}/property/Title,IUPACName/json"
+    try:
+        with urllib.request.urlopen(url, timeout=15) as response:
+            data = json.load(response)
+    except (urllib.error.URLError, OSError, ValueError):
+        return None
+
+    try:
+        properties = data.get("PropertyTable", {}).get("Properties", [])
+        if not properties:
+            return None
+        prop = properties[0]
+        cid = prop.get("CID")
+        name = prop.get("Title") or prop.get("IUPACName")
+        if not cid:
+            return None
+        return {
+            "pubchemId": str(cid),
+            "pubchemName": name,
+        }
+    except Exception:
+        return None
+
+
 def main():
     hypergraph_path = sys.argv[1] if len(sys.argv) > 1 else os.path.join("out", "hypergraph.json")
     cache_path = os.path.join(os.path.dirname(hypergraph_path) or ".", "chembl_cache.json")
@@ -88,13 +113,20 @@ def main():
             result = cache[inchikey]
         else:
             result = lookup_chembl(inchikey)
+            if not result or not result.get("chemblId"):
+                result = lookup_pubchem(inchikey)
             cache[inchikey] = result
             time.sleep(REQUEST_DELAY_SECONDS)
 
-        if result and result.get("chemblId"):
-            node["chemblId"] = result["chemblId"]
-            node["chemblName"] = result.get("chemblName")
-            annotated += 1
+        if result:
+            if result.get("chemblId"):
+                node["chemblId"] = result["chemblId"]
+                node["chemblName"] = result.get("chemblName")
+                annotated += 1
+            elif result.get("pubchemId"):
+                node["pubchemId"] = result["pubchemId"]
+                node["pubchemName"] = result.get("pubchemName")
+                annotated += 1
 
     with open(hypergraph_path, "w") as f:
         json.dump(hypergraph, f, indent=2)
@@ -102,7 +134,7 @@ def main():
     with open(cache_path, "w") as f:
         json.dump(cache, f, indent=2)
 
-    print(f"Annotated {annotated}/{len(hypergraph.get('nodes', []))} molecules with ChEMBL data.")
+    print(f"Annotated {annotated}/{len(hypergraph.get('nodes', []))} molecules with database identifiers.")
 
 
 if __name__ == "__main__":

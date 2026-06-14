@@ -38,6 +38,8 @@ erDiagram
         int iteration
         string chemblId
         string chemblName
+        string pubchemId
+        string pubchemName
     }
 
     HYPEREDGE_JSON {
@@ -53,6 +55,8 @@ erDiagram
         string inchikey
         string chemblId
         string chemblName
+        string pubchemId
+        string pubchemName
     }
 ```
 
@@ -70,6 +74,8 @@ erDiagram
 | `iteration` | Integer | Passos/nível de caminho mais curto a partir dos precursores iniciais (0-indexed). |
 | `chemblId` | String | (Opcional) Identificador do composto na base ChEMBL. |
 | `chemblName` | String | (Opcional) Nome comum retornado pela base ChEMBL. |
+| `pubchemId` | String | (Opcional) Identificador do composto na base PubChem (CID). |
+| `pubchemName` | String | (Opcional) Nome comum retornado pela base PubChem. |
 
 #### Tabela de Hiperarestas (dentro de `hypergraph.json` -> `hyperedges`)
 | Campo | Tipo | Descrição |
@@ -85,8 +91,10 @@ erDiagram
 |---|---|---|
 | `smiles` | String | Representação SMILES da molécula (Chave Primária). |
 | `inchikey` | String | InChIKey calculado (hash) da estrutura SMILES. |
-| `chemblId` | String | Identificador do composto na base ChEMBL. |
-| `chemblName` | String | Nome comum do composto na base ChEMBL. |
+| `chemblId` | String | Identificador do composto na base ChEMBL (ou null se não houver correspondência). |
+| `chemblName` | String | Nome comum do composto na base ChEMBL (ou null se não houver correspondência). |
+| `pubchemId` | String | Identificador do composto na base PubChem (ou null se não houver correspondência). |
+| `pubchemName` | String | Nome comum do composto na base PubChem (ou null se não houver correspondência). |
 
 ## Componentes
 O fluxo de simulação é dividido em componentes de especificação de grafos, aplicação de gramáticas DPO, geração do grafo de derivação e persistência em banco de dados.
@@ -104,7 +112,7 @@ graph TD
     DG -->|Exporta| ExportPy[export_hypergraph.py]
     ExportPy -->|Grava| HGJSON[hypergraph.json]
     HGJSON -->|Anota| AnnotatePy[annotate_chembl.py]
-    AnnotatePy -->|Consulta| ChEMBL[API ChEMBL]
+    AnnotatePy -->|Consulta| ChEMBL[APIs ChEMBL & PubChem]
     HGJSON -->|Renderiza| HGHTML[hypergraph.html]
 ```
 
@@ -210,11 +218,11 @@ Em seguida, abra `report/hypergraph.html` diretamente (duplo-clique, sem precisa
    docker run --rm --entrypoint /bin/bash --volume "$(pwd):/home/shared" --workdir /home/shared 2path-terpenes-mod:latest -c "for f in out/*_g_*.pdf; do mod_post --mode pdfToSvg \${f%.pdf} \${f%.pdf}; done"
    ```
 
-3. **(Opcional) Anotar as moléculas com identificadores ChEMBL**:
+3. **(Opcional) Anotar as moléculas com identificadores de bases de dados**:
    ```bash
    python annotate_chembl.py
    ```
-   Para cada molécula com o campo `smiles`, este script calcula seu InChIKey (via CLI `obabel`) e busca uma correspondência exata na [API REST do ChEMBL](https://www.ebi.ac.uk/chembl/api/data/molecule), adicionando os campos `chemblId`/`chemblName` a `out/hypergraph.json` quando há correspondência. Os resultados são armazenados em cache em `out/chembl_cache.json`, de modo que execuções repetidas só consultam o ChEMBL para estruturas ainda não vistas. Moléculas com correspondência exibem seu ID/nome ChEMBL (com link) no painel de detalhes do visualizador e passam a ser pesquisáveis por esse nome.
+   Para cada molécula com o campo `smiles`, este script calcula seu InChIKey (via CLI `obabel`) e busca uma correspondência exata na [API REST do ChEMBL](https://www.ebi.ac.uk/chembl/api/data/molecule). Se nenhuma correspondência for encontrada, o script faz um fallback consultando o InChIKey na **API REST do PubChem (PUG-REST)**. Ele adiciona os campos `chemblId`/`chemblName` ou `pubchemId`/`pubchemName` a `out/hypergraph.json` quando há correspondência. Os resultados são armazenados em cache em `out/chembl_cache.json`, de modo que execuções repetidas não consultam as APIs externas para estruturas já vistas. Moléculas anotadas exibem seus respectivos links e nomes comuns no painel de detalhes do visualizador e passam a ser pesquisáveis por esse nome.
 
 4. **Gerar o relatório standalone**:
    ```bash
