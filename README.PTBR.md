@@ -119,7 +119,15 @@ Para gerar as imagens de visualização SVG das regras de reação química exib
 
 ### Visualizador Interativo de Hipergrafos (HTML/JS)
 
-Além do relatório em LaTeX/PDF, o grafo de derivação pode ser exportado como um "mapa de metrô" interativo no navegador: moléculas são estações e reações (que podem ter vários educts/produtos) são as conexões entre linhas, coloridas por categoria de regra (Mono/Sesqui/Common).
+Além do relatório em LaTeX/PDF, o grafo de derivação pode ser exportado como um "mapa de metrô" interativo e autocontido no navegador: moléculas são estações e reações (que podem ter vários educts/produtos) são as conexões entre linhas, coloridas por categoria de regra (Mono/Sesqui/Common).
+
+#### Forma rápida (recomendada): `run_pipeline.sh`
+
+O script `run_pipeline.sh` executa os passos 1-3 abaixo em sequência (simulação no Docker, conversão PDF→SVG e geração do pacote standalone `report/`):
+```bash
+bash run_pipeline.sh
+```
+Em seguida, abra `report/hypergraph.html` diretamente (duplo-clique, sem precisar de servidor) para ver o resultado. Os passos manuais a seguir descrevem o que o script faz.
 
 1. **Exportar o hipergrafo como JSON** (executar junto com os scripts de simulação existentes):
    ```bash
@@ -132,18 +140,18 @@ Além do relatório em LaTeX/PDF, o grafo de derivação pode ser exportado como
    docker run --rm --entrypoint /bin/bash --volume "$(pwd):/home/shared" --workdir /home/shared 2path-terpenes-mod:latest -c "for f in out/*_g_*.pdf; do mod_post --mode pdfToSvg \${f%.pdf} \${f%.pdf}; done"
    ```
 
-3. **Copiar os dados e as representações para `docs/`**:
-   ```bash
-   python organize_hypergraph_assets.py
-   ```
-   Isso gera `docs/data/hypergraph.json` e `docs/img/molecules/*.svg`.
-
-4. **(Opcional) Anotar as moléculas com identificadores ChEMBL**:
+3. **(Opcional) Anotar as moléculas com identificadores ChEMBL**:
    ```bash
    python annotate_chembl.py
    ```
-   Para cada molécula com o campo `smiles`, este script calcula seu InChIKey (via CLI `obabel`) e busca uma correspondência exata na [API REST do ChEMBL](https://www.ebi.ac.uk/chembl/api/data/molecule), adicionando os campos `chemblId`/`chemblName` a `docs/data/hypergraph.json` quando há correspondência. Os resultados são armazenados em cache em `docs/data/chembl_cache.json`, de modo que execuções repetidas só consultam o ChEMBL para estruturas ainda não vistas. Moléculas com correspondência exibem seu ID/nome ChEMBL (com link) no painel de detalhes do visualizador e passam a ser pesquisáveis por esse nome.
+   Para cada molécula com o campo `smiles`, este script calcula seu InChIKey (via CLI `obabel`) e busca uma correspondência exata na [API REST do ChEMBL](https://www.ebi.ac.uk/chembl/api/data/molecule), adicionando os campos `chemblId`/`chemblName` a `out/hypergraph.json` quando há correspondência. Os resultados são armazenados em cache em `out/chembl_cache.json`, de modo que execuções repetidas só consultam o ChEMBL para estruturas ainda não vistas. Moléculas com correspondência exibem seu ID/nome ChEMBL (com link) no painel de detalhes do visualizador e passam a ser pesquisáveis por esse nome.
 
-5. **Abrir `docs/hypergraph.html`** (ou acessar via GitHub Pages, pelo link "Interactive Hypergraph Viewer" no seletor de regras). Se `docs/data/hypergraph.json` ainda não existir, a página usa `docs/data/hypergraph.sample.json` como exemplo, permitindo testar o visualizador sem rodar o MØD.
+4. **Gerar o relatório standalone**:
+   ```bash
+   python organize_hypergraph_assets.py
+   ```
+   Isso monta `report/hypergraph.html` junto com seu CSS/JS e as representações SVG das moléculas, com os dados do hipergrafo embutidos inline para a página funcionar offline via `file://`.
+
+5. **Abrir `report/hypergraph.html`** diretamente no navegador. A pasta `report/` inteira é autocontida e pode ser zipada e compartilhada.
 
 O visualizador suporta pan/zoom, busca por nome de molécula, filtro por categoria de reação, e clique em uma molécula ou reação para ver detalhes (SMILES, carga, anéis, regra(s) aplicada(s)).

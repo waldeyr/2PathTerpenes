@@ -1,3 +1,5 @@
+import progress_utils
+
 # Helper para compatibilidade com versões antigas (0.8.0) e novas (1.0+) de MØD
 try:
     from mod import DGPrinter
@@ -40,5 +42,6 @@ def vertex_colour_cb(*args):
 p.pushVertexColour(vertex_colour_cb)
 
 post.summarySection("Plant Monoterpenes Biosynthesis")
-dg.print(p)
+with progress_utils.phase("Fase 4/4: Gerando relatorio PDF/LaTeX (summary.pdf)"):
+    dg.print(p)
 

@@ -1,11 +1,8 @@
 // Interactive "metro map" visualization of the chemical derivation hypergraph.
-// Data format produced by export_hypergraph.py (see docs/data/hypergraph.json),
-// with docs/data/hypergraph.sample.json used as a fallback/preview dataset.
+// Data is embedded inline in hypergraph.html (see #hg-data, filled in by
+// organize_hypergraph_assets.py) so this page works standalone via file://.
 
 (function () {
-  const DATA_URL = 'data/hypergraph.json';
-  const SAMPLE_DATA_URL = 'data/hypergraph.sample.json';
-
   const CATEGORY_COLORS = {
     mono: '#0284c7',
     sesqui: '#9333ea',
@@ -32,24 +29,37 @@
 
   document.addEventListener('DOMContentLoaded', init);
 
-  async function init() {
-    const raw = await loadData();
-    state.data = normalizeData(raw);
+  function init() {
+    state.data = normalizeData(loadData());
+
+    if (state.data.nodes.length === 0) {
+      showEmptyState();
+      return;
+    }
+
     state.layout = computeLayout(state.data);
     render();
     bindControls();
     updateStatus();
   }
 
-  async function loadData() {
+  function loadData() {
+    const el = document.getElementById('hg-data');
     try {
-      const res = await fetch(DATA_URL, { cache: 'no-store' });
-      if (res.ok) return await res.json();
+      return JSON.parse(el.textContent);
     } catch (err) {
-      // fall through to sample data
+      return { meta: {}, nodes: [], hyperedges: [] };
     }
-    const res = await fetch(SAMPLE_DATA_URL);
-    return res.json();
+  }
+
+  function showEmptyState() {
+    d3.select('#hg-status').text('No hypergraph data available.');
+    d3.select('#hg-details').html(
+      '<div class="hg-details-placeholder">' +
+      'No hypergraph data is embedded in this page. Run the export pipeline ' +
+      '(<code>run_pipeline.sh</code>) to regenerate it.' +
+      '</div>'
+    );
   }
 
   function normalizeData(raw) {

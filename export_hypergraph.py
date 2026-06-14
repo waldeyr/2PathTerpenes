@@ -4,9 +4,8 @@
 # derivation graph (a hypergraph: vertices = molecules, hyperedges =
 # reactions with possibly several educts/products) and writes
 # `out/hypergraph.json`, plus one depiction (PDF) per molecule that
-# `organize_hypergraph_assets.py` later converts to SVG and copies into
-# `docs/data/` and `docs/img/molecules/` for the interactive viewer
-# (docs/hypergraph.html).
+# `organize_hypergraph_assets.py` later converts to SVG and bundles into the
+# standalone `report/hypergraph.html` viewer.
 #
 # Helper for MØD compatibility (mirrors molecules.py / simulation.py / printer.py)
 try:
@@ -31,6 +30,8 @@ except ImportError:
 import glob
 import json
 import os
+
+import progress_utils
 
 OUT_DIR = "out"
 os.makedirs(OUT_DIR, exist_ok=True)
@@ -128,7 +129,7 @@ def print_graph(g):
 
 nodes = []
 
-for v in dg.vertices:
+for v in progress_utils.progress_iter(dg.vertices, desc="Fase 3/4: Renderizando moleculas (LaTeX/PDF)"):
     g = v.graph
     file_prefix = print_graph(g)
     nodes.append({
@@ -141,7 +142,7 @@ for v in dg.vertices:
     })
 
 hyperedges = []
-for e in dg.edges:
+for e in progress_utils.progress_iter(dg.edges, desc="Fase 3/4: Exportando reacoes (hiperarestas)"):
     rule_names = []
     try:
         for r in e.rules:

@@ -119,7 +119,15 @@ To generate the SVG preview images for the chemical reaction rules shown in the 
 
 ### Interactive Hypergraph Viewer (HTML/JS)
 
-In addition to the LaTeX/PDF report, the derivation graph can be exported as an interactive, browser-based "metro map" of the chemical hypergraph: molecules are stations and reactions (which may have several educts/products) are the connections between lines, color-coded by rule category (Mono/Sesqui/Common).
+In addition to the LaTeX/PDF report, the derivation graph can be exported as a standalone, interactive, browser-based "metro map" of the chemical hypergraph: molecules are stations and reactions (which may have several educts/products) are the connections between lines, color-coded by rule category (Mono/Sesqui/Common).
+
+#### Quick way (recommended): `run_pipeline.sh`
+
+The `run_pipeline.sh` script runs steps 1-3 below in sequence (Docker simulation, PDF→SVG conversion, and building the standalone `report/` package):
+```bash
+bash run_pipeline.sh
+```
+Then open `report/hypergraph.html` directly (double-click, no server needed) to see the result. The manual steps below describe what the script does.
 
 1. **Export the hypergraph as JSON** (run alongside the existing simulation scripts):
    ```bash
@@ -132,18 +140,18 @@ In addition to the LaTeX/PDF report, the derivation graph can be exported as an 
    docker run --rm --entrypoint /bin/bash --volume "$(pwd):/home/shared" --workdir /home/shared 2path-terpenes-mod:latest -c "for f in out/*_g_*.pdf; do mod_post --mode pdfToSvg \${f%.pdf} \${f%.pdf}; done"
    ```
 
-3. **Copy the data and depictions into `docs/`**:
-   ```bash
-   python organize_hypergraph_assets.py
-   ```
-   This produces `docs/data/hypergraph.json` and `docs/img/molecules/*.svg`.
-
-4. **(Optional) Annotate molecules with ChEMBL identifiers**:
+3. **(Optional) Annotate molecules with ChEMBL identifiers**:
    ```bash
    python annotate_chembl.py
    ```
-   For each molecule with a `smiles` field, this computes its InChIKey (via the `obabel` CLI) and looks up an exact match in the [ChEMBL REST API](https://www.ebi.ac.uk/chembl/api/data/molecule), adding `chemblId`/`chemblName` fields to `docs/data/hypergraph.json` when a match is found. Results are cached in `docs/data/chembl_cache.json` so repeated runs only query ChEMBL for previously unseen structures. Matched molecules show their ChEMBL ID/name (with a link) in the viewer's details panel and become searchable by that name.
+   For each molecule with a `smiles` field, this computes its InChIKey (via the `obabel` CLI) and looks up an exact match in the [ChEMBL REST API](https://www.ebi.ac.uk/chembl/api/data/molecule), adding `chemblId`/`chemblName` fields to `out/hypergraph.json` when a match is found. Results are cached in `out/chembl_cache.json` so repeated runs only query ChEMBL for previously unseen structures. Matched molecules show their ChEMBL ID/name (with a link) in the viewer's details panel and become searchable by that name.
 
-5. **Open `docs/hypergraph.html`** (or visit it on GitHub Pages, via the "Interactive Hypergraph Viewer" link in the rule selector). If `docs/data/hypergraph.json` is not present yet, the page falls back to `docs/data/hypergraph.sample.json` so the viewer can be previewed without running MØD.
+4. **Build the standalone report**:
+   ```bash
+   python organize_hypergraph_assets.py
+   ```
+   This assembles `report/hypergraph.html` together with its CSS/JS and the molecule depiction SVGs, with the hypergraph data embedded inline so the page works offline via `file://`.
+
+5. **Open `report/hypergraph.html`** directly in a browser. The whole `report/` folder is self-contained and can be zipped and shared.
 
 The viewer supports pan/zoom, search by molecule name, filtering by reaction category, and clicking a molecule or reaction to see its details (SMILES, charge, rings, applied rule(s)).

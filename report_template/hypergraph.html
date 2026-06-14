@@ -15,17 +15,12 @@
 <body>
 
   <header>
-    <a class="logo" href="index.html" aria-label="2Path Logo">
-      <img src="img/2PathLogo.png" alt="2Path: a chemical network for plant terpenes Logo">
-    </a>
-    <nav class="site-nav" aria-label="Site navigation">
-      <a href="index.html">Rule Selector</a>
-    </nav>
+    <img class="logo" src="img/2PathLogo.png" alt="2Path: a chemical network for plant terpenes Logo">
   </header>
 
   <main class="hg-page">
     <section class="intro">
-      <h2>Interactive Derivation Hypergraph</h2>
+      <h3>Interactive Derivation Hypergraph</h3>
       <p>
         Explore the chemical derivation network as an interactive "metro map": molecules are stations, and
         reactions (hyperedges, with possibly multiple reactants and products) are the connections between lines.
@@ -82,7 +77,10 @@
     </section>
   </main>
 
-  <script src="https://d3js.org/d3.v7.min.js"></script>
+  <!-- Embedded hypergraph data, filled in by organize_hypergraph_assets.py -->
+  <script type="application/json" id="hg-data">{"meta": {}, "nodes": [], "hyperedges": []}</script>
+
+  <script src="javascript/d3.v7.min.js"></script>
   <script type="text/javascript" src="javascript/hypergraph.js" defer></script>
 </body>
 

@@ -1,3 +1,5 @@
+import progress_utils
+
 # Helper para compatibilidade com versões antigas (0.8.0) e novas (1.0+) de MØD
 try:
     from mod import Rule, LabelSettings, LabelType, LabelRelation, DG
@@ -52,19 +54,20 @@ def overallCharge(a): return sum(int(v.charge) for v in a.vertices)
 def countCycs(a): return a.numEdges - a.numVertices + 1
 
 # Instancia o Derivation Graph com o novo build interface do MØD
-try:
-    # Novo build interface do MØD (v1.0.0+)
-    dg = DG(graphDatabase=inputGraphs, labelSettings=ls)
-    dg.build().execute(strat)
-except (TypeError, AttributeError, Exception):
-    # Compatibilidade com versões antigas do MØD (e.g. 0.8.0)
-    if 'dgRuleComp' in globals():
-        dg = dgRuleComp(inputGraphs, strat, ls)
-    elif 'DG' in globals():
-        dg = DG(inputGraphs, strat, ls)
-    else:
-        try:
-            dg = DG(inputGraphs, strat, ls)
-        except Exception:
+with progress_utils.phase("Fase 2/4: Construindo grafo de derivacao (MOD DPO)"):
+    try:
+        # Novo build interface do MØD (v1.0.0+)
+        dg = DG(graphDatabase=inputGraphs, labelSettings=ls)
+        dg.build().execute(strat)
+    except (TypeError, AttributeError, Exception):
+        # Compatibilidade com versões antigas do MØD (e.g. 0.8.0)
+        if 'dgRuleComp' in globals():
             dg = dgRuleComp(inputGraphs, strat, ls)
-    dg.calc()
+        elif 'DG' in globals():
+            dg = DG(inputGraphs, strat, ls)
+        else:
+            try:
+                dg = DG(inputGraphs, strat, ls)
+            except Exception:
+                dg = dgRuleComp(inputGraphs, strat, ls)
+        dg.calc()

@@ -1,12 +1,12 @@
 # ANNOTATE THE HYPERGRAPH JSON WITH ChEMBL IDENTIFIERS / PREFERRED NAMES
 #
 # Plain Python (no MOD dependency) post-processing step: for each molecule
-# in docs/data/hypergraph.json (or the path given as argv[1]), compute its
+# in out/hypergraph.json (or the path given as argv[1]), compute its
 # InChIKey (via the Open Babel `obabel` CLI) and look up an exact match in
 # the ChEMBL REST API (https://www.ebi.ac.uk/chembl/api/data/molecule).
 # Matches add "chemblId" and "chemblName" fields to the node, which
-# docs/javascript/hypergraph.js shows in the details panel and includes in
-# the search index.
+# report_template/javascript/hypergraph.js shows in the details panel and
+# includes in the search index.
 #
 # Results are cached by InChIKey in chembl_cache.json next to the input
 # file, so repeated runs only query ChEMBL for previously unseen structures.
@@ -63,7 +63,7 @@ def lookup_chembl(inchikey):
 
 
 def main():
-    hypergraph_path = sys.argv[1] if len(sys.argv) > 1 else os.path.join("docs", "data", "hypergraph.json")
+    hypergraph_path = sys.argv[1] if len(sys.argv) > 1 else os.path.join("out", "hypergraph.json")
     cache_path = os.path.join(os.path.dirname(hypergraph_path) or ".", "chembl_cache.json")
 
     with open(hypergraph_path) as f:

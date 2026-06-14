@@ -1,4 +1,7 @@
 # MOLECULES DEFNITIONS
+import progress_utils
+_phase_token = progress_utils.phase_start("Fase 1/4: Carregando moleculas e regras GML")
+
 # Helper para compatibilidade com versões antigas (0.8.0) e novas (1.0+) de MØD
 try:
     from mod import Graph
@@ -68,3 +71,5 @@ betaOcimene = Graph.fromSMILES("CC(=CCC=C(C)C=C)C","beta-ocimene")
 linalool = Graph.fromSMILES("C(C(C)(CCC=C(C)C)O)=C","linalool")
 geraniol = Graph.fromSMILES("C(CO)=C(C)CCC=C(C)C","geraniol")
 cineole18 = Graph.fromSMILES("[CH]1CC2CCC1(C)OC2(C)C", "1,8-cineole")
+
+progress_utils.phase_end(_phase_token)
