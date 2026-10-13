@@ -5,7 +5,7 @@
 *Also available in:* 🇧🇷 *[Português (Brasil)](README.PTBR.md)*
 
 ## Project Summary
-**2PathTerpenes** is a bioinformatics and chemical modeling tool based on graph grammar to reconstruct and explore metabolic networks of plant terpene biosynthesis (C10 monoterpenes and C15 sesquiterpenes). The project utilizes the **MedØlDatschgerl (MØD)** simulator and the Double Pushout (DPO) formalism to generate synthesis pathways for complex molecules (such as $\beta$-caryophyllene, $\alpha$-humulene, and $\beta$-farnesene) starting from linear acyclic precursors like Farnesyl Diphosphate (FPP). The simulation results can be exported as structural PDF reports or integrated into a **Neo4j** graph database under ecological and biological constraints ("Scenarios").
+**2PathTerpenes** is a bioinformatics and chemical modeling tool based on graph grammar to reconstruct and explore metabolic networks of plant terpene biosynthesis (C10 monoterpenes and C15 sesquiterpenes). The project utilizes the **MedØlDatschgerl (MØD)** simulator and the Double Pushout (DPO) formalism to generate synthesis pathways for complex molecules (such as $\beta$-caryophyllene, $\alpha$-humulene, and $\beta$-farnesene) starting from linear acyclic precursors like Farnesyl Diphosphate (FPP). The simulation results can be exported as structural PDF reports or as an interactive HTML/JavaScript hypergraph viewer, optionally annotated with compound identifiers from the ChEMBL database.
 
 ## Feature List
 *   **Molecular Topological Definition**: Modeling of chemical precursors and carbocations using SMILES linear representations and DFS in graphs.
@@ -17,6 +17,84 @@
 ---
 
 # Architecture
+
+## Database (or other storage format)
+This project uses JSON-based files for persistent storage and metadata cache, along with a GML rules dataset.
+
+### Database Diagram
+```mermaid
+erDiagram
+    HYPERGRAPH_JSON ||--o{ NODE_JSON : contains
+    HYPERGRAPH_JSON ||--o{ HYPEREDGE_JSON : contains
+    CHEMBL_CACHE_JSON ||--o{ CHEMBL_ENTRY_JSON : stores
+
+    NODE_JSON {
+        string id PK
+        string name
+        string smiles
+        int charge
+        int cycles
+        string image
+        int iteration
+        string chemblId
+        string chemblName
+        string pubchemId
+        string pubchemName
+    }
+
+    HYPEREDGE_JSON {
+        string id PK
+        string_array sources
+        string_array targets
+        string_array rules
+        string category
+    }
+
+    CHEMBL_ENTRY_JSON {
+        string smiles PK
+        string inchikey
+        string chemblId
+        string chemblName
+        string pubchemId
+        string pubchemName
+    }
+```
+
+### Data Dictionary
+
+#### Nodes Table (inside `hypergraph.json` -> `nodes`)
+| Field | Type | Description |
+|---|---|---|
+| `id` | String | Unique vertex identifier (e.g., `v0`, `v1`). |
+| `name` | String | Name of the chemical compound (e.g., `GPP`, `limonene`). |
+| `smiles` | String | SMILES representation of the molecule. |
+| `charge` | Integer | Net charge of the carbocation/neutral molecule. |
+| `cycles` | Integer | Number of rings/cycles in the molecule. |
+| `image` | String | Relative path to the depiction SVG file. |
+| `iteration` | Integer | Shortest path steps from the initial precursors (0-indexed). |
+| `chemblId` | String | (Optional) ChEMBL compound identifier. |
+| `chemblName` | String | (Optional) Common name fetched from ChEMBL database. |
+| `pubchemId` | String | (Optional) PubChem compound identifier (CID). |
+| `pubchemName` | String | (Optional) Common name fetched from PubChem database. |
+
+#### Hyperedges Table (inside `hypergraph.json` -> `hyperedges`)
+| Field | Type | Description |
+|---|---|---|
+| `id` | String | Unique hyperedge/reaction identifier (e.g., `e0`, `e1`). |
+| `sources` | Array of Strings | Reactant/educt node IDs. |
+| `targets` | Array of Strings | Product node IDs. |
+| `rules` | Array of Strings | Names of the reaction rules applied. |
+| `category` | String | Reaction category (`mono`, `sesqui`, or `common`). |
+
+#### ChEMBL Cache Table (`chembl_cache.json`)
+| Field | Type | Description |
+|---|---|---|
+| `smiles` | String | SMILES representation of the molecule (Primary Key). |
+| `inchikey` | String | Calculated InChIKey (hash) of the SMILES structure. |
+| `chemblId` | String | ChEMBL compound identifier (or null if not matched). |
+| `chemblName` | String | Common name of the compound in ChEMBL (or null if not matched). |
+| `pubchemId` | String | PubChem compound identifier (or null if not matched). |
+| `pubchemName` | String | Common name of the compound in PubChem (or null if not matched). |
 
 ## Components
 The simulation workflow is divided into components for graph specification, DPO grammar application, derivation graph generation, and database persistence.
@@ -31,8 +109,11 @@ graph TD
     MOD -->|Builds| DG[Derivation Graph]
     DG -->|Formats Report| PrintPy[printer.py]
     PrintPy -->|Generates| PDF[PDF Report]
-    DG -->|Writes data| Neo4jStore[Neo4j Storer]
-    Neo4jStore -->|Saves| Neo4j[Neo4j Database]
+    DG -->|Exports| ExportPy[export_hypergraph.py]
+    ExportPy -->|Writes| HGJSON[hypergraph.json]
+    HGJSON -->|Annotates| AnnotatePy[annotate_chembl.py]
+    AnnotatePy -->|Queries| ChEMBL[ChEMBL & PubChem APIs]
+    HGJSON -->|Renders| HGHTML[hypergraph.html]
 ```
 
 ### Web Interface
@@ -42,7 +123,7 @@ The web interface (https://waldeyr.github.io/2PathTerpenes) provides a responsiv
 
 | Technology | Version | Main Function |
 |---|---|---|
-| MedØlDatschgerl (MØD) | v0.8.0 or v1.0.0+ | Chemical graph transformation kernel (DPO) and ILP solver. |
+| MedØlDatschgerl (MØD) | v1.0.0+ | Chemical graph transformation kernel (DPO) and ILP solver. |
 | Python | v3.8+ | Simulation automation scripts (`molecules.py`, `simulation.py`, `printer.py`). |
 | Open Babel | v3.0+ | 3D conformation generation and energy calculation of carbocations. |
 | Docker | v19.x+ | Full Linux environment packaging for agnostic execution of MØD. |
@@ -76,7 +157,7 @@ We have identified **four potential architectural improvements** to implement cy
 ## Installation and Usage
 
 ### Organization of Rules and Resource Files
-*   **GML Rules (`rules/`)**: All official GML reaction rules are maintained and updated directly in the `rules/` directory. The temporary/legacy `rules/novas/` directory has been removed to avoid duplication.
+*   **GML Rules (`rules/`)**: All official GML reaction rules are maintained and updated directly in the `rules/` directory.
 *   **Resource Images (`docs/img/`)**: Only images actively used or dynamically referenced (like rule previews) by `docs/index.html` are kept in version control. Temporary or redundant image files are cleaned up prior to committing.
 
 ### Generating GML Rule Previews
@@ -107,17 +188,53 @@ To generate the SVG preview images for the chemical reaction rules shown in the 
    ```bash
    docker build -t 2path-terpenes-mod:latest .
    ```
-   *(Note: The Docker image installs the LaTeX compiler with support for Latin Modern fonts through the Debian package `lmodern`, fixing potential compilation issues for the summary report `summary.pdf`. To support minimal LaTeX environments or the legacy image, we also include a fallback mock `lmodern.sty` in the workspace, so the compilation automatically falls back to default LaTeX fonts if `lmodern` is missing.)*
+   *(Note: The Docker image installs the LaTeX compiler with support for Latin Modern fonts through the Debian package `lmodern`, fixing potential compilation issues for the summary report `summary.pdf`. To support minimal LaTeX environments, we also include a fallback mock `lmodern.sty` in the workspace, so the compilation automatically falls back to default LaTeX fonts if `lmodern` is missing.)*
 
 2. **Run the main project simulation**:
    ```bash
    docker run --rm --user "$(id -u):$(id -g)" --volume "$(pwd):/home/shared" --workdir /home/shared 2path-terpenes-mod:latest -f /home/shared/molecules.py -f /home/shared/simulation.py -f /home/shared/printer.py
    ```
 
-#### Alternative Option: Using the Legacy Image (waldeyr/mod_v0.8.0)
-If you prefer to use the existing image pre-built on Docker Hub without building locally:
+### Interactive Hypergraph Viewer (HTML/JS)
+
+In addition to the LaTeX/PDF report, the derivation graph can be exported as a standalone, interactive, browser-based "metro map" of the chemical hypergraph: molecules are stations and reactions (which may have several educts/products) are the connections between lines, color-coded by rule category (Mono/Sesqui/Common).
+
+#### Quick way (recommended): `run_pipeline.sh`
+
+The `run_pipeline.sh` script runs steps 1-3 below in sequence (Docker simulation, PDF→SVG conversion, and building the standalone `report/` package):
 ```bash
-docker run --rm --volume $(pwd):/home/shared/ --workdir /home/shared/ waldeyr/mod_v0.8.0:v1.0 /home/mod-v0.8.0/bin/mod -f /home/shared/molecules.py -f /home/shared/simulation.py -f /home/shared/printer.py
+bash run_pipeline.sh
+```
+Then open `report/hypergraph.html` directly (double-click, no server needed) to see the result. The manual steps below describe what the script does.
+
+To run the expanded simulation (all rules, seven iterations), use:
+```bash
+bash run_pipeline.sh --full
 ```
 
-The simulation files contain **dynamic compatibility helpers**, now updated to use the new MØD build interface (`DG.build().execute()`) on newer MØD versions (1.0+) to resolve deprecation warnings for `dgRuleComp` and `DG.calc()`, as well as addressing deprecations for `pushVertexColour` and `postSection` in `printer.py`, while remaining fully backwards-compatible with legacy versions (0.8.0).
+1. **Export the hypergraph as JSON** (run alongside the existing simulation scripts):
+   ```bash
+   docker run --rm --user "$(id -u):$(id -g)" --volume "$(pwd):/home/shared" --workdir /home/shared 2path-terpenes-mod:latest -f /home/shared/molecules.py -f /home/shared/simulation.py -f /home/shared/export_hypergraph.py -f /home/shared/printer.py
+   ```
+   This writes `out/hypergraph.json` and renders one PDF depiction per molecule.
+
+2. **Convert the molecule depictions to SVG** (same `pdfToSvg` approach used for rule previews):
+   ```bash
+   docker run --rm --user "$(id -u):$(id -g)" --entrypoint /bin/bash --volume "$(pwd):/home/shared" --workdir /home/shared 2path-terpenes-mod:latest -c "for f in out/*_g_*.pdf; do mod_post --mode pdfToSvg \${f%.pdf} \${f%.pdf}; done"
+   ```
+
+3. **(Optional) Annotate molecules with database identifiers**:
+   ```bash
+   python annotate_chembl.py
+   ```
+   For each molecule with a `smiles` field, this computes its InChIKey (via the `obabel` CLI) and looks up an exact match in the [ChEMBL REST API](https://www.ebi.ac.uk/chembl/api/data/molecule). If no match is found, it falls back to looking up the InChIKey in the **PubChem PUG-REST API**. The script adds matching `chemblId`/`chemblName` or `pubchemId`/`pubchemName` fields to `out/hypergraph.json`. Results are cached in `out/chembl_cache.json` so repeated runs do not query the external APIs for previously seen structures. Matched molecules show their respective database links and common names in the viewer's details panel and become searchable.
+
+4. **Build the standalone report**:
+   ```bash
+   python organize_hypergraph_assets.py
+   ```
+   This assembles `report/hypergraph.html` together with its CSS/JS and the molecule depiction SVGs, with the hypergraph data embedded inline so the page works offline via `file://`.
+
+5. **Open `report/hypergraph.html`** directly in a browser. The whole `report/` folder is self-contained and can be zipped and shared.
+
+The viewer supports pan/zoom, search by molecule name, filtering by reaction category, and clicking a molecule or reaction to see its details (SMILES, charge, rings, applied rule(s)).

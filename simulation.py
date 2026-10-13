@@ -1,3 +1,5 @@
+import progress_utils
+
 # Helper para compatibilidade com versões antigas (0.8.0) e novas (1.0+) de MØD
 try:
     from mod import Rule, LabelSettings, LabelType, LabelRelation, DG
@@ -53,13 +55,14 @@ def countCycs(a): return a.numEdges - a.numVertices + 1
 # Instancia o Derivation Graph com a interface de build do MØD 1.0+.
 # A seleção é feita pela API disponível, não por uma captura ampla de exceções:
 # falhas de configuração ou de dados devem continuar visíveis para o usuário.
-if hasattr(DG, 'build'):
-    dg = DG(graphDatabase=inputGraphs, labelSettings=ls)
-    dg.build().execute(strat)
-else:
-    # Compatibilidade com versões antigas do MØD (por exemplo, 0.8.0).
-    if 'dgRuleComp' in globals():
-        dg = dgRuleComp(inputGraphs, strat, ls)
+with progress_utils.phase("Phase 2/4: Building derivation graph (MOD DPO)"):
+    if hasattr(DG, 'build'):
+        dg = DG(graphDatabase=inputGraphs, labelSettings=ls)
+        dg.build().execute(strat)
     else:
-        dg = DG(inputGraphs, strat, ls)
-    dg.calc()
+        # Compatibilidade com versões antigas do MØD (por exemplo, 0.8.0).
+        if 'dgRuleComp' in globals():
+            dg = dgRuleComp(inputGraphs, strat, ls)
+        else:
+            dg = DG(inputGraphs, strat, ls)
+        dg.calc()

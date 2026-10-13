@@ -1,0 +1,65 @@
+<!DOCTYPE html>
+<html lang="en-us">
+
+<head>
+  <title>2Path: Interactive Hypergraph Viewer</title>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+  <meta name="description"
+    content="Interactive metro-map style visualization of the 2Path chemical derivation hypergraph.">
+
+  <link rel="stylesheet" href="css/style.css">
+  <link rel="stylesheet" href="css/hypergraph.css">
+</head>
+
+<body>
+
+  <header>
+    <img class="logo" src="img/2PathLogo.png" alt="2Path: a chemical network for plant terpenes Logo">
+  </header>
+
+  <main class="hg-page">
+    <section class="intro">
+      <h3 title="Explore the chemical derivation network as an interactive &quot;metro map&quot;: molecules are stations, and reactions (hyperedges, with possibly multiple reactants and products) are the connections between lines. Click a station for molecule details, click a connection for the reaction rule(s) applied, and use the controls below to search and filter.">Interactive Derivation Hypergraph</h3>
+    </section>
+
+    <section class="hg-toolbar" aria-label="Hypergraph controls">
+      <div class="hg-toolbar-group">
+        <label for="hg-search" class="hg-label">Search molecule</label>
+        <input type="text" id="hg-search" class="hg-search-input" placeholder="e.g. limonene, FPP, cation...">
+      </div>
+
+      <div class="hg-toolbar-group">
+        <label for="hg-pathway" class="hg-label">Highlight pathway to</label>
+        <select id="hg-pathway" class="hg-search-input">
+          <option value="">(none)</option>
+        </select>
+      </div>
+
+      <div class="hg-toolbar-group">
+        <button type="button" id="hg-reset" class="hg-btn">Reset views</button>
+        <span class="hg-status" id="hg-status" aria-live="polite"></span>
+      </div>
+    </section>
+
+    <section class="hg-layout">
+      <div class="hg-canvas-wrap">
+        <svg id="hg-canvas" role="img" aria-label="Derivation hypergraph metro map"></svg>
+      </div>
+
+      <aside class="hg-details" id="hg-details" aria-label="Selection details">
+        <div class="hg-details-placeholder">
+          Select a molecule (station) or a reaction (connector) to see details here.
+        </div>
+      </aside>
+    </section>
+  </main>
+
+  <!-- Embedded hypergraph data, filled in by organize_hypergraph_assets.py -->
+  <script type="application/json" id="hg-data">{"meta": {}, "nodes": [], "hyperedges": []}</script>
+
+  <script src="javascript/d3.v7.min.js"></script>
+  <script type="text/javascript" src="javascript/hypergraph.js" defer></script>
+</body>
+
+</html>
