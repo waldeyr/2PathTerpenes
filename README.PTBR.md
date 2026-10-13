@@ -107,7 +107,7 @@ Para gerar as imagens de visualização SVG das regras de reação química exib
    ```bash
    docker build -t 2path-terpenes-mod:latest .
    ```
-   *(Nota: A imagem Docker instala o compilador LaTeX com suporte a fontes Latin Modern `texlive-lmodern`, corrigindo eventuais problemas de compilação do arquivo de resumo `summary.pdf`. Para suportar ambientes LaTeX mínimos ou a imagem legada, também incluímos um arquivo de fallback mock `lmodern.sty` no workspace, de modo que a compilação use automaticamente as fontes padrão do LaTeX caso o pacote `lmodern` esteja ausente.)*
+   *(Nota: A imagem Docker instala o compilador LaTeX com suporte a fontes Latin Modern por meio do pacote Debian `lmodern`, corrigindo eventuais problemas de compilação do arquivo de resumo `summary.pdf`. Para suportar ambientes LaTeX mínimos ou a imagem legada, também incluímos um arquivo de fallback mock `lmodern.sty` no workspace, de modo que a compilação use automaticamente as fontes padrão do LaTeX caso o pacote `lmodern` esteja ausente.)*
 
 2. **Execute a simulação principal do projeto**:
    ```bash

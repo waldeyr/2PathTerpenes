@@ -107,7 +107,7 @@ To generate the SVG preview images for the chemical reaction rules shown in the 
    ```bash
    docker build -t 2path-terpenes-mod:latest .
    ```
-   *(Note: The Docker image installs the LaTeX compiler with support for Latin Modern fonts `texlive-lmodern`, fixing potential compilation issues for the summary report `summary.pdf`. To support minimal LaTeX environments or the legacy image, we also include a fallback mock `lmodern.sty` in the workspace, so the compilation automatically falls back to default LaTeX fonts if `lmodern` is missing.)*
+   *(Note: The Docker image installs the LaTeX compiler with support for Latin Modern fonts through the Debian package `lmodern`, fixing potential compilation issues for the summary report `summary.pdf`. To support minimal LaTeX environments or the legacy image, we also include a fallback mock `lmodern.sty` in the workspace, so the compilation automatically falls back to default LaTeX fonts if `lmodern` is missing.)*
 
 2. **Run the main project simulation**:
    ```bash

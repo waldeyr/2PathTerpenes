@@ -13,7 +13,7 @@ RUN apt-get update && apt-get install -y --no-install-recommends \
     texlive-fonts-recommended \
     texlive-latex-extra \
     texlive-science \
-    texlive-lmodern \
+    lmodern \
     make \
     && rm -rf /var/lib/apt/lists/*
 
