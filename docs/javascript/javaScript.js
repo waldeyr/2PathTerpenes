@@ -423,31 +423,26 @@ strat = (addSubset(eductMols) >> repeat[${state.iterations}](inputRules))
 ######################################
 # NETWORK GENERATION
 ######################################
-# Compatibilidade com a restrição de LabelRelation.Unification do MØD v1.0
-try:
-    ls = LabelSettings(LabelType.Term, LabelRelation.Unification)
-except Exception:
-    ls = LabelSettings(LabelType.Term, LabelRelation.Identity)
+# Um DG requer configurações de rótulo que formem uma categoria. Em particular,
+# LabelRelation.Unification é inválido aqui no MØD 1.0+; Specialisation mantém
+# a semântica de correspondência por termos adequada à geração da rede.
+ls = LabelSettings(LabelType.Term, LabelRelation.Specialisation)
 
 def overallCharge(a): return sum(int(v.charge) for v in a.vertices)
 def countCycs(a): return a.numEdges - a.numVertices + 1
 
-# Instancia o Derivation Graph com o novo build interface do MØD
-try:
-    # Novo build interface do MØD (v1.0.0+)
+# Instancia o Derivation Graph com a interface de build do MØD 1.0+.
+# A seleção é feita pela API disponível, não por uma captura ampla de exceções:
+# falhas de configuração ou de dados devem continuar visíveis para o usuário.
+if hasattr(DG, 'build'):
     dg = DG(graphDatabase=inputGraphs, labelSettings=ls)
     dg.build().execute(strat)
-except (TypeError, AttributeError, Exception):
-    # Compatibilidade com versões antigas do MØD (e.g. 0.8.0)
+else:
+    # Compatibilidade com versões antigas do MØD (por exemplo, 0.8.0).
     if 'dgRuleComp' in globals():
         dg = dgRuleComp(inputGraphs, strat, ls)
-    elif 'DG' in globals():
-        dg = DG(inputGraphs, strat, ls)
     else:
-        try:
-            dg = DG(inputGraphs, strat, ls)
-        except Exception:
-            dg = dgRuleComp(inputGraphs, strat, ls)
+        dg = DG(inputGraphs, strat, ls)
     dg.calc()
 `;
   
