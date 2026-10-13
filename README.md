@@ -85,12 +85,12 @@ To generate the SVG preview images for the chemical reaction rules shown in the 
 
 1. **Run the generator inside Docker** (this compiles the GML rules and outputs `.pdf` files in `out/`):
    ```bash
-   docker run --rm --volume "$(pwd):/home/shared" --workdir /home/shared 2path-terpenes-mod:latest -f /home/shared/generate_rules_svg.py
+   docker run --rm --user "$(id -u):$(id -g)" --volume "$(pwd):/home/shared" --workdir /home/shared 2path-terpenes-mod:latest -f /home/shared/generate_rules_svg.py
    ```
 
 2. **Convert the generated PDFs to SVGs** (running the loop inside the MØD container in one go):
    ```bash
-   docker run --rm --entrypoint /bin/bash --volume "$(pwd):/home/shared" --workdir /home/shared 2path-terpenes-mod:latest -c "for f in out/*_{L,K,R}.pdf; do mod_post --mode pdfToSvg \${f%.pdf} \${f%.pdf}; done"
+   docker run --rm --user "$(id -u):$(id -g)" --entrypoint /bin/bash --volume "$(pwd):/home/shared" --workdir /home/shared 2path-terpenes-mod:latest -c "for f in out/*_{L,K,R}.pdf; do mod_post --mode pdfToSvg \${f%.pdf} \${f%.pdf}; done"
    ```
 
 3. **Copy generated SVGs to the assets folder**:
@@ -111,7 +111,7 @@ To generate the SVG preview images for the chemical reaction rules shown in the 
 
 2. **Run the main project simulation**:
    ```bash
-   docker run --rm --volume $(pwd):/home/shared/ --workdir /home/shared/ 2path-terpenes-mod:latest -f /home/shared/molecules.py -f /home/shared/simulation.py -f /home/shared/printer.py
+   docker run --rm --user "$(id -u):$(id -g)" --volume "$(pwd):/home/shared" --workdir /home/shared 2path-terpenes-mod:latest -f /home/shared/molecules.py -f /home/shared/simulation.py -f /home/shared/printer.py
    ```
 
 #### Alternative Option: Using the Legacy Image (waldeyr/mod_v0.8.0)

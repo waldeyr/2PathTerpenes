@@ -618,7 +618,7 @@ document.addEventListener('DOMContentLoaded', () => {
   }
   
   const copyDockerNewBtn = document.getElementById('btn_copy_docker_new');
-  const dockerNewCmdText = `docker build -t 2path-terpenes-mod:latest . && docker run --rm --volume $(pwd):/home/shared/ --workdir /home/shared/ 2path-terpenes-mod:latest -f /home/shared/molecules.py -f /home/shared/simulation.py -f /home/shared/printer.py`;
+  const dockerNewCmdText = `docker build -t 2path-terpenes-mod:latest . && docker run --rm --user "$(id -u):$(id -g)" --volume "$(pwd):/home/shared" --workdir /home/shared 2path-terpenes-mod:latest -f /home/shared/molecules.py -f /home/shared/simulation.py -f /home/shared/printer.py`;
   
   if (copyDockerNewBtn) {
     copyDockerNewBtn.addEventListener('click', () => {

@@ -170,8 +170,8 @@
       </h4>
       <div class="terminal-box">
         <span class="terminal-title">Docker Execution</span>
-        <div class="terminal-line">docker build -t 2path-terpenes-mod:latest . && docker run --rm --volume
-          $(pwd):/home/shared/ --workdir /home/shared/ 2path-terpenes-mod:latest -f /home/shared/molecules.py -f
+        <div class="terminal-line">docker build -t 2path-terpenes-mod:latest . && docker run --rm --user "$(id -u):$(id -g)" --volume
+          "$(pwd):/home/shared" --workdir /home/shared 2path-terpenes-mod:latest -f /home/shared/molecules.py -f
           /home/shared/simulation.py -f /home/shared/printer.py</div>
         <button type="button" id="btn_copy_docker_new" class="btn-copy-term" title="Copy Custom Docker command"
           aria-label="Copy Custom Docker command">
