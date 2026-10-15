@@ -199,18 +199,100 @@ To generate the SVG preview images for the chemical reaction rules shown in the 
 
 In addition to the LaTeX/PDF report, the derivation graph can be exported as a standalone, interactive, browser-based "metro map" of the chemical hypergraph: molecules are stations and reactions (which may have several educts/products) are the connections between lines, color-coded by rule category (Mono/Sesqui/Common).
 
-#### Quick way (recommended): `run_pipeline.sh`
+#### Quick way (recommended): `run-pipeline.sh`
 
-The `run_pipeline.sh` script runs steps 1-3 below in sequence (Docker simulation, PDF→SVG conversion, and building the standalone `report/` package):
+Use this command to generate the viewer. It is the only entry point that runs
+the simulation, hypergraph export, PDF→SVG conversion, validations, and HTML
+assembly. Manual Docker commands that include only `printer.py` generate PDFs,
+but **do not** generate the HTML viewer.
+
 ```bash
-bash run_pipeline.sh
+bash run-pipeline.sh
 ```
-Then open `report/hypergraph.html` directly (double-click, no server needed) to see the result. The manual steps below describe what the script does.
+
+Each execution is isolated in `runs/<id>/`, so artifacts from separate runs are
+never mixed. The script prints the resulting
+`runs/<id>/report/hypergraph.html`, which can be opened directly. Monitor a
+long run with:
+
+```bash
+tail -f runs/<id>/logs/pipeline.log
+cat runs/<id>/status.json
+cat runs/<id>/progress.json
+```
 
 To run the expanded simulation (all rules, seven iterations), use:
+
 ```bash
-bash run_pipeline.sh --full
+bash run-pipeline.sh --full
 ```
+
+Before a long run, test the complete pipeline with a single iteration:
+
+```bash
+bash run-pipeline.sh --smoke
+```
+
+The pipeline preserves a log for every stage in `runs/<id>/logs/` and a combined
+log in `logs/pipeline.log`. `status.json` records the PID, Git commit, local
+changes, timestamps, stage and exit code. Command failures, logging errors and
+helper failures mark the run as `failed`. `SIGHUP`, `SIGINT` and `SIGTERM` also
+record the interruption and terminate the stage's processes. `SIGKILL` and a
+machine shutdown cannot be handled this way.
+
+Before publication, the validator compares the JSON embedded in the HTML with
+`out/hypergraph.json`, checks image paths and rejects missing or empty files,
+including CSS, JavaScript and the logo. The report is built in `report.tmp/`
+and renamed to `report/` only after validation. Failed runs preserve their
+artifacts for inspection.
+
+Python loops publish real counters and use `tqdm` when available. During MØD's
+native processing and PDF compilation, a separate process emits a heartbeat
+every 30 seconds to the log and `progress.json`. A heartbeat reports an active
+stage, not an estimated kernel percentage. The file separates the stage state
+(`stageStatus`) from the last Python phase state (`status`) and reports elapsed
+time (`stageElapsedSeconds`).
+
+#### Long runs and configuration
+
+To keep a run alive after disconnecting SSH, use `nohup` with a known run ID:
+
+```bash
+nohup bash run-pipeline.sh --full --run-id full-run > full-run-console.log 2>&1 < /dev/null &
+tail -f full-run-console.log
+```
+
+The script can also be executed directly as `./run-pipeline.sh`. The run ID
+must be new; an existing run is neither overwritten nor automatically resumed.
+
+To use another disk or change the monitoring interval:
+
+```bash
+RUNS_DIR=/path/to/runs HEARTBEAT_SECONDS=15 bash run-pipeline.sh --full --run-id full-run
+```
+
+`RUNS_DIR` accepts absolute paths or paths relative to the directory from which
+the command is invoked. The actual run directory is mounted as `/run` inside
+the container. `IMAGE` selects an already-built Docker image. Preflight checks
+the image, write access and free space on the destination disk: at least 6 GiB
+for standard/full runs and 1 GiB for `--smoke`. Set `MIN_FREE_GIB` to adjust this
+threshold; it does not estimate or guarantee space for an entire run. The host
+requires Python 3.9+ and Docker on Linux or macOS.
+
+#### Regression tests
+
+```bash
+python3 -m unittest discover -s tests -v
+```
+
+The tests check invalid packages, signals, logging failures, heartbeats and
+custom run directories using a Docker substitute. They do not run MØD; use
+`--smoke` to check integration with the installed Docker image.
+
+#### Manual execution from the project root
+
+The following steps use the root-level `out/` and `report/` directories without
+the isolation and monitoring provided by `run-pipeline.sh`.
 
 1. **Export the hypergraph as JSON** (run alongside the existing simulation scripts):
    ```bash
@@ -218,9 +300,9 @@ bash run_pipeline.sh --full
    ```
    This writes `out/hypergraph.json` and renders one PDF depiction per molecule.
 
-2. **Convert the molecule depictions to SVG** (same `pdfToSvg` approach used for rule previews):
+2. **Convert only the PDFs referenced by `out/hypergraph.json` to SVG**:
    ```bash
-   docker run --rm --user "$(id -u):$(id -g)" --entrypoint /bin/bash --volume "$(pwd):/home/shared" --workdir /home/shared 2path-terpenes-mod:latest -c "for f in out/*_g_*.pdf; do mod_post --mode pdfToSvg \${f%.pdf} \${f%.pdf}; done"
+   docker run --rm --user "$(id -u):$(id -g)" --entrypoint python --volume "$(pwd):/home/shared" --workdir /home/shared 2path-terpenes-mod:latest /home/shared/convert_hypergraph_svgs.py
    ```
 
 3. **(Optional) Annotate molecules with database identifiers**:
@@ -234,6 +316,7 @@ bash run_pipeline.sh --full
    python organize_hypergraph_assets.py
    ```
    This assembles `report/hypergraph.html` together with its CSS/JS and the molecule depiction SVGs, with the hypergraph data embedded inline so the page works offline via `file://`.
+   If `report/` already exists, choose a new destination with `REPORT_DIR=report-new python3 organize_hypergraph_assets.py`; the builder preserves previous packages.
 
 5. **Open `report/hypergraph.html`** directly in a browser. The whole `report/` folder is self-contained and can be zipped and shared.
 

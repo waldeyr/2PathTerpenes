@@ -57,7 +57,7 @@
     d3.select('#hg-details').html(
       '<div class="hg-details-placeholder">' +
       'No hypergraph data is embedded in this page. Run the export pipeline ' +
-      '(<code>run_pipeline.sh</code>) to regenerate it.' +
+      '(<code>run-pipeline.sh</code>) to regenerate it.' +
       '</div>'
     );
   }

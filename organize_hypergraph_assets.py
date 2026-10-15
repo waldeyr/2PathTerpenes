@@ -12,38 +12,38 @@ except FileNotFoundError:
     sys.path.insert(0, '')
 
 import progress_utils
+from validate_pipeline import images, require_file, validate_graph
 
 
 def main():
-    out_dir = "out"
-    report_dir = "report"
+    # The pipeline provides isolated per-run directories through these
+    # variables. Defaults retain compatibility with the documented manual use.
+    out_dir = os.environ.get("OUTPUT_DIR", "out")
+    report_dir = os.environ.get("REPORT_DIR", "report")
+    source_dir = os.path.dirname(os.path.abspath(__file__))
 
     hypergraph_path = os.path.join(out_dir, "hypergraph.json")
     if not os.path.isfile(hypergraph_path):
-        print(f"No {hypergraph_path} found. Run export_hypergraph.py first.")
-        return
+        raise FileNotFoundError(f"No {hypergraph_path} found. Run export_hypergraph.py first.")
 
     with open(hypergraph_path) as f:
         hypergraph = json.load(f)
 
-    build_report_package(report_dir)
+    validate_graph(hypergraph)
+    for image in images(hypergraph):
+        require_file(os.path.join(out_dir, image))
+    build_report_package(report_dir, source_dir)
 
     img_dir = os.path.join(report_dir, "img", "molecules")
     os.makedirs(img_dir, exist_ok=True)
     copied = 0
     for node in progress_utils.progress_iter(hypergraph.get("nodes", []), desc="Copying SVG depictions to report/"):
         image = node.get("image")
-        if not image:
-            continue
         src_svg = os.path.join(out_dir, image)
-        if os.path.isfile(src_svg):
-            dest_svg = os.path.join(img_dir, image)
-            shutil.copy2(src_svg, dest_svg)
-            node["image"] = f"img/molecules/{image}"
-            copied += 1
-        else:
-            print(f"Missing depiction: {src_svg}")
-            node["image"] = None
+        dest_svg = os.path.join(img_dir, image)
+        shutil.copy2(src_svg, dest_svg)
+        node["image"] = f"img/molecules/{image}"
+        copied += 1
 
     embed_data_in_html(hypergraph, report_dir)
 
@@ -51,15 +51,15 @@ def main():
     print(f"Built standalone report in {report_dir}/hypergraph.html.")
 
 
-def build_report_package(report_dir):
+def build_report_package(report_dir, source_dir=None):
     """Assemble a standalone report/ folder with everything hypergraph.html
     needs, so it can be zipped and shared and opened directly via file://
     without a server."""
-    if os.path.isdir(report_dir):
-        shutil.rmtree(report_dir)
-    os.makedirs(report_dir, exist_ok=True)
+    source_dir = source_dir or os.path.dirname(os.path.abspath(__file__))
+    # Refuse to overwrite a prior package; a failed build remains inspectable.
+    os.makedirs(report_dir, exist_ok=False)
 
-    shutil.copy2(os.path.join("report_template", "hypergraph.html"), os.path.join(report_dir, "hypergraph.html"))
+    shutil.copy2(os.path.join(source_dir, "report_template", "hypergraph.html"), os.path.join(report_dir, "hypergraph.html"))
 
     for rel_file in [
         os.path.join("report_template", "css", "hypergraph.css"),
@@ -68,13 +68,13 @@ def build_report_package(report_dir):
     ]:
         dest = os.path.join(report_dir, os.path.relpath(rel_file, "report_template"))
         os.makedirs(os.path.dirname(dest), exist_ok=True)
-        shutil.copy2(rel_file, dest)
+        shutil.copy2(os.path.join(source_dir, rel_file), dest)
 
     for rel_file in [
         os.path.join("css", "style.css"),
         os.path.join("img", "2PathLogo.png"),
     ]:
-        src = os.path.join("docs", rel_file)
+        src = os.path.join(source_dir, "docs", rel_file)
         dest = os.path.join(report_dir, rel_file)
         os.makedirs(os.path.dirname(dest), exist_ok=True)
         shutil.copy2(src, dest)
@@ -89,12 +89,11 @@ def embed_data_in_html(hypergraph, report_dir):
     with open(html_path, encoding="utf-8") as f:
         html = f.read()
 
-    embedded = json.dumps(hypergraph)
+    embedded = json.dumps(hypergraph).replace("<", "\\u003c")
     pattern = r'(<script type="application/json" id="hg-data">)(.*?)(</script>)'
     new_html, count = re.subn(pattern, lambda m: m.group(1) + embedded + m.group(3), html, count=1, flags=re.S)
-    if count == 0:
-        print(f"Warning: could not find hg-data script tag in {html_path}, skipping inline data embed.")
-        return
+    if count != 1:
+        raise ValueError(f"Could not embed hypergraph data in {html_path}")
 
     with open(html_path, "w", encoding="utf-8") as f:
         f.write(new_html)

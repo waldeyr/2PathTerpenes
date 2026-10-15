@@ -199,18 +199,100 @@ Para gerar as imagens de visualização SVG das regras de reação química exib
 
 Além do relatório em LaTeX/PDF, o grafo de derivação pode ser exportado como um "mapa de metrô" interativo e autocontido no navegador: moléculas são estações e reações (que podem ter vários educts/produtos) são as conexões entre linhas, coloridas por categoria de regra (Mono/Sesqui/Common).
 
-#### Forma rápida (recomendada): `run_pipeline.sh`
+#### Forma rápida (recomendada): `run-pipeline.sh`
 
-O script `run_pipeline.sh` executa os passos 1-3 abaixo em sequência (simulação no Docker, conversão PDF→SVG e geração do pacote standalone `report/`):
+Use este comando para gerar o visualizador. Ele é o único ponto de entrada que
+executa simulação, exportação do hipergrafo, conversão PDF→SVG, validações e a
+montagem do HTML. Os comandos Docker manuais usados apenas com `printer.py`
+geram PDFs, mas **não** geram o HTML.
+
 ```bash
-bash run_pipeline.sh
+bash run-pipeline.sh
 ```
-Em seguida, abra `report/hypergraph.html` diretamente (duplo-clique, sem precisar de servidor) para ver o resultado. Os passos manuais a seguir descrevem o que o script faz.
+
+Cada execução é isolada em `runs/<id>/`, para que uma rodada não reutilize
+assets de outra. Ao final, o script informa o caminho de
+`runs/<id>/report/hypergraph.html`, que pode ser aberto diretamente (sem
+servidor). Acompanhe uma rodada longa por:
+
+```bash
+tail -f runs/<id>/logs/pipeline.log
+cat runs/<id>/status.json
+cat runs/<id>/progress.json
+```
 
 Para executar a simulação expandida (todas as regras, sete iterações), use:
+
 ```bash
-bash run_pipeline.sh --full
+bash run-pipeline.sh --full
 ```
+
+Antes de uma rodada longa, verifique o fluxo inteiro com uma única iteração:
+
+```bash
+bash run-pipeline.sh --smoke
+```
+
+O pipeline preserva um log por etapa em `runs/<id>/logs/` e um log consolidado
+em `logs/pipeline.log`. O `status.json` registra o PID, commit Git, alterações
+locais, horários, etapa e código de saída. Falhas de comandos, de gravação de
+logs ou de outros auxiliares encerram a rodada como `failed`. Sinais `SIGHUP`,
+`SIGINT` e `SIGTERM` também registram a interrupção e encerram os processos
+da etapa. `SIGKILL` e desligamento da máquina não permitem esse tratamento.
+
+Antes da publicação, o validador compara o JSON embutido no HTML com
+`out/hypergraph.json`, confere os caminhos das imagens e rejeita arquivos
+ausentes ou vazios, incluindo CSS, JavaScript e logo. O relatório é montado
+em `report.tmp/` e só recebe o nome `report/` após passar na validação.
+Uma falha preserva os artefatos da rodada para inspeção.
+
+As iterações em Python publicam contadores reais e usam `tqdm` quando disponível.
+Durante o processamento interno do MØD e a compilação de PDFs, um processo
+separado publica um heartbeat a cada 30 segundos no log e em `progress.json`.
+O heartbeat informa que a etapa está ativa; não estima um percentual do kernel.
+O arquivo separa o estado da etapa (`stageStatus`) do estado da última fase
+Python (`status`) e informa o tempo decorrido (`stageElapsedSeconds`).
+
+#### Rodadas longas e configuração
+
+Para manter uma execução após desconectar o SSH, use `nohup` com um ID conhecido:
+
+```bash
+nohup bash run-pipeline.sh --full --run-id rodada-full > rodada-full-console.log 2>&1 < /dev/null &
+tail -f rodada-full-console.log
+```
+
+O script também é executável diretamente como `./run-pipeline.sh`. O ID precisa
+ser novo; uma rodada existente não é sobrescrita nem retomada automaticamente.
+
+Para usar outro disco ou ajustar o intervalo de acompanhamento:
+
+```bash
+RUNS_DIR=/caminho/para/rodadas HEARTBEAT_SECONDS=15 bash run-pipeline.sh --full --run-id rodada-full
+```
+
+`RUNS_DIR` aceita caminhos absolutos ou relativos ao diretório de onde o comando
+é executado. O diretório real da rodada é montado no container como `/run`.
+`IMAGE` seleciona uma imagem Docker já construída. A pré-checagem verifica a
+imagem, a escrita e o espaço livre no disco de destino: no mínimo 6 GiB para
+rodadas normais/completas e 1 GiB para `--smoke`. Use `MIN_FREE_GIB` para ajustar
+esse mínimo; ele não é uma estimativa nem uma garantia de espaço para toda a rodada.
+O host precisa de Python 3.9+ e Docker, em Linux ou macOS.
+
+#### Testes de regressão
+
+```bash
+python3 -m unittest discover -s tests -v
+```
+
+Os testes verificam pacotes inválidos, sinais, falhas de logging, heartbeat e
+diretórios personalizados usando um substituto do Docker. Não executam o MØD;
+para verificar a integração real com a imagem instalada, execute `--smoke`.
+
+#### Execução manual na raiz do projeto
+
+Os passos abaixo usam os diretórios `out/` e `report/` da raiz, sem o isolamento
+e o acompanhamento fornecidos por `run-pipeline.sh`.
 
 1. **Exportar o hipergrafo como JSON** (executar junto com os scripts de simulação existentes):
    ```bash
@@ -218,9 +300,9 @@ bash run_pipeline.sh --full
    ```
    Isso grava `out/hypergraph.json` e renderiza um PDF de representação para cada molécula.
 
-2. **Converter as representações das moléculas para SVG** (mesma abordagem `pdfToSvg` usada para os previews de regras):
+2. **Converter somente os PDFs referenciados em `out/hypergraph.json` para SVG**:
    ```bash
-   docker run --rm --user "$(id -u):$(id -g)" --entrypoint /bin/bash --volume "$(pwd):/home/shared" --workdir /home/shared 2path-terpenes-mod:latest -c "for f in out/*_g_*.pdf; do mod_post --mode pdfToSvg \${f%.pdf} \${f%.pdf}; done"
+   docker run --rm --user "$(id -u):$(id -g)" --entrypoint python --volume "$(pwd):/home/shared" --workdir /home/shared 2path-terpenes-mod:latest /home/shared/convert_hypergraph_svgs.py
    ```
 
 3. **(Opcional) Anotar as moléculas com identificadores de bases de dados**:
@@ -234,6 +316,7 @@ bash run_pipeline.sh --full
    python organize_hypergraph_assets.py
    ```
    Isso monta `report/hypergraph.html` junto com seu CSS/JS e as representações SVG das moléculas, com os dados do hipergrafo embutidos inline para a página funcionar offline via `file://`.
+   Se `report/` já existir, escolha um destino novo com `REPORT_DIR=report-novo python3 organize_hypergraph_assets.py`; o montador preserva pacotes anteriores.
 
 5. **Abrir `report/hypergraph.html`** diretamente no navegador. A pasta `report/` inteira é autocontida e pode ser zipada e compartilhada.
 
