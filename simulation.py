@@ -1,3 +1,5 @@
+import os
+
 import progress_utils
 
 # Helper para compatibilidade com versões antigas (0.8.0) e novas (1.0+) de MØD
@@ -39,7 +41,10 @@ eductMols = [gpp,fpp,H2O]
 # ITERATIONS
 ######################################
 
-strat = (addSubset(eductMols) >> repeat[4](inputRules))
+iterations = int(os.environ.get("SIMULATION_ITERATIONS", "4"))
+if iterations < 1:
+    raise ValueError("SIMULATION_ITERATIONS must be at least 1")
+strat = (addSubset(eductMols) >> repeat[iterations](inputRules))
 
 ######################################
 # NETWORK GENERATION
