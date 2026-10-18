@@ -6,8 +6,10 @@ import json
 import os
 import subprocess
 import sys
+import tempfile
 
 import progress_utils
+from validate_pipeline import images, validate_graph, validate_svg
 
 
 def expected_images(out_dir):
@@ -15,20 +17,8 @@ def expected_images(out_dir):
     with open(path, encoding="utf-8") as handle:
         hypergraph = json.load(handle)
 
-    images = []
-    for node in hypergraph.get("nodes", []):
-        image = node.get("image")
-        if not image:
-            continue
-        if os.path.basename(image) != image or not image.endswith(".svg"):
-            raise ValueError(f"Unsafe or invalid image reference: {image!r}")
-        images.append(image)
-
-    if not images:
-        raise ValueError("hypergraph.json has no molecule image references")
-    if len(images) != len(set(images)):
-        raise ValueError("hypergraph.json has duplicate molecule image references")
-    return images
+    validate_graph(hypergraph)
+    return images(hypergraph)
 
 
 def main():
@@ -44,16 +34,25 @@ def main():
     for image in progress_utils.progress_iter(images, desc="Phase 3/4: Converting PDF depictions to SVG"):
         svg_path = os.path.join(args.out_dir, image)
         pdf_path = f"{svg_path[:-4]}.pdf"
+        if os.path.isfile(svg_path):
+            try:
+                validate_svg(svg_path)
+            except ValueError:
+                pass  # An interrupted/invalid conversion must be regenerated.
+            else:
+                skipped += 1
+                continue
         if not os.path.isfile(pdf_path) or os.path.getsize(pdf_path) == 0:
             missing_pdfs.append(pdf_path)
             continue
-        if os.path.isfile(svg_path) and os.path.getsize(svg_path) > 0:
-            skipped += 1
-            continue
         base = pdf_path[:-4]
-        subprocess.run(["mod_post", "--mode", "pdfToSvg", base, base], check=True)
-        if not os.path.isfile(svg_path) or os.path.getsize(svg_path) == 0:
-            raise RuntimeError(f"mod_post did not create a usable SVG: {svg_path}")
+        # Publish only after a successful, parsed conversion. A failed command
+        # must never leave a non-empty partial SVG that a retry would reuse.
+        with tempfile.TemporaryDirectory(prefix=".svg-", dir=args.out_dir) as temporary:
+            target = os.path.join(temporary, "molecule")
+            subprocess.run(["mod_post", "--mode", "pdfToSvg", base, target], check=True)
+            validate_svg(f"{target}.svg")
+            os.replace(f"{target}.svg", svg_path)
         converted += 1
 
     if missing_pdfs:

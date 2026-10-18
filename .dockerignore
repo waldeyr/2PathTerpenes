@@ -1,0 +1,8 @@
+.git
+runs/
+out/
+report/
+summary/
+__pycache__/
+tests/__pycache__/
+short-paper-bsb/

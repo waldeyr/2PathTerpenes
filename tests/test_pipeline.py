@@ -21,6 +21,7 @@ sys.path.insert(0, str(ROOT))
 
 import organize_hypergraph_assets as package
 import progress_utils
+from report_policy import should_render_pdf_report
 from validate_pipeline import validate_report
 from pipeline_stage import write_all
 
@@ -43,6 +44,32 @@ class LogWriteTests(unittest.TestCase):
         stream.write.return_value = 0
         with self.assertRaises(OSError):
             write_all(stream, b"must not be lost")
+
+
+class PdfReportPolicyTests(unittest.TestCase):
+    def test_small_graph_keeps_pdf_report(self):
+        allowed, message = should_render_pdf_report(5_000, 10_000, {})
+        self.assertTrue(allowed)
+        self.assertIn("Generating", message)
+
+    def test_oversized_graph_skips_only_monolithic_pdf(self):
+        allowed, message = should_render_pdf_report(48_639, 122_770, {})
+        self.assertFalse(allowed)
+        self.assertIn("interactive hypergraph export remains enabled", message)
+
+    def test_force_flag_requires_deliberate_opt_in(self):
+        allowed, message = should_render_pdf_report(
+            48_639, 122_770, {"FORCE_PDF_REPORT": "1"})
+        self.assertTrue(allowed)
+        self.assertIn("FORCE_PDF_REPORT", message)
+
+    def test_invalid_limit_is_rejected(self):
+        with self.assertRaisesRegex(ValueError, "PDF_REPORT_MAX_EDGES"):
+            should_render_pdf_report(1, 1, {"PDF_REPORT_MAX_EDGES": "0"})
+
+    def test_invalid_force_flag_is_rejected(self):
+        with self.assertRaisesRegex(ValueError, "FORCE_PDF_REPORT"):
+            should_render_pdf_report(1, 1, {"FORCE_PDF_REPORT": "maybe"})
 
 
 class ReportValidationTests(unittest.TestCase):
@@ -107,6 +134,12 @@ class ReportValidationTests(unittest.TestCase):
                     validate_report(self.report, self.graph)
                 path.write_bytes(content)
 
+    def test_truncated_packaged_svg_is_rejected(self):
+        image = self.report / "img" / "molecules" / "001_g_0.svg"
+        image.write_text("<svg><path")
+        with self.assertRaisesRegex(ValueError, "Invalid or truncated SVG"):
+            validate_report(self.report, self.graph)
+
     def test_unlinked_runtime_script_is_rejected(self):
         html = self.report / "hypergraph.html"
         html.write_text(html.read_text().replace('src="javascript/hypergraph.js"', 'src="other.js"'))
@@ -142,7 +175,7 @@ class PipelineExecutionTests(unittest.TestCase):
         self.project.mkdir()
         for name in ("run-pipeline.sh", "pipeline_stage.py", "pipeline_status.py", "progress_utils.py",
                      "validate_pipeline.py", "convert_hypergraph_svgs.py", "organize_hypergraph_assets.py",
-                     "simulation.py", "simulation-full.py", "lmodern.sty"):
+                     "simulation.py", "simulation-full.py", "report_policy.py", "lmodern.sty"):
             shutil.copy2(ROOT / name, self.project / name)
         for name in ("docs", "rules", "report_template"):
             shutil.copytree(ROOT / name, self.project / name)
@@ -162,6 +195,8 @@ class PipelineExecutionTests(unittest.TestCase):
                         FAKE_RUN_ID="regression", FAKE_DOCKER_CALLS=str(self.calls),
                         FAKE_DOCKER_MARKER=str(self.marker))
         self.env.pop("FAKE_DOCKER_MODE", None)
+        for name in ('PDF_REPORT_MAX_VERTICES', 'PDF_REPORT_MAX_EDGES', 'FORCE_PDF_REPORT'):
+            self.env.pop(name, None)
 
     @property
     def run_dir(self):
@@ -191,6 +226,10 @@ class PipelineExecutionTests(unittest.TestCase):
         for call in calls:
             self.assertEqual(call["mounts"]["/run"], str(self.run_dir.resolve()))
             self.assertEqual(call["workdir"], "/run")
+            self.assertEqual(call["env"]["HOME"], "/tmp")
+            self.assertEqual(call["env"]["XDG_CACHE_HOME"], "/tmp/.cache")
+            self.assertEqual(call["env"]["PDF_REPORT_MAX_VERTICES"], "5000")
+            self.assertEqual(call["env"]["PDF_REPORT_MAX_EDGES"], "10000")
         validate_report(self.run_dir / "report", json.loads((self.run_dir / "out" / "hypergraph.json").read_text()))
 
     def test_relative_runs_directory_from_another_working_directory(self):
@@ -206,6 +245,30 @@ class PipelineExecutionTests(unittest.TestCase):
         self.assertEqual(self.status()["failedStage"], "simulation")
         self.assertEqual(self.status()["exitCode"], 7)
         self.assertFalse((self.run_dir / "report").exists())
+
+    def test_invalid_pdf_limit_fails_before_simulation(self):
+        self.env['PDF_REPORT_MAX_VERTICES'] = 'oops'
+        result = self.execute()
+        self.assertNotEqual(result.returncode, 0)
+        self.assertEqual(self.status()['failedStage'], 'preflight')
+        self.assertFalse(self.calls.exists())
+
+    def test_invalid_force_flag_fails_before_simulation(self):
+        self.env['FORCE_PDF_REPORT'] = 'maybe'
+        result = self.execute()
+        self.assertNotEqual(result.returncode, 0)
+        self.assertEqual(self.status()['failedStage'], 'preflight')
+        self.assertFalse(self.calls.exists())
+
+    def test_custom_pdf_limits_reach_container(self):
+        self.env.update(PDF_REPORT_MAX_VERTICES='123', PDF_REPORT_MAX_EDGES='456', FORCE_PDF_REPORT='1')
+        result = self.execute()
+        self.assertEqual(result.returncode, 0, result.stdout + result.stderr)
+        calls = [json.loads(line) for line in self.calls.read_text().splitlines()]
+        for call in calls:
+            self.assertEqual(call['env']['PDF_REPORT_MAX_VERTICES'], '123')
+            self.assertEqual(call['env']['PDF_REPORT_MAX_EDGES'], '456')
+            self.assertEqual(call['env']['FORCE_PDF_REPORT'], '1')
 
     def test_stage_log_open_failure_is_recorded(self):
         result = self.execute("break-log")

@@ -5,7 +5,7 @@
 *Disponível também em:* 🇺🇸 *[English](README.md)*
 
 ## Resumo do projeto
-O **2PathTerpenes** é uma ferramenta de bioinformática e modelagem química baseada em gramática de grafos para reconstruir e explorar redes metabólicas de biossíntese de terpenos vegetais (monoterpenos C10 e sesquiterpenos C15). O projeto utiliza o simulador **MedØlDatschgerl (MØD)** e o formalismo de Double Pushout (DPO) para gerar caminhos de síntese de moléculas complexas (como $\beta$-caryophyllene, $\alpha$-humulene e $\beta$-farnesene) a partir de precursores acíclicos lineares como o Farnesyl Diphosphate (FPP). Os resultados da simulação podem ser exportados em relatórios estruturais PDF ou como um visualizador interativo de hipergrafo em HTML/JavaScript, opcionalmente anotado com identificadores de compostos da base ChEMBL.
+O **2PathTerpenes** é uma ferramenta de bioinformática e modelagem química baseada em gramática de grafos para reconstruir e explorar redes metabólicas de biossíntese de terpenos (monoterpenos C10 e sesquiterpenos C15). O projeto utiliza o simulador **MedØlDatschgerl (MØD)** e o formalismo de Double Pushout (DPO) para gerar caminhos de síntese de moléculas complexas (como $\beta$-caryophyllene, $\alpha$-humulene e $\beta$-farnesene) a partir de precursores acíclicos lineares como o Farnesyl Diphosphate (FPP). Os resultados da simulação podem ser exportados em relatórios estruturais PDF ou como um visualizador interativo de hipergrafo em HTML/JavaScript, opcionalmente anotado com identificadores de compostos da base ChEMBL.
 
 ## Lista de funcionalidades
 *   **Definição Topológica de Moléculas**: Modelagem de precursores químicos e carbocátions usando representações lineares SMILES e DFS em grafos.
@@ -241,10 +241,11 @@ logs ou de outros auxiliares encerram a rodada como `failed`. Sinais `SIGHUP`,
 da etapa. `SIGKILL` e desligamento da máquina não permitem esse tratamento.
 
 Antes da publicação, o validador compara o JSON embutido no HTML com
-`out/hypergraph.json`, confere os caminhos das imagens e rejeita arquivos
-ausentes ou vazios, incluindo CSS, JavaScript e logo. O relatório é montado
-em `report.tmp/` e só recebe o nome `report/` após passar na validação.
-Uma falha preserva os artefatos da rodada para inspeção.
+`out/hypergraph.json`, confere os caminhos das imagens, interpreta cada SVG de
+molécula já copiado e rejeita arquivos ausentes ou vazios, incluindo CSS,
+JavaScript e logotipo. O relatório é montado em `report.tmp/` e só recebe o nome
+`report/` após passar na validação. Uma falha preserva os artefatos da rodada
+para inspeção.
 
 As iterações em Python publicam contadores reais e usam `tqdm` quando disponível.
 Durante o processamento interno do MØD e a compilação de PDFs, um processo
@@ -279,15 +280,57 @@ rodadas normais/completas e 1 GiB para `--smoke`. Use `MIN_FREE_GIB` para ajusta
 esse mínimo; ele não é uma estimativa nem uma garantia de espaço para toda a rodada.
 O host precisa de Python 3.9+ e Docker, em Linux ou macOS.
 
+O PDF monolítico do grafo de derivação é diferente do visualizador HTML: ele
+pede ao Graphviz que faça o layout de toda a rede. Por padrão, o pipeline o
+omite acima de 5.000 vértices ou 10.000 arestas, pois esse layout não escala de
+forma confiável; a exportação interativa e as imagens das moléculas continuam
+ativas. Os limites podem ser ajustados com `PDF_REPORT_MAX_VERTICES` e
+`PDF_REPORT_MAX_EDGES`. Use `FORCE_PDF_REPORT=1` somente para uma rodada
+deliberadamente dimensionada para gerar esse PDF.
+
+Para redes grandes, o visualizador conserva todos os dados embutidos e oferece
+busca global e paginação de 100 moléculas. Cada vista desenha no máximo 500
+moléculas, 500 reações e 2.000 conexões, incluindo apenas reações com todos os
+seus participantes. Em vez de comprimir centenas de linhas até os pontos
+ficarem microscópicos, uma página grande abre em uma janela legível, navegável
+por pan/zoom. Os totais e a quantidade exibida aparecem na tela. Caminhos são
+calculados sobre a rede completa; listas de detalhes exibem até 100 reações.
+Esses limites de visualização não reduzem o resultado da simulação/exportação.
+
+A conversão PDF→SVG publica cada imagem somente após validar seu XML. Imagens
+parciais de uma conversão interrompida são regeneradas; imagens válidas já
+existentes podem ser reaproveitadas. O cache do Fontconfig fica em um diretório
+gravável do contêiner, inclusive quando este roda com o UID do host.
+
 #### Testes de regressão
 
 ```bash
 python3 -m unittest discover -s tests -v
+node --test tests/test_viewer.cjs
 ```
 
 Os testes verificam pacotes inválidos, sinais, falhas de logging, heartbeat e
 diretórios personalizados usando um substituto do Docker. Não executam o MØD;
 para verificar a integração real com a imagem instalada, execute `--smoke`.
+
+Teste de escala reproduzível (gera dados e SVGs sintéticos; não executa a
+simulação química nem mede o custo de renderizar estruturas reais):
+
+```bash
+python3 tests/stress_pipeline.py --output-dir /tmp/2path-stress-novo
+# Opcional, com Playwright e Chrome instalados:
+node tests/browser_scale.cjs /tmp/2path-stress-novo/report/hypergraph.html
+```
+
+São 50.000 moléculas, 125.000 reações e 50.000 SVGs, validados e empacotados no
+disco. Por padrão, cada SVG tem cerca de 10 KiB, a média observada na execução
+em escala de produção; use `--svg-bytes` para alterar esse valor. O diretório
+precisa ser novo; tempos, bytes dos SVGs e tamanho do HTML ficam em
+`metrics.json`.
+Os testes unitários também incluem uma cadeia reversa de 50.000 moléculas,
+verificação de semântica dos reagentes e bloqueio efetivo do `DGPrinter` grande.
+No Mac ARM, a instalação atual do MØD requer construir a imagem com
+`docker build --platform linux/amd64 -t 2path-terpenes-mod:latest .`.
 
 #### Execução manual na raiz do projeto
 

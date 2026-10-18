@@ -1,4 +1,5 @@
 import progress_utils
+from report_policy import should_render_pdf_report
 
 # Helper para compatibilidade com versões antigas (0.8.0) e novas (1.0+) de MØD
 try:
@@ -42,6 +43,25 @@ def vertex_colour_cb(*args):
 p.pushVertexColour(vertex_colour_cb)
 
 post.summarySection("Plant Monoterpenes Biosynthesis")
-with progress_utils.phase("Phase 4/4: Generating PDF/LaTeX report (summary.pdf)"):
-    dg.print(p)
+
+# ``dg.print`` asks Graphviz/neato to lay out the complete derivation graph.
+# This is separate from the molecule depictions queued by export_hypergraph.py
+# for the interactive report. Apply a configurable precautionary size limit.
+# ``DG.vertices``/``DG.edges`` are iterable in both supported MØD APIs, while
+# some older bindings do not expose ``len`` on their proxy collections.
+vertex_count = sum(1 for _ in dg.vertices)
+edge_count = sum(1 for _ in dg.edges)
+render_pdf, message = should_render_pdf_report(vertex_count, edge_count)
+print(message, flush=True)
+if render_pdf:
+    with progress_utils.phase("Phase 4/4: Generating PDF/LaTeX report (summary.pdf)"):
+        dg.print(p)
+else:
+    # MØD compiles the queued per-molecule PDFs after Python exits. Keep the
+    # heartbeat truthful while that potentially long post-processing runs.
+    progress_utils.update_progress(
+        progress_utils.PROGRESS_FILE,
+        description="Compiling molecule depictions (monolithic graph PDF skipped)",
+        status="running", current=None, total=None,
+    )
 

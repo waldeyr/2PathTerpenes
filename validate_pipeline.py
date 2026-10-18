@@ -8,6 +8,7 @@ import sys
 from html.parser import HTMLParser
 from pathlib import Path
 from urllib.parse import unquote, urlsplit
+from xml.etree import ElementTree
 
 
 class ReportHTML(HTMLParser):
@@ -44,6 +45,22 @@ class ReportHTML(HTMLParser):
 def require_file(path):
     if not os.path.isfile(path) or os.path.getsize(path) == 0:
         raise ValueError(f"Missing or empty file: {path}")
+
+
+def validate_svg(path):
+    """Reject truncated cached conversions, not just empty files."""
+    require_file(path)
+    try:
+        root_seen = False
+        for event, element in ElementTree.iterparse(path, events=("start", "end")):
+            if not root_seen:
+                if element.tag not in {"svg", "{http://www.w3.org/2000/svg}svg"}:
+                    raise ValueError(f"Not an SVG document: {path}")
+                root_seen = True
+            if event == "end":
+                element.clear()
+    except ElementTree.ParseError as error:
+        raise ValueError(f"Invalid or truncated SVG: {path}: {error}") from error
 
 
 def validate_graph(hypergraph):
@@ -122,7 +139,8 @@ def validate_report(report_dir, hypergraph):
     if not required.issubset(parser.assets):
         raise ValueError("Report does not reference all required CSS, JavaScript and logo assets")
 
-    for relative in parser.assets + [node["image"] for node in embedded["nodes"]]:
+    molecule_assets = [node["image"] for node in embedded["nodes"]]
+    for relative in parser.assets + molecule_assets:
         url = urlsplit(relative)
         if url.scheme or url.netloc or url.path.startswith("/"):
             raise ValueError(f"Report asset is not a local relative path: {relative}")
@@ -130,6 +148,11 @@ def validate_report(report_dir, hypergraph):
         if Path(report_dir).resolve() not in target.parents:
             raise ValueError(f"Report asset escapes the package: {relative}")
         require_file(target)
+
+    # Verify the copied files, not only their source versions from out/. This
+    # catches truncation or corruption during report assembly before publish.
+    for relative in molecule_assets:
+        validate_svg(Path(report_dir) / unquote(urlsplit(relative).path))
 
 
 def main():
@@ -148,7 +171,7 @@ def main():
 
     out_dir = os.path.join(args.run_dir, "out")
     for name in referenced:
-        require_file(os.path.join(out_dir, name))
+        validate_svg(os.path.join(out_dir, name))
     print(f"Validated SVG assets: {len(referenced)} present.")
 
     if args.stage == "assets":

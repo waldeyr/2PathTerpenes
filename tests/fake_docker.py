@@ -46,7 +46,8 @@ def main():
             workdir = value
     args.pop(0)  # image
     with open(os.environ["FAKE_DOCKER_CALLS"], "a", encoding="utf-8") as handle:
-        handle.write(json.dumps({"mounts": mounts, "workdir": workdir, "args": args}) + "\n")
+        handle.write(json.dumps({"mounts": mounts, "workdir": workdir, "args": args,
+                                 "env": container_env}) + "\n")
 
     if mode == "failure":
         print("Simulated simulation failure", flush=True)

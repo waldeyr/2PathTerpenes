@@ -12,7 +12,7 @@ except FileNotFoundError:
     sys.path.insert(0, '')
 
 import progress_utils
-from validate_pipeline import images, require_file, validate_graph
+from validate_pipeline import images, validate_graph, validate_svg
 
 
 def main():
@@ -31,7 +31,7 @@ def main():
 
     validate_graph(hypergraph)
     for image in images(hypergraph):
-        require_file(os.path.join(out_dir, image))
+        validate_svg(os.path.join(out_dir, image))
     build_report_package(report_dir, source_dir)
 
     img_dir = os.path.join(report_dir, "img", "molecules")

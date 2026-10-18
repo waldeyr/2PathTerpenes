@@ -15,9 +15,61 @@
   const MARGIN_X = 80;
   const MARGIN_Y = 60;
   const NODE_RADIUS = 20;
+  const PAGE_SIZE = 100;
+  const MAX_VIEW_NODES = 500;
+  const MAX_VIEW_EDGES = 500;
+  const MAX_VIEW_LINKS = 2000;
+  // Do not shrink a tall, bounded page until hundreds of stations become
+  // sub-pixel dots. The SVG opens a readable window; pan/zoom reaches the
+  // remaining rows and columns in that page.
+  const INITIAL_VIEW_WIDTH = 1200;
+  const INITIAL_VIEW_HEIGHT = 800;
+
+  function indexGraph(data) {
+    const nodesById = new Map(data.nodes.map(n => [n.id, n]));
+    const edgesById = new Map(data.hyperedges.map(e => [e.id, e]));
+    const incoming = new Map(data.nodes.map(n => [n.id, []]));
+    const outgoing = new Map(data.nodes.map(n => [n.id, []]));
+    for (const edge of data.hyperedges) {
+      for (const id of new Set(edge.sources)) outgoing.get(id)?.push(edge);
+      for (const id of new Set(edge.targets)) incoming.get(id)?.push(edge);
+    }
+    return { nodesById, edgesById, incoming, outgoing };
+  }
+
+  // Retain the complete dataset but bound the DOM, even for a high-degree
+  // cofactor. Every displayed reaction includes ALL its reactants/products.
+  function boundedView(data, index, seeds, allowedEdges = null) {
+    const ids = new Set(seeds.slice(0, PAGE_SIZE).map(n => n.id));
+    const edges = new Map();
+    const examined = new Set();
+    let links = 0;
+    for (const seed of seeds.slice(0, PAGE_SIZE)) {
+      const candidates = [...index.incoming.get(seed.id), ...index.outgoing.get(seed.id)];
+      for (const edge of candidates) {
+        if (edges.size >= MAX_VIEW_EDGES) break;
+        if (examined.has(edge.id) || (allowedEdges && !allowedEdges.has(edge.id))) continue;
+        examined.add(edge.id);
+        const endpoints = [...edge.sources, ...edge.targets];
+        if (links + endpoints.length > MAX_VIEW_LINKS) continue;
+        const additional = new Set(endpoints.filter(id => !ids.has(id)));
+        if (ids.size + additional.size > MAX_VIEW_NODES) continue;
+        additional.forEach(id => ids.add(id));
+        edges.set(edge.id, edge);
+        links += endpoints.length;
+      }
+    }
+    return { meta: data.meta, nodes: [...ids].map(id => index.nodesById.get(id)),
+      hyperedges: [...edges.values()] };
+  }
 
   const state = {
     data: null,
+    index: null,
+    view: null,
+    large: false,
+    page: 0,
+    pageCount: 1,
     layout: null,
     selection: null,
     pathHighlight: null,
@@ -27,7 +79,8 @@
     zoom: null
   };
 
-  document.addEventListener('DOMContentLoaded', init);
+  if (typeof document !== 'undefined') document.addEventListener('DOMContentLoaded', init);
+  if (typeof module !== 'undefined') module.exports = { indexGraph, boundedView, computeLayout, computePathToTarget };
 
   function init() {
     state.data = normalizeData(loadData());
@@ -37,10 +90,37 @@
       return;
     }
 
-    state.layout = computeLayout(state.data);
-    render();
+    state.index = indexGraph(state.data);
+    const incidences = state.data.hyperedges.reduce((n, e) => n + e.sources.length + e.targets.length, 0);
+    state.large = state.data.nodes.length > MAX_VIEW_NODES ||
+      state.data.hyperedges.length > MAX_VIEW_EDGES || incidences > MAX_VIEW_LINKS;
+    refreshView();
     bindControls();
     updateStatus();
+  }
+
+  function matchesSearch(node, term) {
+    return [node.id, node.name, node.smiles, node.chemblName, node.chemblId,
+      node.pubchemName, node.pubchemId].some(value => String(value || '').toLowerCase().includes(term));
+  }
+
+  function refreshView() {
+    const term = state.searchTerm.trim().toLowerCase();
+    const candidates = state.data.nodes.filter(n =>
+      (!term || matchesSearch(n, term)) && (!state.pathHighlight || state.pathHighlight.nodes.has(n.id)));
+    state.pageCount = Math.max(1, Math.ceil(candidates.length / PAGE_SIZE));
+    state.page = Math.min(state.page, state.pageCount - 1);
+    state.view = state.large
+      ? boundedView(state.data, state.index, candidates.slice(state.page * PAGE_SIZE, (state.page + 1) * PAGE_SIZE),
+          state.pathHighlight?.edges)
+      : state.data;
+    state.layout = computeLayout(state.view);
+    render();
+    populatePathwaySelect();
+    d3.select('#hg-paging').property('hidden', !state.large);
+    d3.select('#hg-page').text(`Page ${state.page + 1} / ${state.pageCount}`);
+    d3.select('#hg-prev').property('disabled', state.page === 0);
+    d3.select('#hg-next').property('disabled', state.page + 1 >= state.pageCount);
   }
 
   function loadData() {
@@ -124,7 +204,7 @@
         n.iteration = 1;
       }
     });
-    let changed = true;
+    let changed = data.nodes.some(n => n.iteration == null);
     let guard = 0;
     while (changed && guard < 1000) {
       changed = false;
@@ -176,6 +256,7 @@
     }
     columns.forEach(col => {
       const occupied = new Set();
+      let firstFree = 0;
       const ordered = [...col].sort((a, b) => {
         const pa = preferredLane(a);
         const pb = preferredLane(b);
@@ -184,10 +265,10 @@
       ordered.forEach(n => {
         let lane = preferredLane(n);
         if (lane == null || occupied.has(lane)) {
-          lane = 0;
-          while (occupied.has(lane)) lane++;
+          lane = firstFree;
         }
         occupied.add(lane);
+        while (occupied.has(firstFree)) firstFree++;
         laneOf.set(n.id, lane);
         n.lane = lane;
       });
@@ -233,11 +314,14 @@
   // Rendering
   // ---------------------------------------------------------------------
   function render() {
-    const data = state.data;
+    const data = state.view;
     const layout = state.layout;
     const svg = d3.select('#hg-canvas');
     svg.selectAll('*').remove();
-    svg.attr('viewBox', `0 0 ${layout.width} ${layout.height}`);
+    const viewWidth = state.large ? Math.min(layout.width, INITIAL_VIEW_WIDTH) : layout.width;
+    const viewHeight = state.large ? Math.min(layout.height, INITIAL_VIEW_HEIGHT) : layout.height;
+    svg.attr('viewBox', `0 0 ${viewWidth} ${viewHeight}`)
+      .attr('preserveAspectRatio', 'xMinYMin meet');
 
     const root = svg.append('g').attr('class', 'hg-root');
 
@@ -257,7 +341,9 @@
     const zoom = d3.zoom()
       .scaleExtent([0.3, 3])
       .on('zoom', event => root.attr('transform', event.transform));
-    svg.call(zoom);
+    // Redraws replace the root group. Reset D3's retained zoom state too, so
+    // a page/search change cannot make the next gesture jump unexpectedly.
+    svg.call(zoom).call(zoom.transform, d3.zoomIdentity);
     state.svg = svg;
     state.zoom = zoom;
 
@@ -389,34 +475,34 @@
   // Pathway highlighting: trace a route from a root molecule (e.g. GPP/FPP)
   // to a chosen target through the hyperedges that were actually reachable.
   // ---------------------------------------------------------------------
-  function computePathToTarget(targetId) {
-    const { incoming, outgoing, nodesById } = state.layout;
+  function computePathToTarget(targetId, data = state.data, index = state.index) {
+    const { incoming, outgoing } = index;
 
-    const roots = state.data.nodes
-      .filter(n => (incoming.get(n.id) || []).length === 0)
+    const knownRoots = new Set(data.meta.rootIds || []);
+    const roots = data.nodes
+      .filter(n => knownRoots.has(n.id) || ['gpp', 'fpp', 'h2o', 'water'].includes(n.name.toLowerCase()) ||
+        (incoming.get(n.id) || []).length === 0)
       .map(n => n.id);
 
     // Multi-source BFS: a hyperedge "fires" once all of its sources have
     // been reached, recording the hyperedge that first reached each target.
     const predEdge = new Map();
     const reached = new Set(roots);
-    let frontier = [...roots];
-    while (frontier.length) {
-      const next = [];
-      frontier.forEach(nodeId => {
-        (outgoing.get(nodeId) || []).forEach(e => {
-          if (e.sources.every(s => reached.has(s))) {
-            e.targets.forEach(t => {
-              if (!reached.has(t)) {
-                reached.add(t);
-                predEdge.set(t, e);
-                next.push(t);
-              }
-            });
-          }
-        });
+    const pending = new Map(data.hyperedges.map(e => [e.id, new Set(e.sources).size]));
+    const frontier = [...roots];
+    for (let cursor = 0; cursor < frontier.length; cursor++) {
+      (outgoing.get(frontier[cursor]) || []).forEach(e => {
+        pending.set(e.id, pending.get(e.id) - 1);
+        if (pending.get(e.id) === 0) {
+          e.targets.forEach(t => {
+            if (!reached.has(t)) {
+              reached.add(t);
+              predEdge.set(t, e);
+              frontier.push(t);
+            }
+          });
+        }
       });
-      frontier = next;
     }
 
     if (!reached.has(targetId)) return null;
@@ -426,11 +512,13 @@
     // so following all of its sources keeps the highlighted set connected
     // (e.g. a merge step also highlights the edge that produced each educt).
     const nodes = new Set();
+    const visited = new Set();
     const edges = new Set();
     const stack = [targetId];
     while (stack.length) {
       const current = stack.pop();
-      if (nodes.has(current)) continue;
+      if (visited.has(current)) continue;
+      visited.add(current);
       nodes.add(current);
       const edge = predEdge.get(current);
       if (!edge) continue;
@@ -443,8 +531,8 @@
 
   function populatePathwaySelect() {
     const select = d3.select('#hg-pathway');
-    const leaves = state.data.nodes
-      .filter(n => (state.layout.outgoing.get(n.id) || []).length === 0)
+    const leaves = state.view.nodes
+      .filter(n => state.large || (state.index.outgoing.get(n.id) || []).length === 0)
       .sort((a, b) => a.name.localeCompare(b.name));
     select.selectAll('option:not([value=""])').remove();
     select.selectAll('option.hg-pathway-option')
@@ -477,13 +565,7 @@
     const search = state.searchTerm.trim().toLowerCase();
 
     const searchNodes = search
-      ? new Set(data.nodes.filter(n => {
-          return n.name.toLowerCase().includes(search) ||
-            (n.chemblName && n.chemblName.toLowerCase().includes(search)) ||
-            (n.chemblId && n.chemblId.toLowerCase().includes(search)) ||
-            (n.pubchemName && n.pubchemName.toLowerCase().includes(search)) ||
-            (n.pubchemId && String(n.pubchemId).toLowerCase().includes(search));
-        }).map(n => n.id))
+      ? new Set(data.nodes.filter(n => matchesSearch(n, search)).map(n => n.id))
       : null;
 
     const highlightNodes = new Set();
@@ -491,7 +573,7 @@
     if (state.selection) {
       if (state.selection.type === 'node') {
         highlightNodes.add(state.selection.id);
-        data.hyperedges.forEach(e => {
+        [...state.index.incoming.get(state.selection.id), ...state.index.outgoing.get(state.selection.id)].forEach(e => {
           if (e.sources.includes(state.selection.id) || e.targets.includes(state.selection.id)) {
             highlightEdges.add(e.id);
             e.sources.forEach(s => highlightNodes.add(s));
@@ -499,7 +581,7 @@
           }
         });
       } else if (state.selection.type === 'edge') {
-        const edge = data.hyperedges.find(e => e.id === state.selection.id);
+        const edge = state.index.edgesById.get(state.selection.id);
         highlightEdges.add(edge.id);
         edge.sources.forEach(s => highlightNodes.add(s));
         edge.targets.forEach(t => highlightNodes.add(t));
@@ -537,8 +619,8 @@
   }
 
   function renderNodeDetails(node) {
-    const incomingEdges = state.layout.incoming.get(node.id) || [];
-    const outgoingEdges = state.layout.outgoing.get(node.id) || [];
+    const incomingEdges = state.index.incoming.get(node.id) || [];
+    const outgoingEdges = state.index.outgoing.get(node.id) || [];
 
     let html = `<h3>${escapeHtml(node.name)}</h3>`;
     if (node.image) {
@@ -565,17 +647,19 @@
 
     if (incomingEdges.length) {
       html += '<p class="hg-label">Produced by</p><ul class="hg-rule-list">';
-      incomingEdges.forEach(e => {
+      incomingEdges.slice(0, 100).forEach(e => {
         html += `<li>${escapeHtml((e.rules || []).join(', ') || e.id)}</li>`;
       });
       html += '</ul>';
+      if (incomingEdges.length > 100) html += `<p>Showing 100 of ${incomingEdges.length} incoming reactions.</p>`;
     }
     if (outgoingEdges.length) {
       html += '<p class="hg-label">Reacts via</p><ul class="hg-rule-list">';
-      outgoingEdges.forEach(e => {
+      outgoingEdges.slice(0, 100).forEach(e => {
         html += `<li>${escapeHtml((e.rules || []).join(', ') || e.id)}</li>`;
       });
       html += '</ul>';
+      if (outgoingEdges.length > 100) html += `<p>Showing 100 of ${outgoingEdges.length} outgoing reactions.</p>`;
     }
     d3.select('#hg-details').html(html);
   }
@@ -606,6 +690,7 @@
   function updateStatus(searchNodes) {
     const data = state.data;
     let text = `${data.nodes.length} molecules · ${data.hyperedges.length} reactions`;
+    if (state.large) text += ` · View: ${state.view.nodes.length} molecules / ${state.view.hyperedges.length} reactions. Search all molecules or use pages; each view includes a limited set of complete reactions.`;
     if (searchNodes) text += ` · ${searchNodes.size} match${searchNodes.size === 1 ? '' : 'es'}`;
     d3.select('#hg-status').text(text);
   }
@@ -613,25 +698,48 @@
   function bindControls() {
     populatePathwaySelect();
 
+    let searchTimer;
     d3.select('#hg-search').on('input', event => {
       state.searchTerm = event.target.value;
-      applyFilters();
+      clearTimeout(searchTimer);
+      searchTimer = setTimeout(() => {
+        state.page = 0;
+        state.pathHighlight = null;
+        state.selection = null;
+        if (state.large) refreshView();
+        else applyFilters();
+      }, 180);
     });
+
+    for (const [selector, delta] of [['#hg-prev', -1], ['#hg-next', 1]]) {
+      d3.select(selector).on('click', () => {
+        state.page += delta;
+        state.selection = null;
+        refreshView();
+        renderPlaceholder();
+      });
+    }
 
 
     d3.select('#hg-pathway').on('change', event => {
       const targetId = event.target.value;
       if (!targetId) {
         state.pathHighlight = null;
-        applyFilters();
+        if (state.large) refreshView();
+        else applyFilters();
         renderPlaceholder();
         return;
       }
       const path = computePathToTarget(targetId);
       state.pathHighlight = path;
-      applyFilters();
+      if (state.large && path) {
+        state.searchTerm = '';
+        state.page = 0;
+        d3.select('#hg-search').property('value', '');
+        refreshView();
+      } else applyFilters();
       if (path) {
-        renderPathwayDetails(state.layout.nodesById.get(targetId), path);
+        renderPathwayDetails(state.index.nodesById.get(targetId), path);
       } else {
         d3.select('#hg-details').html(
           '<div class="hg-details-placeholder">No reachable pathway found to this molecule.</div>'
@@ -640,28 +748,34 @@
     });
 
     d3.select('#hg-reset').on('click', () => {
+      clearTimeout(searchTimer);
       state.selection = null;
       state.pathHighlight = null;
       state.searchTerm = '';
+      state.page = 0;
       d3.select('#hg-search').property('value', '');
       d3.select('#hg-pathway').property('value', '');
-      state.svg.transition().duration(300).call(state.zoom.transform, d3.zoomIdentity);
-      applyFilters();
+      if (state.large) refreshView();
+      else {
+        state.svg.transition().duration(300).call(state.zoom.transform, d3.zoomIdentity);
+        applyFilters();
+      }
       renderPlaceholder();
     });
   }
 
   function renderPathwayDetails(target, path) {
     const steps = [...path.edges]
-      .map(id => state.data.hyperedges.find(e => e.id === id))
+      .map(id => state.index.edgesById.get(id))
       .sort((a, b) => a.iteration - b.iteration);
 
     let html = `<h3>Pathway to ${escapeHtml(target.name)}</h3>`;
     html += `<p class="hg-label">${steps.length} reaction step(s)</p>`;
     html += '<ul class="hg-rule-list">';
-    steps.forEach(e => {
-      const sources = e.sources.map(id => state.layout.nodesById.get(id)?.name || id).join(' + ');
-      const targets = e.targets.map(id => state.layout.nodesById.get(id)?.name || id).join(' + ');
+    if (steps.length > 100) html += '<li>Showing the first 100 steps; use pages to explore the pathway.</li>';
+    steps.slice(0, 100).forEach(e => {
+      const sources = e.sources.map(id => state.index.nodesById.get(id)?.name || id).join(' + ');
+      const targets = e.targets.map(id => state.index.nodesById.get(id)?.name || id).join(' + ');
       const rules = e.rules.length ? e.rules.join(', ') : '(unnamed rule)';
       html += `<li>${escapeHtml(sources)} &rarr; ${escapeHtml(targets)}<br><em>${escapeHtml(rules)}</em></li>`;
     });

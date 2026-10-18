@@ -25,7 +25,9 @@ progress.json, out/, and report/. Follow a run with:
   tail -f runs/<run-id>/logs/pipeline.log
 
 Environment: RUNS_DIR (output root), IMAGE (Docker image), MIN_FREE_GIB
-(default: 6; smoke: 1), HEARTBEAT_SECONDS (default: 30).
+(default: 6; smoke: 1), HEARTBEAT_SECONDS (default: 30),
+PDF_REPORT_MAX_VERTICES (default: 5000), PDF_REPORT_MAX_EDGES (default: 10000)
+and FORCE_PDF_REPORT=1 (explicitly permits an oversized PDF layout).
 EOF
 }
 
@@ -199,6 +201,13 @@ docker_args=(
   --env "PIPELINE_PROGRESS_FILE=/run/progress.json"
   --env "PYTHONPATH=/workspace"
   --env "PYTHONUNBUFFERED=1"
+  # Docker runs with the host UID, whose configured container HOME may not be
+  # writable. A writable cache prevents repeated Fontconfig diagnostics.
+  --env "HOME=/tmp"
+  --env "XDG_CACHE_HOME=/tmp/.cache"
+  --env "PDF_REPORT_MAX_VERTICES=${PDF_REPORT_MAX_VERTICES:-5000}"
+  --env "PDF_REPORT_MAX_EDGES=${PDF_REPORT_MAX_EDGES:-10000}"
+  --env "FORCE_PDF_REPORT=${FORCE_PDF_REPORT:-0}"
 )
 if [[ -n "$SIMULATION_ITERATIONS" ]]; then
   docker_args+=(--env "SIMULATION_ITERATIONS=$SIMULATION_ITERATIONS")

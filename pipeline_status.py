@@ -91,6 +91,9 @@ def finish(args):
 
 
 def preflight(args):
+    from report_policy import pdf_report_limits
+    # Reject typos before spending hours in the native simulation.
+    pdf_report_limits()
     if not shutil.which("docker"):
         raise SystemExit("docker is not available")
     subprocess.run(["docker", "image", "inspect", args.image], check=True, stdout=subprocess.DEVNULL)

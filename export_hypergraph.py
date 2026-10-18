@@ -32,6 +32,7 @@ import json
 import os
 
 import progress_utils
+from hypergraph_levels import derivation_levels
 
 OUT_DIR = "out"
 os.makedirs(OUT_DIR, exist_ok=True)
@@ -143,42 +144,21 @@ def print_graph(g):
     return base
 
 
-# Compute shortest-path level (iteration) from initial compounds (roots)
-incoming_edges = {v.id: [] for v in dg.vertices}
-for e in dg.edges:
-    for tgt in e.targets:
-        incoming_edges[tgt.id].append(e)
-
 # Identify roots: starting educts (GPP, FPP, H2O) or nodes with no incoming edges
 educt_names = {m.name for m in eductMols} if 'eductMols' in globals() else {"GPP", "FPP", "H2O"}
 roots = [v for v in dg.vertices if v.graph.name in educt_names]
 if not roots:
-    roots = [v for v in dg.vertices if not incoming_edges[v.id]]
+    targets_with_incoming = {t.id for e in dg.edges for t in e.targets}
+    roots = [v for v in dg.vertices if v.id not in targets_with_incoming]
 
-vertex_iterations = {v.id: None for v in dg.vertices}
-for r in roots:
-    if r.graph.name.upper() in ("H2O", "WATER"):
-        vertex_iterations[r.id] = 1  # H2O is placed at the second level (iteration 1)
-    else:
-        vertex_iterations[r.id] = 0
-
-# BFS-style level propagation
-changed = True
-while changed:
-    changed = False
-    for e in dg.edges:
-        # Filter out H2O from source nodes when propagating levels to avoid advancing other products
-        sources_to_propagate = [src for src in e.sources if src.graph.name.upper() not in ("H2O", "WATER")]
-        if not sources_to_propagate:
-            sources_to_propagate = e.sources
-
-        if sources_to_propagate and all(vertex_iterations[src.id] is not None for src in sources_to_propagate):
-            src_levels = [vertex_iterations[src.id] for src in sources_to_propagate]
-            level = max(src_levels) + 1
-            for tgt in e.targets:
-                if vertex_iterations[tgt.id] is None or level < vertex_iterations[tgt.id]:
-                    vertex_iterations[tgt.id] = level
-                    changed = True
+root_levels = {v.id: 1 if v.graph.name.upper() in ("H2O", "WATER") else 0 for v in roots}
+with progress_utils.phase("Computing derivation levels"):
+    vertex_iterations = derivation_levels(
+        (v.id for v in dg.vertices),
+        (([s.id for s in e.sources], [t.id for t in e.targets]) for e in dg.edges),
+        root_levels,
+        (v.id for v in dg.vertices if v.graph.name.upper() in ("H2O", "WATER")),
+    )
 
 # Default any unreachable node to iteration 0
 for v in dg.vertices:
@@ -224,6 +204,7 @@ for e in progress_utils.progress_iter(dg.edges, desc="Phase 3/4: Exporting react
 hypergraph = {
     "meta": {
         "title": "Plant Terpenes Biosynthesis - Derivation Hypergraph",
+        "rootIds": [f"v{v.id}" for v in roots],
     },
     "nodes": nodes,
     "hyperedges": hyperedges,
