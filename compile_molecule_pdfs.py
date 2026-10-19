@@ -59,6 +59,36 @@ def _run_make(makefile, threads, target="all"):
     subprocess.run([make, "-s", "-j", str(threads), "-f", str(makefile), target], check=True)
 
 
+def _ensure_post_makefiles(out_dir):
+    """Generate MØD's per-target rules without invoking its giant recipe.
+
+    ``mod`` removes everything below ``out/`` at startup, so the
+    ``disableInvokeMake`` marker must be created after the simulation has
+    finished.  The pipeline runs MØD with ``--nopost`` and reaches this helper
+    in a separate container invocation for exactly that reason.
+    """
+    makefile_impl = Path("summary") / "MakefileImpl"
+    if makefile_impl.is_file():
+        return makefile_impl
+
+    post_script = out_dir / "post.sh"
+    if not post_script.is_file():
+        return makefile_impl
+
+    marker = out_dir / "disableInvokeMake"
+    marker.touch()
+    mod_post = shutil.which("mod_post")
+    if mod_post is None:
+        raise RuntimeError(
+            "MØD post script exists but mod_post is unavailable; "
+            "cannot generate molecule PDF rules"
+        )
+    subprocess.run([mod_post], check=True)
+    if not makefile_impl.is_file():
+        raise RuntimeError("mod_post did not generate summary/MakefileImpl")
+    return makefile_impl
+
+
 def _recipe_line_count(makefile):
     """Count tab-prefixed recipe lines without parsing the Makefile."""
     try:
@@ -79,7 +109,7 @@ def main():
     targets = [str(out_dir / (image[:-4] + ".pdf")) for image in expected]
     missing = [target for target in targets if not Path(target).is_file() or Path(target).stat().st_size == 0]
 
-    makefile_impl = Path("summary") / "MakefileImpl"
+    makefile_impl = _ensure_post_makefiles(out_dir)
     if missing:
         if not makefile_impl.is_file():
             raise RuntimeError(f"Missing {len(missing)} molecule PDFs and {makefile_impl} was not generated")

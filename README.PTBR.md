@@ -302,11 +302,12 @@ parciais de uma conversão interrompida são regeneradas; imagens válidas já
 existentes podem ser reaproveitadas. O cache do Fontconfig fica em um diretório
 gravável do contêiner, inclusive quando este roda com o UID do host.
 
-Em execuções grandes, o pipeline cria `out/disableInvokeMake` antes de iniciar
-o MØD. Isso preserva as regras individuais das representações, mas impede que
-a receita única de `summary/all.tex` ultrapasse o limite de 65.535 linhas do
-GNU make. A etapa `compile-depictions` solicita então somente os alvos PDF das
-moléculas por meio de `compile_molecule_pdfs.py`; o PDF monolítico de resumo é
+Em execuções grandes, o pipeline inicia o MØD com `--nopost`, pois o MØD limpa
+`out/` ao iniciar. A etapa `compile-depictions` cria então
+`out/disableInvokeMake`, executa `mod_post` para gerar as regras individuais e
+solicita somente os alvos PDF das moléculas por meio de
+`compile_molecule_pdfs.py`. Assim, a receita única de `summary/all.tex` não
+ultrapassa o limite de 65.535 linhas do GNU make; o PDF monolítico de resumo é
 gerado apenas quando os limites configurados do grafo permitem.
 
 #### Testes de regressão

@@ -110,6 +110,29 @@ class ConversionIntegrityTests(unittest.TestCase):
 
 
 class MoleculePdfMakefileTests(unittest.TestCase):
+    def test_post_makefiles_create_marker_before_mod_post(self):
+        with tempfile.TemporaryDirectory() as directory:
+            root = Path(directory)
+            out = root / "out"
+            out.mkdir()
+            (out / "post.sh").write_text("summarySection test\n")
+            previous = os.getcwd()
+            os.chdir(root)
+
+            def fake_mod_post(command, **kwargs):
+                self.assertEqual(command, ["mod_post"])
+                self.assertTrue((out / "disableInvokeMake").is_file())
+                summary = root / "summary"
+                summary.mkdir()
+                (summary / "MakefileImpl").write_text("")
+
+            try:
+                with mock.patch.object(compile_molecule_pdfs.shutil, "which", return_value="mod_post"), \
+                     mock.patch.object(compile_molecule_pdfs.subprocess, "run", side_effect=fake_mod_post):
+                    self.assertTrue(compile_molecule_pdfs._ensure_post_makefiles(out).is_file())
+            finally:
+                os.chdir(previous)
+
     def test_helper_compiles_only_requested_targets_from_impl(self):
         with tempfile.TemporaryDirectory() as directory:
             root = Path(directory)

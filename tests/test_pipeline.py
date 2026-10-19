@@ -224,6 +224,8 @@ class PipelineExecutionTests(unittest.TestCase):
         self.assertFalse((self.run_dir / "out" / "unreferenced.svg").exists())
         calls = [json.loads(line) for line in self.calls.read_text().splitlines()]
         self.assertEqual(len(calls), 3)
+        self.assertIn("--nopost", calls[0]["args"])
+        self.assertNotIn("--nopost", calls[1]["args"])
         for call in calls:
             self.assertEqual(call["mounts"]["/run"], str(self.run_dir.resolve()))
             self.assertEqual(call["workdir"], "/run")

@@ -192,13 +192,12 @@ fi
 run_stage preflight python3 "$PROJECT_ROOT/pipeline_status.py" preflight \
   --image "$IMAGE" --run-dir "$RUN_DIR" --min-free-gib "$MIN_FREE_GIB"
 
-# MØD's automatic post command builds summary/all.tex with one shell recipe
-# line per depiction. GNU make refuses that recipe above 65,535 lines. Keep
-# the generated per-target rules, but compile them in a bounded makefile after
-# the container exits (compile_molecule_pdfs.py).
+# MØD clears out/ when it starts, so a disableInvokeMake marker created before
+# the simulation would be deleted. Run MØD with --nopost and let
+# compile_molecule_pdfs.py create the marker immediately before invoking
+# mod_post, after MØD has finished clearing out/.
 mkdir -p "$RUN_DIR/out"
-: > "$RUN_DIR/out/disableInvokeMake"
-log "Disabled MØD automatic summary make; molecule PDFs will use bounded compilation."
+log "MØD post-processing deferred; molecule PDFs will use bounded compilation."
 
 docker_args=(
   run --rm --user "$(id -u):$(id -g)"
@@ -225,6 +224,7 @@ fi
 
 run_stage simulation \
   docker "${docker_args[@]}" "$IMAGE" \
+  --nopost \
   -f /workspace/molecules.py \
   -f "/workspace/$SIMULATION_SCRIPT" \
   -f /workspace/export_hypergraph.py \
