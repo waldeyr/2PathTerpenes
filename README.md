@@ -300,6 +300,13 @@ Partial images left by interrupted conversions are regenerated; valid existing
 images can be reused. Fontconfig uses a writable container cache, including
 when Docker runs with the host UID.
 
+For large runs, the pipeline places `out/disableInvokeMake` before starting
+MØD. This preserves MØD's per-depiction rules but prevents its single
+`summary/all.tex` recipe from exceeding GNU make's 65,535-line limit. The
+`compile-depictions` stage then requests only the molecule PDF targets through
+`compile_molecule_pdfs.py`; the monolithic summary PDF is built only when the
+configured graph limits allow it.
+
 #### Regression tests
 
 ```bash

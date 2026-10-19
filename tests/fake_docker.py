@@ -75,7 +75,7 @@ def main():
         return subprocess.call([sys.executable, script] + args[1:], cwd=run_dir, env=environment)
 
     out = run_dir / "out"
-    out.mkdir()
+    out.mkdir(exist_ok=True)
     graph = {
         "meta": {"title": "Fixture graph"},
         "nodes": [{"id": "v0", "name": "A", "image": "001_g_0.svg"},

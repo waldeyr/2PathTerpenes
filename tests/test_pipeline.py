@@ -174,7 +174,8 @@ class PipelineExecutionTests(unittest.TestCase):
         self.project = self.base / "project"
         self.project.mkdir()
         for name in ("run-pipeline.sh", "pipeline_stage.py", "pipeline_status.py", "progress_utils.py",
-                     "validate_pipeline.py", "convert_hypergraph_svgs.py", "organize_hypergraph_assets.py",
+                     "validate_pipeline.py", "convert_hypergraph_svgs.py", "compile_molecule_pdfs.py",
+                     "organize_hypergraph_assets.py",
                      "simulation.py", "simulation-full.py", "report_policy.py", "lmodern.sty"):
             shutil.copy2(ROOT / name, self.project / name)
         for name in ("docs", "rules", "report_template"):
@@ -222,7 +223,7 @@ class PipelineExecutionTests(unittest.TestCase):
         self.assertEqual(len(list((self.run_dir / "report" / "img" / "molecules").glob("*.svg"))), 2)
         self.assertFalse((self.run_dir / "out" / "unreferenced.svg").exists())
         calls = [json.loads(line) for line in self.calls.read_text().splitlines()]
-        self.assertEqual(len(calls), 2)
+        self.assertEqual(len(calls), 3)
         for call in calls:
             self.assertEqual(call["mounts"]["/run"], str(self.run_dir.resolve()))
             self.assertEqual(call["workdir"], "/run")
@@ -230,6 +231,7 @@ class PipelineExecutionTests(unittest.TestCase):
             self.assertEqual(call["env"]["XDG_CACHE_HOME"], "/tmp/.cache")
             self.assertEqual(call["env"]["PDF_REPORT_MAX_VERTICES"], "5000")
             self.assertEqual(call["env"]["PDF_REPORT_MAX_EDGES"], "10000")
+            self.assertEqual(call["env"]["MOD_NUM_POST_THREADS"], "2")
         validate_report(self.run_dir / "report", json.loads((self.run_dir / "out" / "hypergraph.json").read_text()))
 
     def test_relative_runs_directory_from_another_working_directory(self):

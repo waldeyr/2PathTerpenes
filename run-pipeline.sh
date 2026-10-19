@@ -27,7 +27,8 @@ progress.json, out/, and report/. Follow a run with:
 Environment: RUNS_DIR (output root), IMAGE (Docker image), MIN_FREE_GIB
 (default: 6; smoke: 1), HEARTBEAT_SECONDS (default: 30),
 PDF_REPORT_MAX_VERTICES (default: 5000), PDF_REPORT_MAX_EDGES (default: 10000)
-and FORCE_PDF_REPORT=1 (explicitly permits an oversized PDF layout).
+and FORCE_PDF_REPORT=1 (explicitly permits an oversized PDF layout),
+MOD_NUM_POST_THREADS (default: 2, controls molecule PDF compilation).
 EOF
 }
 
@@ -191,6 +192,14 @@ fi
 run_stage preflight python3 "$PROJECT_ROOT/pipeline_status.py" preflight \
   --image "$IMAGE" --run-dir "$RUN_DIR" --min-free-gib "$MIN_FREE_GIB"
 
+# MØD's automatic post command builds summary/all.tex with one shell recipe
+# line per depiction. GNU make refuses that recipe above 65,535 lines. Keep
+# the generated per-target rules, but compile them in a bounded makefile after
+# the container exits (compile_molecule_pdfs.py).
+mkdir -p "$RUN_DIR/out"
+: > "$RUN_DIR/out/disableInvokeMake"
+log "Disabled MØD automatic summary make; molecule PDFs will use bounded compilation."
+
 docker_args=(
   run --rm --user "$(id -u):$(id -g)"
   --volume "$PROJECT_ROOT:/workspace:ro"
@@ -208,6 +217,7 @@ docker_args=(
   --env "PDF_REPORT_MAX_VERTICES=${PDF_REPORT_MAX_VERTICES:-5000}"
   --env "PDF_REPORT_MAX_EDGES=${PDF_REPORT_MAX_EDGES:-10000}"
   --env "FORCE_PDF_REPORT=${FORCE_PDF_REPORT:-0}"
+  --env "MOD_NUM_POST_THREADS=${MOD_NUM_POST_THREADS:-2}"
 )
 if [[ -n "$SIMULATION_ITERATIONS" ]]; then
   docker_args+=(--env "SIMULATION_ITERATIONS=$SIMULATION_ITERATIONS")
@@ -222,6 +232,10 @@ run_stage simulation \
 
 run_stage validate-simulation \
   python3 "$PROJECT_ROOT/validate_pipeline.py" --run-dir "$RUN_DIR" --stage simulation
+
+run_stage compile-depictions \
+  docker "${docker_args[@]}" --entrypoint python "$IMAGE" \
+  /workspace/compile_molecule_pdfs.py --out-dir out
 
 run_stage svg-conversion \
   docker "${docker_args[@]}" --entrypoint python "$IMAGE" \

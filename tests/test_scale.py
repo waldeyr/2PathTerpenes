@@ -1,6 +1,7 @@
 """Scale and integrity regressions independent of a Docker/MØD installation."""
 
 import contextlib
+import compile_molecule_pdfs
 import io
 import json
 import os
@@ -106,6 +107,77 @@ class ConversionIntegrityTests(unittest.TestCase):
                     converter.main()
                     run.assert_not_called()
             self.assertEqual(list(out.glob('.svg-*')), [])
+
+
+class MoleculePdfMakefileTests(unittest.TestCase):
+    def test_helper_compiles_only_requested_targets_from_impl(self):
+        with tempfile.TemporaryDirectory() as directory:
+            root = Path(directory)
+            out = root / "out"
+            summary = root / "summary"
+            out.mkdir()
+            summary.mkdir()
+            graph = {
+                "meta": {},
+                "nodes": [{"id": "v0", "image": "001.svg"}],
+                "hyperedges": [{"id": "e0", "sources": ["v0"], "targets": ["v0"]}],
+            }
+            (out / "hypergraph.json").write_text(json.dumps(graph))
+            (out / "001.tex").write_text("tex")
+            (summary / "MakefileImpl").write_text(
+                "out/001.pdf: out/001.tex\n\tprintf pdf > $@\n"
+            )
+            previous = os.getcwd()
+            previous_argv = sys.argv
+            os.chdir(root)
+            sys.argv = ["compile_molecule_pdfs.py", "--out-dir", "out"]
+            try:
+                compile_molecule_pdfs.main()
+            finally:
+                sys.argv = previous_argv
+                os.chdir(previous)
+            self.assertEqual((out / "001.pdf").read_bytes(), b"pdf")
+
+    def test_bounded_makefile_has_no_monolithic_recipe(self):
+        with tempfile.TemporaryDirectory() as directory:
+            path = Path(directory) / "compile.mk"
+            targets = [f"out/{index:05d}.pdf" for index in range(70_000)]
+            compile_molecule_pdfs._write_makefile(path, targets)
+            text = path.read_text()
+            self.assertIn("include summary/MakefileImpl", text)
+            self.assertNotIn("\n\t", text)
+            self.assertLessEqual(max(map(len, text.splitlines())), 8_000)
+
+    def test_large_graph_with_existing_pdfs_skips_summary(self):
+        with tempfile.TemporaryDirectory() as directory:
+            root = Path(directory)
+            out = root / "out"
+            out.mkdir()
+            graph = {
+                "meta": {},
+                "nodes": [{"id": "v0", "image": "001.svg"},
+                          {"id": "v1", "image": "002.svg"}],
+                "hyperedges": [{"id": "e0", "sources": ["v0"], "targets": ["v1"]}],
+            }
+            (out / "hypergraph.json").write_text(json.dumps(graph))
+            (out / "001.pdf").write_bytes(b"pdf")
+            (out / "002.pdf").write_bytes(b"pdf")
+            with contextlib.redirect_stdout(io.StringIO()) as output:
+                previous = os.getcwd()
+                previous_argv = sys.argv
+                previous_env = os.environ.copy()
+                os.chdir(root)
+                sys.argv = ["compile_molecule_pdfs.py", "--out-dir", "out"]
+                os.environ["PDF_REPORT_MAX_VERTICES"] = "1"
+                try:
+                    compile_molecule_pdfs.main()
+                finally:
+                    os.environ.clear()
+                    os.environ.update(previous_env)
+                    sys.argv = previous_argv
+                    os.chdir(previous)
+            self.assertIn("Molecule PDF", output.getvalue())
+            self.assertIn("skipped for large graph", output.getvalue())
 
 
 if __name__ == '__main__':
